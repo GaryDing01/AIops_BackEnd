@@ -1,76 +1,37 @@
 package com.aiops_web.std;
 
-import org.springframework.http.HttpStatus;
+import lombok.Data;
 
-public class ResponseStd {
+import java.io.Serializable;
 
-    /**
-     * 成功
-     *
-     * @param data
-     * @param <T>
-     * @return
-     */
-    public static <T> BaseResponse<T> success(T data) {
-        return new BaseResponse<>(ErrorCode.SUCCESS.getCode(), data, "连接正常");
+@Data
+public class ResponseStd<T> implements Serializable {
+
+    private T data;
+    private int code;
+    private String message;
+    private String description;
+
+    public ResponseStd(T data, int code, String message, String description) {
+        this.data = data;
+        this.code = code;
+        this.message = message;
+        this.description = description;
     }
 
-    public static <T> BaseResponse<T> success(String message) {
-        return new BaseResponse<>(ErrorCode.SUCCESS.getCode(), null, message);
+    public ResponseStd(T data, int code, String message) {
+        this(data, code, message, "");
     }
 
-    /**
-     * 失败
-     *
-     * @param errorCode
-     * @return
-     */
-    public static BaseResponse error(ErrorCode errorCode) {
-        return new BaseResponse<>(errorCode);
+    public ResponseStd( T data, int code) {
+        this(data, code, "", "");
     }
 
-    /**
-     * 失败
-     *
-     * @param code
-     * @param message
-     * @param description
-     * @return
-     */
-    public static BaseResponse error(int code, String message, String description) {
-        return new BaseResponse(code, null, message, description);
+    public ResponseStd( T data) {
+        this(data, ErrorCode.SUCCESS.getCode(), "", "");
     }
 
-    /**
-     * 失败
-     *
-     * @param errorCode
-     * @return
-     */
-    public static BaseResponse error(ErrorCode errorCode, String message, String description) {
-        return new BaseResponse(errorCode.getCode(), null, message, description);
-    }
-
-    /**
-     * 失败
-     *
-     * @param errorCode
-     * @return
-     */
-    public static BaseResponse error(ErrorCode errorCode, String description) {
-        return new BaseResponse(errorCode.getCode(), errorCode.getMessage(), description);
-    }
-    public static BaseResponse error(String message) {
-        return new BaseResponse(ErrorCode.FAIL.getCode(),message);
-    }
-    /**
-     * 失败
-     *
-     * @param errorCode
-     * @return
-     */
-    public static BaseResponse error(HttpStatus errorCode, String description) {
-        return new BaseResponse(errorCode.value(), errorCode.getReasonPhrase(), description);
+    public ResponseStd(ErrorCode errorCode) {
+        this(null, errorCode.getCode(), errorCode.getMessage(), errorCode.getDescription());
     }
 }
-
