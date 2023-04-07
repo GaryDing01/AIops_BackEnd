@@ -1,0 +1,19 @@
+server:
+  port: 8080
+  tomcat:
+    uri-encoding: UTF-8
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/sql_hr?useUnicode=true&&characterEncoding=UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: Learner_1
+    password: Learner_1
+
+mybatis-plus:  # if mybatis, change this
+  mapper-locations: classpath:/mapping/*.xml
+  type-aliases-package: com.aiops_web.entity
+  # Only for mybatis-plus
+  configuration:
+    map-underscore-to-camel-case: false
