@@ -5,14 +5,46 @@ server:
 
 spring:
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://localhost:3306/sql_hr?useUnicode=true&&characterEncoding=UTF-8
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: Learner_1
-    password: Learner_1
+    druid:
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      filters: stat,wall,slf4j
+      maxPoolPreparedStatementPerConnectionSize: 20
+      useGlobalDataSourceStat: true
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+    dynamic:
+      datasource:
+        # MySQL
+        master:
+          url: jdbc:mysql://localhost:3306/sql_hr?useUnicode=true&&characterEncoding=UTF-8
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: Learner_1
+          password: Learner_1
+        # Neo4j
+        neo4j:
+          url: jdbc:neo4j:bolt://localhost:7687
+          driver-class-name: org.neo4j.jdbc.Driver
+          username: neo4j
+          password: neo4j
+          # Encounter Error but Okay
+          druid:
+            test-while-idle: true
+            validation-query: MATCH(n) RETURN n
+  neo4j:
+    url: bolt://localhost:7687
+    authentication:
+      username: neo4j
+      password: neo4j
 
 mybatis-plus:  # if mybatis, change this
-  mapper-locations: classpath:/mapping/*.xml
+  mapper-locations: classpath:/mapping/**/*.xml
   type-aliases-package: com.aiops_web.entity
   # Only for mybatis-plus
   configuration:

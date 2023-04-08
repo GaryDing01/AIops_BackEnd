@@ -1,4 +1,4 @@
-package com.aiops_web.entity;
+package com.aiops_web.entity.sql;
 
 import lombok.Data;
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aiops_web.dao.neo4j.PodMapper">
+    <select id="findAll" resultType="com.aiops_web.entity.neo4j.Pod">
+        match (n:Pod) return id(n) as id, n.name as name
+    </select>
+</mapper>

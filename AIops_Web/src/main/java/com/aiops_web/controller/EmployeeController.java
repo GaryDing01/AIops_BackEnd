@@ -1,9 +1,8 @@
 package com.aiops_web.controller;
 
-import co.elastic.clients.elasticsearch.xpack.usage.Base;
-import com.aiops_web.entity.Employee;
-import com.aiops_web.dao.EmployeeMapper;
-import com.aiops_web.std.BaseResponse;
+import com.aiops_web.entity.sql.Employee;
+import com.aiops_web.dao.sql.EmployeeMapper;
+import com.aiops_web.service.sql.ManageEmployeeService;
 import com.aiops_web.std.ResponseStd;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,30 +13,30 @@ import java.util.List;
 @RequestMapping("/employee")
 public class EmployeeController {
     @Autowired
-    private EmployeeMapper employeeMapper;
+    private ManageEmployeeService manageEmployeeService;
 
-    @PostMapping("/save")
-    public BaseResponse<Integer> save(@RequestBody Employee employee) {
-        return ResponseStd.success(employeeMapper.save(employee));
-    }
-
-    @DeleteMapping("/deleteByID")
-    public BaseResponse<Integer> deleteByID(@RequestBody Integer id){
-        return ResponseStd.success(employeeMapper.deleteByID(id));
-    }
-
-    @PutMapping("/update")
-    public BaseResponse<Integer> update(@RequestBody Employee employee){
-        return ResponseStd.success(employeeMapper.update(employee));
-    }
-
-    @GetMapping("/findByID/{id}")
-    public BaseResponse<Employee> findByID(@PathVariable("id") Integer id) {
-        return ResponseStd.success(employeeMapper.findByID(id));
-    }
+//    @PostMapping("/save")
+//    public ResponseStd<Integer> save(@RequestBody Employee employee) {
+//        return new ResponseStd(employeeMapper.save(employee));
+//    }
+//
+//    @DeleteMapping("/deleteByID")
+//    public ResponseStd<Integer> deleteByID(@RequestBody Integer id){
+//        return new ResponseStd(employeeMapper.deleteByID(id));
+//    }
+//
+//    @PutMapping("/update")
+//    public ResponseStd<Integer> update(@RequestBody Employee employee){
+//        return new ResponseStd(employeeMapper.update(employee));
+//    }
+//
+//    @GetMapping("/findByID/{id}")
+//    public ResponseStd<Employee> findByID(@PathVariable("id") Integer id) {
+//        return new ResponseStd(employeeMapper.findByID(id));
+//    }
 
     @GetMapping("/findAll")
-    public BaseResponse<List<Employee>> findAll() {
-        return ResponseStd.success(employeeMapper.findAll());
+    public ResponseStd<List<Employee>> findAll() {
+        return new ResponseStd(manageEmployeeService.findAllEmployee());
     }
 }

@@ -3,8 +3,8 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.aiops_web.dao.EmployeeMapper">
-    <insert id="save" parameterType="com.aiops_web.entity.Employee">
+<mapper namespace="com.aiops_web.dao.sql.EmployeeMapper">
+    <insert id="save" parameterType="com.aiops_web.entity.sql.Employee">
         insert into employees(employee_id, first_name, last_name, job_title, salary, reports_to, office_id) values(#{employee_id}, #{first_name}, #{last_name}, #{job_title}, #{salary}, #{reports_to}, #{office_id})
     </insert>
     
@@ -12,15 +12,15 @@
         delete from employees where employee_id = #{employee_id}
     </delete>
 
-    <update id="update" parameterType="com.aiops_web.entity.Employee">
+    <update id="update" parameterType="com.aiops_web.entity.sql.Employee">
         update employees set salary = #{salary} where employee_id = #{employee_id}
     </update>
 
-    <select id="findByID" parameterType="java.lang.Integer" resultType="com.aiops_web.entity.Employee">
+    <select id="findByID" parameterType="java.lang.Integer" resultType="com.aiops_web.entity.sql.Employee">
         select * from employees where employee_id = #{employee_id}
     </select>
 
-    <select id="findAll" resultType="com.aiops_web.entity.Employee">
+    <select id="findAll" resultType="com.aiops_web.entity.sql.Employee">
         select * from employees
     </select>
 </mapper>
