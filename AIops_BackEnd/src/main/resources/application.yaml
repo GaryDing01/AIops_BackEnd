@@ -23,10 +23,10 @@ spring:
       datasource:
         # MySQL
         master:
-          url: jdbc:mysql://localhost:3306/sql_hr?useUnicode=true&&characterEncoding=UTF-8
+          url: jdbc:mysql://localhost:3306/aiops_db?useUnicode=true&&characterEncoding=UTF-8
           driver-class-name: com.mysql.cj.jdbc.Driver
-          username: Learner_1
-          password: Learner_1
+          username: AIops_Admin
+          password: AIops_Admin
         # Neo4j
         neo4j:
           url: jdbc:neo4j:bolt://localhost:7687
@@ -47,5 +47,5 @@ mybatis-plus:  # if mybatis, change this
   mapper-locations: classpath:/mapping/**/*.xml
   type-aliases-package: com.aiops_web.entity
   # Only for mybatis-plus
-  configuration:
-    map-underscore-to-camel-case: false
+#  configuration:
+#    map-underscore-to-camel-case: false
