@@ -30,10 +30,10 @@ public class EmployeeController {
 //        return new ResponseStd(employeeMapper.update(employee));
 //    }
 //
-//    @GetMapping("/findByID/{id}")
-//    public ResponseStd<Employee> findByID(@PathVariable("id") Integer id) {
-//        return new ResponseStd(employeeMapper.findByID(id));
-//    }
+    @GetMapping("/findByID/{id}")
+    public ResponseStd<Employee> findByID(@PathVariable("id") Integer id) {
+        return new ResponseStd(manageEmployeeService.findEmployeeByID(id));
+    }
 
     @GetMapping("/findAll")
     public ResponseStd<List<Employee>> findAll() {
