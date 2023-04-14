@@ -38,7 +38,7 @@ spring:
             test-while-idle: true
             validation-query: MATCH(n) RETURN n
   neo4j:
-    url: bolt://localhost:7687
+    url: bolt://localhost:7687/apifox
     authentication:
       username: neo4j
       password: neo4j123
