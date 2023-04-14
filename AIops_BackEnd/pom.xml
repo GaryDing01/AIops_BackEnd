@@ -50,21 +50,42 @@
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-jdbc-driver</artifactId>
+            <version>4.0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>4.4.19</version>
+            <!--            <version>3.3.4</version>-->
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-ogm-embedded-driver</artifactId>
+            <version>3.2.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-ogm-bolt-driver</artifactId>
-            <version>2.1.1</version>
+            <version>3.2.0</version>
         </dependency>
-
-        <!--&lt;!&ndash; Mybatis &ndash;&gt;-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.mybatis.spring.boot</groupId>-->
-        <!--            <artifactId>mybatis-spring-boot-starter</artifactId>-->
-        <!--            <version>3.0.0</version>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-ogm-core</artifactId>
+            <version>3.2.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-neo4j</artifactId>
+            <version>6.3.10</version>
+        </dependency>
+        <!--        &lt;!&ndash; Mybatis &ndash;&gt;-->
+        <!--                <dependency>-->
+        <!--                    <groupId>org.mybatis.spring.boot</groupId>-->
+        <!--                    <artifactId>mybatis-spring-boot-starter</artifactId>-->
+        <!--                    <version>3.0.0</version>-->
+        <!--                </dependency>-->
 
         <!-- Mybatis Plus-->
         <dependency>
@@ -97,6 +118,13 @@
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>1.1.21</version>
+        </dependency>
+
+        <!-- Dynamic DataSource -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+<!--            <version>3.5.2</version>-->
         </dependency>
 
     </dependencies>
