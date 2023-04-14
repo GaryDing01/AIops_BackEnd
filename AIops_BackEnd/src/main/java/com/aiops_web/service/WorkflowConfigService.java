@@ -12,5 +12,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2023-04-12
  */
 public interface WorkflowConfigService extends IService<WorkflowConfig> {
-
+    // 新增流程
+    Integer saveWorkflows(Integer userId, String name);
 }
