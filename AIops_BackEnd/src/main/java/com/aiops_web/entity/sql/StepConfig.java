@@ -1,11 +1,13 @@
 package com.aiops_web.entity.sql;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.Map;
+
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,23 +21,23 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value="StepConfig对象", description="")
 public class StepConfig implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "step_id", type = IdType.AUTO)
+    @TableId(value = "step_id", type = IdType.AUTO)
     private Integer stepId;
 
     private Integer typeId;
 
     private Integer stepNum;
 
-    private String param;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, Object> param;
 
     private Integer algId;
 
-    private String wfId;
+    private Integer wfId;
 
 
 }
