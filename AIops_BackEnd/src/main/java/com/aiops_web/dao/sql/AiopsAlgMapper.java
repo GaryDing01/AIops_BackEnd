@@ -13,4 +13,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface AiopsAlgMapper extends BaseMapper<AiopsAlg> {
 
+    AiopsAlg getAlgById(int algId);
+
+    int deleteAlgById(int algId);
+
+    int createAlg(AiopsAlg alg);
+
+    int updateAlg(AiopsAlg alg);
+
+
 }

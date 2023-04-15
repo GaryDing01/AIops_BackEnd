@@ -2,4 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiops_web.dao.sql.AiopsAlgMapper">
 
+    <select id="getAlgById" resultType="AiopsAlg">
+        select * from aiops_alg where alg_id = #{algId};
+    </select>
+
+    <delete id="deleteAlgById">
+        delete from aiops_alg where alg_id = #{algId};
+    </delete>
+
+    <insert id="createAlg">
+
+    </insert>
+
+    <update id="updateAlg" >
+
+    </update>
+
+
 </mapper>

@@ -1,5 +1,6 @@
 package com.aiops_web.service;
 
+import com.aiops_web.controller.AiopsAlgController;
 import com.aiops_web.entity.sql.AiopsAlg;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface AiopsAlgService extends IService<AiopsAlg> {
 
+    AiopsAlg getAlgById(int algId);
+
+    boolean deleteAlgById(int algId);
+
+    boolean updateAlg(String param);
+
+    boolean createAlg(String param);
 }
