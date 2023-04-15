@@ -23,10 +23,10 @@ spring:
       datasource:
         # MySQL
         master:
-          url: jdbc:mysql://localhost:3306/aiops_db?useUnicode=true&&characterEncoding=UTF-8
+          url: jdbc:mysql://124.220.67.187:3306/aiops_db?useUnicode=true&&characterEncoding=UTF-8
           driver-class-name: com.mysql.cj.jdbc.Driver
-          username: AIops_Admin
-          password: AIops_Admin
+          username: yuran
+          password: YuRan2022
         # Neo4j
         neo4j:
           url: jdbc:neo4j:bolt://localhost:7687
