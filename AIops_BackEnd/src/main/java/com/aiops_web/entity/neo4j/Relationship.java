@@ -4,17 +4,20 @@ import lombok.Builder;
 import lombok.Data;
 import org.neo4j.ogm.annotation.*;
 
-@RelationshipEntity(type = "contains")
+@RelationshipEntity(type = "relationship")
 @Data
 @Builder
-public class Container {
+public class Relationship {
     @Id
     @GeneratedValue
     private Long id;
 
     @StartNode
-    private System parent;
+    private Node startNode;
 
     @EndNode
-    private Pod child;
+    private Node endNode;
+
+    @Property(name = "type")
+    private String type;
 }
