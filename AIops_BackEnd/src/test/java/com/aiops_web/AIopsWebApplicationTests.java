@@ -1,13 +1,22 @@
 package com.aiops_web;
 
+import com.aiops_web.service.AiopsAlgService;
+import com.aiops_web.service.impl.AiopsAlgServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class AIopsWebApplicationTests {
 
+    @Autowired
+    AiopsAlgServiceImpl aiopsAlgService;
+
     @Test
-    void contextLoads() {
+    void contextLoads() throws JsonProcessingException {
+
+
     }
 
 }

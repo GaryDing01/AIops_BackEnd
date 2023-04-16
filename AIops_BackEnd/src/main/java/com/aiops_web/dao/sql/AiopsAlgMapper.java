@@ -2,6 +2,9 @@ package com.aiops_web.dao.sql;
 
 import com.aiops_web.entity.sql.AiopsAlg;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,9 +16,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface AiopsAlgMapper extends BaseMapper<AiopsAlg> {
 
-    AiopsAlg getAlgById(int algId);
+    List<AiopsAlg> getAlgByUserId(int userId);
 
     int deleteAlgById(int algId);
+
+    int deleteAlgByIds(@Param("ids")List<Integer> ids);
 
     int createAlg(AiopsAlg alg);
 

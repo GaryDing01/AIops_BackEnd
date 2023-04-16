@@ -2,20 +2,47 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiops_web.dao.sql.AiopsAlgMapper">
 
-    <select id="getAlgById" resultType="AiopsAlg">
-        select * from aiops_alg where alg_id = #{algId};
+    <select id="getAlgByUserId" resultType="AiopsAlg">
+        select * from aiops_alg where user_id = #{userId};
     </select>
 
     <delete id="deleteAlgById">
         delete from aiops_alg where alg_id = #{algId};
     </delete>
 
-    <insert id="createAlg">
+    <delete id="deleteAlgByIds">
+        delete
+        from aiops_alg
+        where aiops_alg.alg_id
+        in (
+            <foreach collection="ids" item="id" separator=","> #{id} </foreach>
+            );
+    </delete>
 
+    <!-- 添加 并把自动生成的主码注入到 对象中 -->
+    <insert id="createAlg" useGeneratedKeys="true" keyProperty="algId">
+        insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)
+        values (#{typeId}, #{name}, #{intro}, #{source}, #{updateTstamp}, #{updateNum}, #{userId}, #{param}, #{content});
     </insert>
 
     <update id="updateAlg" >
 
+    </update>
+
+    <update id="updateCourse">
+        update aiops_alg
+        <set>
+            <if test="status != 0">
+                status = #{status},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="desc != null and desc != ''">
+                course.desc = #{desc},
+            </if>
+        </set>
+        where c_id = #{c_id};
     </update>
 
 
