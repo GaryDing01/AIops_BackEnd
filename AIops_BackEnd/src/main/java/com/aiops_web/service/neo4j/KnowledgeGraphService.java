@@ -8,6 +8,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import com.aiops_web.dao.neo4j.Neo4jNodeDao;
 import com.aiops_web.dao.neo4j.Neo4jRelationshipDao;
+import com.aiops_web.dto.Neo4jRelationshipDto;
 import com.aiops_web.entity.neo4j.Node;
 import com.aiops_web.entity.neo4j.Relationship;
 
@@ -43,8 +44,9 @@ public class KnowledgeGraphService {
         return relationships;
     }
 
-    public Relationship getRelationshipById(Long id) {
-        Relationship relationships = neo4jRelationshipDao.findRelationshipById(id);
+    public Neo4jRelationshipDto getRelationshipById(Long id) {
+        Neo4jRelationshipDto relationships = neo4jRelationshipDao.findRelationshipById(id);
+        // Relationship relationships = neo4jRelationshipDao.findById(id).orElse(null);
         return relationships;
     }
 

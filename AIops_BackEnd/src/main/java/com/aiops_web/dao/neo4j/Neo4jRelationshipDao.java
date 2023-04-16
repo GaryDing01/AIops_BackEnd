@@ -1,5 +1,6 @@
 package com.aiops_web.dao.neo4j;
 
+import com.aiops_web.dto.Neo4jRelationshipDto;
 import com.aiops_web.entity.neo4j.Relationship;
 import com.baomidou.dynamic.datasource.annotation.DS;
 
@@ -13,9 +14,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface Neo4jRelationshipDao extends Neo4jRepository<Relationship, Long> {
 
-    @Query("MATCH ()-[r:Relationship]->() RETURN r")
+    @Query("MATCH ()-[r:Relationship]->() RETURN r.id as id, r.type as type ")
     List<Relationship> findAllRelationship();
 
-    @Query("MATCH ()-[r:Relationship]->() WHERE r.id = $id RETURN r")
-    Relationship findRelationshipById(Long id);
+    @Query("MATCH (m:Node)-[r:Relationship]->(n:Node) WHERE r.id = $id RETURN r.id as id, r.type as type, m.id as startId, n.id as endId ")
+    Neo4jRelationshipDto findRelationshipById(Long id);
 }

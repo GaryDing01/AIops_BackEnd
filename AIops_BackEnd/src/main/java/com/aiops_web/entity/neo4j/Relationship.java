@@ -25,4 +25,5 @@ public class Relationship {
 
     @Property(name = "type")
     private String type;
+
 }

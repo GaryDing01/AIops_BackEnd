@@ -41,10 +41,10 @@ spring:
     authentication:
       username: neo4j
       password: neo4j123
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: none
+  # jpa:
+  #   show-sql: true
+  #   hibernate:
+  #     ddl-auto: none
 
 mybatis-plus:  # if mybatis, change this
   mapper-locations: classpath:/mapping/**/*.xml

@@ -1,6 +1,7 @@
 package com.aiops_web.controller;
 
 import com.aiops_web.dao.neo4j.PodMapper;
+import com.aiops_web.dto.Neo4jRelationshipDto;
 import com.aiops_web.entity.neo4j.Node;
 import com.aiops_web.entity.neo4j.Relationship;
 import com.aiops_web.service.neo4j.KnowledgeGraphService;
@@ -69,9 +70,9 @@ public class KnowledgeGraphController {
     }
 
     @RequestMapping(value = "/relationships/{relationshipId}", method = RequestMethod.GET)
-    public ResponseStd<Relationship> getRelationships(
+    public ResponseStd<Neo4jRelationshipDto> getRelationships(
             @PathVariable Long relationshipId) {
-        Relationship relationship = knowledgeGraph.getRelationshipById(relationshipId);
+        Neo4jRelationshipDto relationship = knowledgeGraph.getRelationshipById(relationshipId);
         return new ResponseStd<>(relationship, 200, "success", "成功返回关系!");
     }
 }
