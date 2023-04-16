@@ -13,12 +13,11 @@ import org.neo4j.ogm.annotation.Property;
 
 @NodeEntity(label = "Node")
 @Data
-@Builder
 public class Node {
 
     @Id
     @GeneratedValue
-    private String id;
+    private Long id;
 
     @Property(name = "type")
     private String type;
@@ -30,5 +29,5 @@ public class Node {
     private String content;
 
     @Property(name = "parentId")
-    private String parentId;
+    private Long parentId;
 }

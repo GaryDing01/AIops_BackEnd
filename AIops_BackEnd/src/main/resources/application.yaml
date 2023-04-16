@@ -2,7 +2,6 @@ server:
   port: 8080
   tomcat:
     uri-encoding: UTF-8
-
 spring:
   datasource:
     druid:
@@ -29,7 +28,7 @@ spring:
           password: AIops_Admin
         # Neo4j
         neo4j:
-          url: jdbc:neo4j:bolt://localhost:7687
+          url: jdbc:neo4j:bolt://localhost:7687/neo4j
           driver-class-name: org.neo4j.jdbc.Driver
           username: neo4j
           password: neo4j123
@@ -38,10 +37,14 @@ spring:
             test-while-idle: true
             validation-query: MATCH(n) RETURN n
   neo4j:
-    url: bolt://localhost:7687/apifox
+    url: bolt://localhost:7687/neo4j
     authentication:
       username: neo4j
       password: neo4j123
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
 
 mybatis-plus:  # if mybatis, change this
   mapper-locations: classpath:/mapping/**/*.xml
