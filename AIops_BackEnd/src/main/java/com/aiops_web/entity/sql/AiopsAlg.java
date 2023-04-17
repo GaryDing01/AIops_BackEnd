@@ -64,8 +64,17 @@ public class AiopsAlg implements Serializable {
         this.name = (String) map.get("name");
         this.intro = (String) map.get("intro");
         this.source = (String) map.get("source");
-        this.updateTstamp = new Date(Long.parseLong((String)map.get("updateTstamp")));
-        this.updateNum = (Integer) map.get("updateNum");
+
+        // Long.parseLong can be given a ""
+//        String tmp = (String)map.get("updateTstamp");
+//        if (tmp != null && tmp.length()>0) {
+//            this.updateTstamp = new Date(Long.parseLong(tmp));
+//        }
+
+        // perhaps time should be set at backend
+        this.updateTstamp = new Date(System.currentTimeMillis());
+
+        this.updateNum = (Integer) map.get("updateNum");  // 初始化数据 但是在对数据库的操作中不会使用
         this.userId = (Integer) map.get("userId");
         this.content = (String) map.get("content");
         param = listToParamString((List) map.get("param"));
@@ -86,7 +95,7 @@ public class AiopsAlg implements Serializable {
         ObjectMapper mapper = new ObjectMapper();
         String str = mapper.writeValueAsString(params);
 
-        System.out.println(str);
+//        System.out.println(str);
         return str;
     }
 

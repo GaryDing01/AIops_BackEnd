@@ -1,5 +1,6 @@
 package com.aiops_web;
 
+import com.aiops_web.dao.sql.AiopsAlgMapper;
 import com.aiops_web.service.AiopsAlgService;
 import com.aiops_web.service.impl.AiopsAlgServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,8 +16,7 @@ class AIopsWebApplicationTests {
 
     @Test
     void contextLoads() throws JsonProcessingException {
-
-
+//        aiopsAlgService.getAlgByUserId(2053677);
     }
 
 }

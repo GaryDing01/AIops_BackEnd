@@ -18,13 +18,13 @@ import java.util.List;
  */
 public interface AiopsAlgService extends IService<AiopsAlg> {
 
-    List<AiopsAlg> getAlgByUserId(int algId);
+    List<AiopsAlg> getAlgByUserId(int algId, int pageNum, int pageSize);
 
     boolean deleteAlgById(int algId);
 
     int deleteAlgByIds(List<Integer> ids);
 
-    boolean updateAlg(String param);
+    boolean updateAlg(String param) throws JsonProcessingException;
 
     boolean createAlg(String param) throws JsonProcessingException;
 }

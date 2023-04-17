@@ -6,10 +6,13 @@ import com.aiops_web.service.AiopsAlgService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.sql.SQLOutput;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,8 +32,14 @@ public class AiopsAlgServiceImpl extends ServiceImpl<AiopsAlgMapper, AiopsAlg> i
     private AiopsAlgMapper algMapper;
 
     @Override
-    public List<AiopsAlg> getAlgByUserId(int userId) {
-        List<AiopsAlg> algs= algMapper.getAlgByUserId(userId);
+    public List<AiopsAlg> getAlgByUserId(int algId, int pageNum, int pageSize) {
+        Map<String, Integer> map = new HashMap<>();
+        pageNum = pageNum > 1? pageNum : 1;
+        pageSize = pageSize > 0? pageSize : 5;   // 默认5
+        map.put("startIdx", (pageNum-1)*pageSize);
+        map.put("pageSize", pageSize);
+        map.put("userId", 2053677);
+        List<AiopsAlg> algs= algMapper.getAlgByUserId(map);
         return algs;
     }
 
@@ -46,10 +55,13 @@ public class AiopsAlgServiceImpl extends ServiceImpl<AiopsAlgMapper, AiopsAlg> i
     }
 
     @Override
-    public boolean updateAlg(String param) {
-        AiopsAlg alg = new AiopsAlg();
-//        return algMapper.updateAlg(alg) > 0;
-        return true;
+    public boolean updateAlg(String param) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> map = mapper.readValue(param, Map.class);
+        // robustness
+
+        AiopsAlg alg = new AiopsAlg(map);
+        return algMapper.updateAlg(alg) > 0;
     }
 
     @Override

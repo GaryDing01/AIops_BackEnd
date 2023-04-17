@@ -28,9 +28,9 @@ public class AiopsAlgController {
     @Resource
     AiopsAlgService aiopsAlgService;
 
-    @GetMapping("/{userId}/pagesize")
-    public ResponseStd<List<AiopsAlg>> getAlg(@PathVariable int userId) {
-        List<AiopsAlg> alg = aiopsAlgService.getAlgByUserId(userId);
+    @GetMapping("/{userId}/{pageNum}/{pageSize}")
+    public ResponseStd<List<AiopsAlg>> getAlg(@PathVariable int userId, @PathVariable int pageNum, @PathVariable int pageSize) {
+        List<AiopsAlg> alg = aiopsAlgService.getAlgByUserId(userId, pageNum, pageSize);
         // 该用户没有算法  返回空值  通过 errorcode 提示
         if (alg.isEmpty()) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
@@ -39,7 +39,7 @@ public class AiopsAlgController {
     }
 
     @PutMapping
-    public ResponseStd<Boolean> updateAlg(@RequestBody String param) {
+    public ResponseStd<Boolean> updateAlg(@RequestBody String param) throws JsonProcessingException {
         // 在 Service 中解析参数
         boolean res = aiopsAlgService.updateAlg(param);
         return  new ResponseStd<>(res);

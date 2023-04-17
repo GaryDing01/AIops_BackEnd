@@ -19,6 +19,10 @@ CREATE TABLE `aiops_alg` (
 
 
 -- 算法数据模拟
+---------------------------------
+--  param格式有问题  但是由于对于param的操作都是对字符串  因此可以先初始化  解析的话不能用
+---------------------------------
+
 insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(10, '正则表达式过滤', '根据正则表达式替换日志某些变量', '多个SOTA的日志异常检测论文常用操作', CURRENT_TIMESTAMP, 1, 2053677, '{"regex": "", "log_file": ""}', '内容');
 insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(10, '正则表达式过滤', '根据正则表达式替换日志某些变量', '多个SOTA的日志异常检测论文常用操作', CURRENT_TIMESTAMP, 1, 2053677, '{"regex": "", "log_file": ""}', '内容');
 insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(10, '正则表达式过滤', '根据正则表达式替换日志某些变量', '多个SOTA的日志异常检测论文常用操作', CURRENT_TIMESTAMP, 1, 2053677, '{"regex": "", "log_file": ""}', '内容');
@@ -43,9 +47,9 @@ insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, u
 insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(2, 'bert-as-service', '使用bert模型直接得到句向量', 'BERT', CURRENT_TIMESTAMP, 1, 2053677, '{"log_record": ""}', '内容');
 insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(2, 'bert-as-service', '使用bert模型直接得到句向量', 'BERT', CURRENT_TIMESTAMP, 1, 2053677, '{"log_record": ""}', '内容');
  
-insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(2, '日志语言模型', '训练：使用日志语料对预训练语言模型进行微调;向量化：使用日志语言模型得到句向量', '自研', CURRENT_TIMESTAMP, 1, 2053677, '{"intput_file": "", "log_record": "", "model_fir": ""}', '内容');
-insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(2, '日志语言模型', '训练：使用日志语料对预训练语言模型进行微调;向量化：使用日志语言模型得到句向量', '自研', CURRENT_TIMESTAMP, 1, 2053677, '{"intput_file": "", "log_record": "", "model_fir": ""}', '内容');
-insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(2, '日志语言模型', '训练：使用日志语料对预训练语言模型进行微调;向量化：使用日志语言模型得到句向量', '自研', CURRENT_TIMESTAMP, 1, 2053677, '{"intput_file": "", "log_record": "", "model_fir": ""}', '内容');
+insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(2, '日志语言模型', '训练：使用日志语料对预训练语言模型进行微调;向量化：使用日志语言模型得到句向量', '自研', CURRENT_TIMESTAMP, 1, 2053677, '{"input_file": "", "log_record": "", "model_dir": ""}', '内容');
+insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(2, '日志语言模型', '训练：使用日志语料对预训练语言模型进行微调;向量化：使用日志语言模型得到句向量', '自研', CURRENT_TIMESTAMP, 1, 2053677, '{"input_file": "", "log_record": "", "model_dir": ""}', '内容');
+insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(2, '日志语言模型', '训练：使用日志语料对预训练语言模型进行微调;向量化：使用日志语言模型得到句向量', '自研', CURRENT_TIMESTAMP, 1, 2053677, '{"input_file": "", "log_record": "", "model_dir": ""}', '内容');
 
 insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(3, 'DeepLog', 'DeepLog是一个深层神经网络，使用LSTM对日志序列进行建模，可以从正常执行中自动学习日志模式的模型，并将偏离正常运行的行为标识为异常。', '《DeepLog: Anomaly Detection and Diagnosis from System Logs through Deep Learning》', CURRENT_TIMESTAMP, 1, 2053677, '{"mock": "tmp"}', '内容');
 insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)  values(3, 'DeepLog', 'DeepLog是一个深层神经网络，使用LSTM对日志序列进行建模，可以从正常执行中自动学习日志模式的模型，并将偏离正常运行的行为标识为异常。', '《DeepLog: Anomaly Detection and Diagnosis from System Logs through Deep Learning》', CURRENT_TIMESTAMP, 1, 2053677, '{"mock": "tmp"}', '内容');

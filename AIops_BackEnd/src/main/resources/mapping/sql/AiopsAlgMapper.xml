@@ -3,7 +3,7 @@
 <mapper namespace="com.aiops_web.dao.sql.AiopsAlgMapper">
 
     <select id="getAlgByUserId" resultType="AiopsAlg">
-        select * from aiops_alg where user_id = #{userId};
+        select * from aiops_alg where user_id = #{userId} limit #{startIdx}, #{pageSize};
     </select>
 
     <delete id="deleteAlgById">
@@ -22,28 +22,44 @@
     <!-- 添加 并把自动生成的主码注入到 对象中 -->
     <insert id="createAlg" useGeneratedKeys="true" keyProperty="algId">
         insert into aiops_alg(type_id, name, intro, source, update_tstamp, update_num, user_id, param, content)
-        values (#{typeId}, #{name}, #{intro}, #{source}, #{updateTstamp}, #{updateNum}, #{userId}, #{param}, #{content});
+        values (#{typeId}, #{name}, #{intro}, #{source}, #{updateTstamp}, 0, #{userId}, #{param}, #{content});
     </insert>
 
     <update id="updateAlg" >
-
-    </update>
-
-    <update id="updateCourse">
         update aiops_alg
         <set>
-            <if test="status != 0">
-                status = #{status},
+            <if test="typeId != 0">
+                type_id = #{typeId},
             </if>
             <if test="name != null and name != ''">
                 name = #{name},
             </if>
-            <if test="desc != null and desc != ''">
-                course.desc = #{desc},
+            <if test="intro != null and intro != ''">
+                intro = #{intro},
+            </if>
+            <if test="source != null and source != ''">
+                source = #{source},
+            </if>
+            <if test="updateTstamp != null">
+                update_tstamp = #{updateTstamp},
+            </if>
+<!--            <if test="updateNum != null and updateNum != ''">-->
+<!--                update_num = #{updateNum},-->
+<!--            </if>-->
+                update_num = update_num+1,
+            <if test="userId != null and userId != ''">
+                user_id = #{userId},
+            </if>
+            <if test="param != null and param != ''">
+                param = #{param},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
             </if>
         </set>
-        where c_id = #{c_id};
+        where alg_id = #{algId};
     </update>
+
 
 
 </mapper>

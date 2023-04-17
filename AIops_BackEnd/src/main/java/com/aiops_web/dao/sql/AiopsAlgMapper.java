@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -16,7 +17,7 @@ import java.util.List;
  */
 public interface AiopsAlgMapper extends BaseMapper<AiopsAlg> {
 
-    List<AiopsAlg> getAlgByUserId(int userId);
+    List<AiopsAlg> getAlgByUserId(Map<String, Integer> map);
 
     int deleteAlgById(int algId);
 
