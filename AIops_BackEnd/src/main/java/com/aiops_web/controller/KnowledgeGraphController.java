@@ -30,7 +30,7 @@ public class KnowledgeGraphController {
     @Resource
     private KnowledgeGraphService knowledgeGraphService;
 
-    @RequestMapping(value = "/nodes", method = RequestMethod.POST)
+    @RequestMapping(value = "/nodes/node", method = RequestMethod.POST)
     public ResponseStd<Long> addNode(@RequestBody Node node) {
         Long newId = knowledgeGraphService.addNode(node);
         return new ResponseStd<>(newId, 200, "success", "返回节点Id!");
@@ -59,17 +59,25 @@ public class KnowledgeGraphController {
         return new ResponseStd<>(res, 200, "success", "执行删除!");
     }
 
+    @RequestMapping(value = "/nodes", method = RequestMethod.PUT)
+    public ResponseStd<Boolean> updateNodeByNode(@RequestBody(required = true) Node node) {
+        Boolean res = knowledgeGraphService.updateNodeByNode(node);
+        if (res == false)
+            return new ResponseStd<>(res, 40000, "failure", "执行更新失败!");
+        return new ResponseStd<>(res, 200, "success", "执行更新!");
+    }
+
     // @RequestMapping(value = "/nodes/node", method = RequestMethod.GET)
     // public ResponseStd<List<Node>> getNodesByNode(@RequestBody Node node) {
     // List<Node> nodes = knowledgeGraphService.getNodeListByNode(node);
     // return new ResponseStd<>(nodes, 200, "success", "成功返回节点!");
     // }
 
-    @RequestMapping(value = "/nodes/{nodeId}", method = RequestMethod.GET)
-    public ResponseStd<Node> getNodeById(@PathVariable Long nodeId) {
-        Node node = knowledgeGraphService.getNodeById(nodeId);
-        return new ResponseStd<>(node, 200, "success", "成功返回节点!");
-    }
+    // @RequestMapping(value = "/nodes/{nodeId}", method = RequestMethod.GET)
+    // public ResponseStd<Node> getNodeById(@PathVariable Long nodeId) {
+    // Node node = knowledgeGraphService.getNodeById(nodeId);
+    // return new ResponseStd<>(node, 200, "success", "成功返回节点!");
+    // }
 
     // @RequestMapping(value = "/nodes/type", method = RequestMethod.GET)
     // public ResponseStd<List<Node>> getNodesByType(@RequestParam(required = true)

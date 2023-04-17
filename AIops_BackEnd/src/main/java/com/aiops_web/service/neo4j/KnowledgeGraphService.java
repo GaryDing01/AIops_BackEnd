@@ -50,10 +50,10 @@ public class KnowledgeGraphService {
         return nodes;
     }
 
-    public Node getNodeById(Long id) {
-        Node node = neo4jNodeDao.findById(id).orElse(null);
-        return node;
-    }
+    // public Node getNodeById(Long id) {
+    // Node node = neo4jNodeDao.findById(id).orElse(null);
+    // return node;
+    // }
 
     public Boolean deleteNodeById(Long id) {
         Node node = neo4jNodeDao.findById(id).orElse(null);
@@ -65,6 +65,21 @@ public class KnowledgeGraphService {
 
     public Boolean deleteNodesByIds(List<Long> ids) {
         neo4jNodeDao.deleteByIds(ids);
+        return true;
+    }
+
+    public Boolean updateNodeByNode(Node node) {
+        if (node.getId() == null)
+            throw new BadRequestException("id 不能为空!");
+        if (node.getType() == "" || node.getType() == null)
+            throw new BadRequestException("type 不能为空!");
+        if (node.getName() == "" || node.getName() == null)
+            throw new BadRequestException("name 不能为空!");
+        Node oldN = neo4jNodeDao.findById(node.getId()).orElse(null);
+        if(oldN == null)
+            return false;
+            
+        neo4jNodeDao.save(node);
         return true;
     }
 
