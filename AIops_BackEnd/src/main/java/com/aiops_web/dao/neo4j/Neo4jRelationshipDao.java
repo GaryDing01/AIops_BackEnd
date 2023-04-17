@@ -14,9 +14,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface Neo4jRelationshipDao extends Neo4jRepository<Relationship, Long> {
 
-    @Query("MATCH ()-[r:Relationship]->() RETURN r.id as id, r.type as type ")
-    List<Relationship> findAllRelationship();
+    @Query("MATCH (m:Node)-[r:Relationship]->(n:Node) RETURN id(r) as rId, r.type as type, id(m) as startId, id(n) as endId ")
+    List<Neo4jRelationshipDto> findAllRelationship();
 
-    @Query("MATCH (m:Node)-[r:Relationship]->(n:Node) WHERE r.id = $id RETURN r.id as id, r.type as type, m.id as startId, n.id as endId ")
+    @Query("MATCH (m:Node)-[r:Relationship]->(n:Node) WHERE id(r) = $id RETURN id(r) as rId, r.type as type, id(m) as startId, id(n) as endId ")
     Neo4jRelationshipDto findRelationshipById(Long id);
 }

@@ -15,4 +15,7 @@ public interface Neo4jNodeDao extends Neo4jRepository<Node, Long> {
     
     @Query("MATCH (n:Node) WHERE n.type = $type RETURN n")
     List<Node> findByType(String type);
+
+    @Query("MATCH (n:Node) WHERE id(n) in $ids DETACH DELETE n")
+    Void deleteByIds(List<Long> ids);
 }

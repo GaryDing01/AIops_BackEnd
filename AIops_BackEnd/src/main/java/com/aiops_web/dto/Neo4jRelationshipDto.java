@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class Neo4jRelationshipDto {
-    private Long id;
+    private Long rId;
 
     private String type;
 
