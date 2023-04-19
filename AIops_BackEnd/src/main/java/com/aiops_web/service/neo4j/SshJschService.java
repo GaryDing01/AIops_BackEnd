@@ -47,6 +47,7 @@ public class SshJschService {
     public void releaseSession() {
         if (session != null) {
             session.disconnect();
+            System.out.println("session disconnect");
         }
     }
 
