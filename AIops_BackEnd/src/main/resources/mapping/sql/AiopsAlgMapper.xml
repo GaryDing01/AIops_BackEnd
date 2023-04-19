@@ -60,6 +60,4 @@
         where alg_id = #{algId};
     </update>
 
-
-
 </mapper>

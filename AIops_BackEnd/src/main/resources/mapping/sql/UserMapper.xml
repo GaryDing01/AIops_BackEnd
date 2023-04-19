@@ -2,4 +2,53 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiops_web.dao.sql.UserMapper">
 
+    <select id="getAllUsers" resultType="User">
+        select * from user;
+    </select>
+
+    <insert id="createUser">
+        insert into user (role, name, password, permit_ids)
+        values (#{role}, #{name}, #{password}, #{permitIds});
+    </insert>
+
+    <delete id="deleteUserById" >
+        delete
+        from user
+        where user_id = #{userId};
+    </delete>
+
+    <select id="getPassword" resultType="String">
+        select password
+        from user
+        where user_id=#{userId};
+    </select>
+
+    <update id="updatePermissions">
+        update user
+        set permit_ids = #{permissions}
+        where user_id = #{userId};
+    </update>
+    
+    <update id="updatePassword">
+        update user
+        <set>
+            <if test="password != null and password!= ''">
+                password = #{password}
+            </if>
+        </set>
+        where user_id=#{userId};
+    </update>
+
+    <update id="updateInfo">
+        update user
+        <set>
+            <if test="name!=null and name!=''">
+                name = #{name},
+            </if>
+            <if test="role!=null and role!=''">
+                role = #{role},
+            </if>
+        </set>
+        where user_id=#{userId};
+    </update>
 </mapper>

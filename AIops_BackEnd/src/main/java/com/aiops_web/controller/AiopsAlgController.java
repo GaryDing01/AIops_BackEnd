@@ -30,7 +30,7 @@ public class AiopsAlgController {
     AiopsAlgService aiopsAlgService;
 
     @GetMapping()
-    public ResponseStd<List<AiopsAlg>> getAlg(@PathVariable int userId, @PathVariable int pageNum, @PathVariable int pageSize) {
+    public ResponseStd<List<AiopsAlg>> getAlg() {
         List<AiopsAlg> alg = aiopsAlgService.getAllAlgs();
         // 没有算法
         if (alg.isEmpty()) {
