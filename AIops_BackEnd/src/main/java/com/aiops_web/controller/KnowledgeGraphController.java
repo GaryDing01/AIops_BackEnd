@@ -5,6 +5,7 @@ import com.aiops_web.dto.Neo4jRelationshipDto;
 import com.aiops_web.entity.neo4j.Node;
 import com.aiops_web.entity.neo4j.Relationship;
 import com.aiops_web.service.neo4j.KnowledgeGraphService;
+import com.aiops_web.service.neo4j.SystemArchitectureService;
 import com.aiops_web.std.ResponseStd;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,5 +136,14 @@ public class KnowledgeGraphController {
         if (res == null || res == false)
             return new ResponseStd<>(res, 40000, "failure", "执行更新失败!");
         return new ResponseStd<>(res, 200, "success", "执行更新!");
+    }
+
+    @Resource
+    private SystemArchitectureService systemArchitectureService;
+
+    @RequestMapping(value = "/system/architecture", method = RequestMethod.POST)
+    public ResponseStd<Boolean> SystemArchitecture() {
+        Boolean res = systemArchitectureService.configSystemArchitecture();
+        return new ResponseStd<>(res, 200, "success", "返回是否成功!");
     }
 }

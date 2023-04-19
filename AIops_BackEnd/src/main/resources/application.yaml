@@ -52,3 +52,11 @@ mybatis-plus:  # if mybatis, change this
   # Only for mybatis-plus
 #  configuration:
 #    map-underscore-to-camel-case: false
+
+jsch:
+  username: serveradmin/root
+  ip: 10.60.38.173
+  port: 50022
+  password: Tongji409!
+  StrictHostKeyChecking: 'no'
+

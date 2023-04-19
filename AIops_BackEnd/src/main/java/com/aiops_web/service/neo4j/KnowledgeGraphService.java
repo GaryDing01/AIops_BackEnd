@@ -5,14 +5,12 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.ws.rs.BadRequestException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import com.aiops_web.dao.neo4j.Neo4jNodeDao;
 import com.aiops_web.dao.neo4j.Neo4jRelationshipDao;
 import com.aiops_web.dto.Neo4jRelationshipDto;
 import com.aiops_web.entity.neo4j.Node;
-import com.aiops_web.entity.neo4j.Relationship;
 
 @Service
 public class KnowledgeGraphService {
@@ -26,9 +24,9 @@ public class KnowledgeGraphService {
     // Node
     public Long addNode(Node node) {
         node.setId(null);
-        if (node.getType() == "" || node.getType() == null)
+        if (node.getType().isEmpty() || node.getType() == null)
             throw new BadRequestException("type 不能为空!");
-        if (node.getName() == "" || node.getName() == null)
+        if (node.getName().isEmpty() || node.getName() == null)
             throw new BadRequestException("name 不能为空!");
         neo4jNodeDao.save(node);
         return node.getId();
@@ -38,11 +36,11 @@ public class KnowledgeGraphService {
         Node model = new Node();
         if (id != null)
             model.setId(id);
-        if (type != null && type != "")
+        if (type != null && !type.isEmpty())
             model.setType(type);
-        if (name != null && name != "")
+        if (name != null && !name.isEmpty())
             model.setName(name);
-        if (content != null && content != "")
+        if (content != null && !content.isEmpty())
             model.setContent(content);
         if (parentId != null)
             model.setParentId(parentId);
@@ -67,9 +65,9 @@ public class KnowledgeGraphService {
     public Boolean updateNodeByNode(Node node) {
         if (node.getId() == null)
             throw new BadRequestException("id 不能为空!");
-        if (node.getType() == "" || node.getType() == null)
+        if (node.getType().isEmpty() || node.getType() == null)
             throw new BadRequestException("type 不能为空!");
-        if (node.getName() == "" || node.getName() == null)
+        if (node.getName().isEmpty() || node.getName() == null)
             throw new BadRequestException("name 不能为空!");
         Node oldN = neo4jNodeDao.findById(node.getId()).orElse(null);
         if (oldN == null)
