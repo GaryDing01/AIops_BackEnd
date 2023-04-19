@@ -23,6 +23,7 @@ public class KnowledgeGraphService {
     @Resource
     private Neo4jRelationshipDao neo4jRelationshipDao;
 
+    // Node
     public Long addNode(Node node) {
         node.setId(null);
         if (node.getType() == "" || node.getType() == null)
@@ -50,11 +51,6 @@ public class KnowledgeGraphService {
         return nodes;
     }
 
-    // public Node getNodeById(Long id) {
-    // Node node = neo4jNodeDao.findById(id).orElse(null);
-    // return node;
-    // }
-
     public Boolean deleteNodeById(Long id) {
         Node node = neo4jNodeDao.findById(id).orElse(null);
         if (node == null)
@@ -76,21 +72,61 @@ public class KnowledgeGraphService {
         if (node.getName() == "" || node.getName() == null)
             throw new BadRequestException("name 不能为空!");
         Node oldN = neo4jNodeDao.findById(node.getId()).orElse(null);
-        if(oldN == null)
+        if (oldN == null)
             return false;
-            
+
         neo4jNodeDao.save(node);
         return true;
     }
 
+    // Relationship
+    public Long addRelationship(Neo4jRelationshipDto relationshipDto) {
+        relationshipDto.setRId(null);
+        Long rId = neo4jRelationshipDao.addRelationship(relationshipDto.getType(), relationshipDto.getContent(),
+                relationshipDto.getStartId(), relationshipDto.getEndId());
+        return rId;
+    }
+
     public List<Neo4jRelationshipDto> getRelationshipList() {
-        List<Neo4jRelationshipDto> relationships = neo4jRelationshipDao.findAllRelationship();
+        List<Neo4jRelationshipDto> relationships = neo4jRelationshipDao.findAllRelationships();
         return relationships;
     }
 
     public Neo4jRelationshipDto getRelationshipById(Long id) {
-        Neo4jRelationshipDto relationships = neo4jRelationshipDao.findRelationshipById(id);
-        return relationships;
+        Neo4jRelationshipDto relationship = neo4jRelationshipDao.findRelationshipById(id);
+        return relationship;
+    }
+
+    public List<Neo4jRelationshipDto> getRelationshipByStartIdAndEndId(Long startId, Long EndId) {
+        List<Neo4jRelationshipDto> relationship = neo4jRelationshipDao.findRelationshipByStartIdAndEndId(startId,
+                EndId);
+        return relationship;
+    }
+
+    public Boolean deleteRelationshipById(Long id) {
+        Neo4jRelationshipDto relationship = neo4jRelationshipDao.findRelationshipById(id);
+        if (relationship == null)
+            return false;
+        neo4jRelationshipDao.deleteRelationshipById(id);
+        return true;
+    }
+
+    public Boolean deleteRelationshipsByIds(List<Long> ids) {
+        neo4jRelationshipDao.deleteRelationshipsByIds(ids);
+        return true;
+    }
+
+    public Boolean updateRelationship(Neo4jRelationshipDto relationshipDto) {
+        if (relationshipDto.getRId() == null)
+            throw new BadRequestException("rId 不能为空!");
+
+        Neo4jRelationshipDto oldR = neo4jRelationshipDao.findRelationshipById(relationshipDto.getRId());
+        if (oldR == null)
+            throw new BadRequestException("图谱中无此关系!");
+
+        neo4jRelationshipDao.updateRelationship(relationshipDto.getRId(), relationshipDto.getType(),
+                relationshipDto.getContent());
+        return true;
     }
 
     // public Relationship findRelatinoshipById(Long id) {

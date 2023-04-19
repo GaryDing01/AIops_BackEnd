@@ -27,47 +27,47 @@ create
 // contain
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Pod1' AND b.name = 'Container1'
-CREATE (a)-[:Relationship {type:'contain'}] -> (b);
+CREATE (a)-[:Relationship {type:'contain',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Pod1' AND b.name = 'Container2'
-CREATE (a)-[:Relationship {type:'contain'}] -> (b);
+CREATE (a)-[:Relationship {type:'contain',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Pod2' AND b.name = 'Container3'
-CREATE (a)-[:Relationship {type:'contain'}] -> (b);
+CREATE (a)-[:Relationship {type:'contain',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Service1' AND b.name = 'Class1'
-CREATE (a)-[:Relationship {type:'contain'}] -> (b);
+CREATE (a)-[:Relationship {type:'contain',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Service1' AND b.name = 'Class2'
-CREATE (a)-[:Relationship {type:'contain'}] -> (b);
+CREATE (a)-[:Relationship {type:'contain',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Service2' AND b.name = 'Class3'
-CREATE (a)-[:Relationship {type:'contain'}] -> (b);
+CREATE (a)-[:Relationship {type:'contain',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 
 // runIn
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Pod1' AND b.name = 'Node1'
-CREATE (a)-[:Relationship {type:'runIn'}] -> (b);
+CREATE (a)-[:Relationship {type:'runIn',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Pod2' AND b.name = 'Node2'
-CREATE (a)-[:Relationship {type:'runIn'}] -> (b);
+CREATE (a)-[:Relationship {type:'runIn',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Pod3' AND b.name = 'Node3'
-CREATE (a)-[:Relationship {type:'runIn'}] -> (b);
+CREATE (a)-[:Relationship {type:'runIn',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 
 // logicalAbstract
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Service1' AND b.name = 'Pod1'
-CREATE (a)-[:Relationship {type:'logicalAbstract'}] -> (b);
+CREATE (a)-[:Relationship {type:'logicalAbstract',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Service1' AND b.name = 'Pod2'
-CREATE (a)-[:Relationship {type:'logicalAbstract'}] -> (b);
+CREATE (a)-[:Relationship {type:'logicalAbstract',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Service1' AND b.name = 'Pod3'
-CREATE (a)-[:Relationship {type:'logicalAbstract'}] -> (b);
+CREATE (a)-[:Relationship {type:'logicalAbstract',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Service2' AND b.name = 'Pod2'
-CREATE (a)-[:Relationship {type:'logicalAbstract'}] -> (b);
+CREATE (a)-[:Relationship {type:'logicalAbstract',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);
 MATCH (a:Node),(b:Node)
 WHERE a.name = 'Service3' AND b.name = 'Pod3'
-CREATE (a)-[:Relationship {type:'logicalAbstract'}] -> (b);
+CREATE (a)-[:Relationship {type:'logicalAbstract',content:"{param1:3,param2:'s2',param3:'s3'}"}] -> (b);

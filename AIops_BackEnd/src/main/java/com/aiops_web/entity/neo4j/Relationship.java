@@ -18,13 +18,15 @@ public class Relationship {
     @GeneratedValue
     private Long id;
 
-    @StartNode
-    private Node startNode;
+    // @StartNode
+    // private Node startNode;
 
-    @EndNode
-    private Node endNode;
+    // @EndNode
+    // private Node endNode;
 
     @Property(name = "type")
     private String type;
 
+    @Property(name = "content")
+    private String content;
 }
