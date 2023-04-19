@@ -4,6 +4,7 @@ package com.aiops_web.controller;
 import com.aiops_web.entity.sql.AiopsAlg;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
 import com.aiops_web.service.AiopsAlgService;
@@ -28,10 +29,10 @@ public class AiopsAlgController {
     @Resource
     AiopsAlgService aiopsAlgService;
 
-    @GetMapping("/{userId}/{pageNum}/{pageSize}")
+    @GetMapping()
     public ResponseStd<List<AiopsAlg>> getAlg(@PathVariable int userId, @PathVariable int pageNum, @PathVariable int pageSize) {
-        List<AiopsAlg> alg = aiopsAlgService.getAlgByUserId(userId, pageNum, pageSize);
-        // 该用户没有算法  返回空值  通过 errorcode 提示
+        List<AiopsAlg> alg = aiopsAlgService.getAllAlgs();
+        // 没有算法
         if (alg.isEmpty()) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
@@ -52,7 +53,6 @@ public class AiopsAlgController {
         return  new ResponseStd<>(res);
     }
 
-
     @DeleteMapping("/{algId}")
     public ResponseStd<Boolean> deleteAlg(@PathVariable int algId) {
         boolean res = aiopsAlgService.deleteAlgById(algId);
@@ -60,7 +60,7 @@ public class AiopsAlgController {
     }
 
     @DeleteMapping()
-    public ResponseStd<Integer> deleteAlgByIds(@RequestParam List<Integer> ids) {
+    public ResponseStd<Integer> deleteAlgByIds(@RequestBody List<Integer> ids) {
         // test ids
         if (ids.isEmpty()) {
             return new ResponseStd<>(ErrorCode.PARAMS_ERROR);
@@ -70,8 +70,6 @@ public class AiopsAlgController {
         int tupleNum = aiopsAlgService.deleteAlgByIds(ids);
         return new ResponseStd<>(tupleNum);
     }
-
-
 
 }
 

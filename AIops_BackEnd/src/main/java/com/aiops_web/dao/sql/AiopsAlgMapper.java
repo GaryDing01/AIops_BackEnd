@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public interface AiopsAlgMapper extends BaseMapper<AiopsAlg> {
 
-    List<AiopsAlg> getAlgByUserId(Map<String, Integer> map);
+    List<AiopsAlg> getAllAlgs();
 
     int deleteAlgById(int algId);
 

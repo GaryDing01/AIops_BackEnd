@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface AiopsAlgService extends IService<AiopsAlg> {
 
-    List<AiopsAlg> getAlgByUserId(int algId, int pageNum, int pageSize);
+    List<AiopsAlg> getAllAlgs();
 
     boolean deleteAlgById(int algId);
 

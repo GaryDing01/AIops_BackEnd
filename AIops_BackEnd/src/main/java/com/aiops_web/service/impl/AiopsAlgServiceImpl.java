@@ -32,14 +32,15 @@ public class AiopsAlgServiceImpl extends ServiceImpl<AiopsAlgMapper, AiopsAlg> i
     private AiopsAlgMapper algMapper;
 
     @Override
-    public List<AiopsAlg> getAlgByUserId(int algId, int pageNum, int pageSize) {
-        Map<String, Integer> map = new HashMap<>();
-        pageNum = pageNum > 1? pageNum : 1;
-        pageSize = pageSize > 0? pageSize : 5;   // 默认5
-        map.put("startIdx", (pageNum-1)*pageSize);
-        map.put("pageSize", pageSize);
-        map.put("userId", 2053677);
-        List<AiopsAlg> algs= algMapper.getAlgByUserId(map);
+    public List<AiopsAlg> getAllAlgs() {
+        //(int algId, int pageNum, int pageSize)
+//        Map<String, Integer> map = new HashMap<>();
+//        pageNum = pageNum > 1? pageNum : 1;
+//        pageSize = pageSize > 0? pageSize : 5;   // 默认5
+//        map.put("startIdx", (pageNum-1)*pageSize);
+//        map.put("pageSize", pageSize);
+//        map.put("userId", 2053677);
+        List<AiopsAlg> algs= algMapper.getAllAlgs();
         return algs;
     }
 
