@@ -132,4 +132,9 @@ public class KnowledgeGraphService {
     // return relationships;
     // }
 
+    // 清空neo4j数据库中的所有数据
+    public Boolean deleteAllData() {
+        neo4jNodeDao.deleteAllData();
+        return true;
+    }
 }

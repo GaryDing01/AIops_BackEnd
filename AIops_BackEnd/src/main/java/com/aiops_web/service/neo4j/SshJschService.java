@@ -42,12 +42,13 @@ public class SshJschService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("session connect!");
     }
 
     public void releaseSession() {
         if (session != null) {
             session.disconnect();
-            System.out.println("session disconnect");
+            System.out.println("session disconnect!");
         }
     }
 

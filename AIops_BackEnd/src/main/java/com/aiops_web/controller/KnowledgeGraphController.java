@@ -138,6 +138,13 @@ public class KnowledgeGraphController {
         return new ResponseStd<>(res, 200, "success", "执行更新!");
     }
 
+    // clear database
+    @RequestMapping(value = "/clearDatabase", method = RequestMethod.DELETE)
+    public ResponseStd<Boolean> clearDatabase() {
+        Boolean res = knowledgeGraphService.deleteAllData();
+        return new ResponseStd<>(res, 200, "success", "清空neo4j数据库!");
+    }
+
     @Resource
     private SystemArchitectureService systemArchitectureService;
 
