@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
-import javax.json.JsonObject;
 
 import org.springframework.stereotype.Service;
 

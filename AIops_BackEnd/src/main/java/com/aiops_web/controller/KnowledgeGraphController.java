@@ -1,14 +1,11 @@
 package com.aiops_web.controller;
 
-import com.aiops_web.dao.neo4j.PodMapper;
 import com.aiops_web.dto.Neo4jRelationshipDto;
 import com.aiops_web.entity.neo4j.Node;
-import com.aiops_web.entity.neo4j.Relationship;
 import com.aiops_web.service.neo4j.KnowledgeGraphService;
 import com.aiops_web.service.neo4j.SystemArchitectureService;
 import com.aiops_web.std.ResponseStd;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,15 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController(value = "knowledgeGraphController")
 @RequestMapping("/KG")
 public class KnowledgeGraphController {
-
-    @Resource
-    private PodMapper podMapper;
 
     @Resource
     private KnowledgeGraphService knowledgeGraphService;
