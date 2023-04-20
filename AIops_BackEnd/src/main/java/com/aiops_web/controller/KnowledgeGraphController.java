@@ -56,7 +56,7 @@ public class KnowledgeGraphController {
     }
 
     @RequestMapping(value = "/nodes/multiple", method = RequestMethod.DELETE)
-    public ResponseStd<Boolean> deleteNodesByIds(@RequestBody(required = true) List<Long> ids) {
+    public ResponseStd<Boolean> deleteNodesByIds(@RequestParam(required = true) List<Long> ids) {
         Boolean res = knowledgeGraphService.deleteNodesByIds(ids);
         return new ResponseStd<>(res, 200, "success", "执行删除!");
     }
@@ -123,7 +123,7 @@ public class KnowledgeGraphController {
     }
 
     @RequestMapping(value = "/relationships/multiple", method = RequestMethod.DELETE)
-    public ResponseStd<Boolean> deleteRelationshipsByIds(@RequestBody(required = true) List<Long> ids) {
+    public ResponseStd<Boolean> deleteRelationshipsByIds(@RequestParam(required = true) List<Long> ids) {
         Boolean res = knowledgeGraphService.deleteRelationshipsByIds(ids);
         return new ResponseStd<>(res, 200, "success", "执行删除!");
     }
