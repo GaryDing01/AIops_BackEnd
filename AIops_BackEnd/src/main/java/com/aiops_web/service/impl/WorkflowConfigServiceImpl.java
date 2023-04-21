@@ -3,9 +3,7 @@ package com.aiops_web.service.impl;
 import com.aiops_web.dao.sql.AiopsObjEnumMapper;
 import com.aiops_web.dao.sql.StepConfigMapper;
 import com.aiops_web.dto.TemplateDTO;
-import com.aiops_web.entity.sql.AiopsObjEnum;
-import com.aiops_web.entity.sql.StepConfig;
-import com.aiops_web.entity.sql.WorkflowConfig;
+import com.aiops_web.entity.sql.*;
 import com.aiops_web.dao.sql.WorkflowConfigMapper;
 import com.aiops_web.service.WorkflowConfigService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -38,6 +36,7 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
     // 新增流程
     @Override
     public Integer saveWorkflows(Integer userId, String name) {
+
         // 创建流程
         WorkflowConfig workflowConfig = new WorkflowConfig();
         workflowConfig.setName(name);
@@ -178,11 +177,24 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
         return stepIdList;
     }
 
-//    @Override
-//    public Boolean removeStepsByT(Integer wfId) {
-//        Map<String,Object> map = new HashMap<>();
-//        map.put("wfId",wfId);
-//        stepConfigMapper.deleteByMap(map);
-//    }
+    @Override
+    public Boolean removeStepsByT(Integer wfId) {
+        Map<String,Object> map = new HashMap<>();
+        map.put("wf_id",wfId);
+        int delete = stepConfigMapper.deleteByMap(map);
+        System.out.println("delete: " + delete);
+        return delete > 0;
+    }
 
+    @Override
+    public Boolean saveStepsByT(Integer wfId, TemplateDTO templateDTO) {
+        List<StepConfig> stepConfigList = templateDTO.getStepConfigList();
+        for(StepConfig stepConfig : stepConfigList) {
+            stepConfig.setWfId(wfId);
+            int insert = stepConfigMapper.insert(stepConfig);
+            System.out.println("insert: " + insert);
+            if (insert < 0) return false;
+        }
+        return true;
+    }
 }

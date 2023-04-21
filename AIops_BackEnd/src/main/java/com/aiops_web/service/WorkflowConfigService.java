@@ -36,9 +36,9 @@ public interface WorkflowConfigService extends IService<WorkflowConfig> {
     // 根据模板抽出步骤编号
     List<Integer> getSIdByT(TemplateDTO templateDTO);
 
-    // 根据模板编号批量删除步骤
-//    Boolean removeStepsByT(Integer wfId);
+    // 根据要覆盖的模板编号批量删除步骤
+    Boolean removeStepsByT(Integer wfId);
 
-    // 根据模板批量增加步骤
-//    Boolean saveStepsByT(TemplateDTO templateDTO);
+    //  根据原始模板批量增加要覆盖的模板的步骤
+    Boolean saveStepsByT(Integer wfId, TemplateDTO templateDTO);
 }

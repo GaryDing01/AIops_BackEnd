@@ -1,18 +1,15 @@
 package com.aiops_web.controller;
 
 import com.aiops_web.dto.TemplateDTO;
-import com.aiops_web.entity.neo4j.Pod;
 import com.aiops_web.entity.sql.StepConfig;
 import com.aiops_web.entity.sql.WorkflowConfig;
 import com.aiops_web.service.StepConfigService;
 import com.aiops_web.service.WorkflowConfigService;
 import com.aiops_web.std.ResponseStd;
-import org.neo4j.cypher.internal.expressions.In;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 @RestController(value = "workflowController")
 @RequestMapping("/workflow")
@@ -109,8 +106,14 @@ public class WorkflowController {
     }
 
     // 更新模板
+    /**
+     *
+     * @param wfId 要覆盖的模板编号
+     * @param templateDTO 原始模板
+     * @return
+     */
     @PutMapping("/template/{wfId}")
-    public ResponseStd<Boolean> updateOneTemplate(@PathVariable Integer wfId, @RequestParam TemplateDTO templateDTO) {
+    public ResponseStd<Boolean> updateOneTemplate(@PathVariable Integer wfId, @RequestBody TemplateDTO templateDTO) {
         // 取原模板编号
         int wfId_origin = templateDTO.getWfId();
         // TemplateDTO templateDTO_origin = workflowConfigService.getOneTemplate(wfId_origin);
@@ -121,10 +124,12 @@ public class WorkflowController {
         if (!updateWf) return new ResponseStd<Boolean>(false);
 
         // 删步骤
-
+        boolean removeSteps = workflowConfigService.removeStepsByT(wfId);
+        if (!removeSteps) return new ResponseStd<Boolean>(false);
 
         // 加步骤
-
+        boolean saveSteps =workflowConfigService.saveStepsByT(wfId, templateDTO);
+        if (!saveSteps) return new ResponseStd<Boolean>(false);
 
         return new ResponseStd<Boolean>(true);
     }
