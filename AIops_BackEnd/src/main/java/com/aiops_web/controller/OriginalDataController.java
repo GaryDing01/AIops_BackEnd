@@ -1,10 +1,8 @@
 package com.aiops_web.controller;
 
 import com.aiops_web.service.OriginalDataService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.aiops_web.std.ResponseStd;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -17,11 +15,29 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/originalData")
 public class OriginalDataController {
-    @Autowired
-    private OriginalDataService originalDataService;
+    private final OriginalDataService originalDataService;
 
-    @PostMapping("/createDoc")
-    public void createDoc(Integer batchId, String content, Integer objId) throws IOException {
-        originalDataService.createDocument(batchId, content, objId);
+    public OriginalDataController(OriginalDataService originalDataService) {
+        this.originalDataService = originalDataService;
+    }
+
+    @GetMapping("")
+    public ResponseStd getAll() {
+        return new ResponseStd(originalDataService.getAll());
+    }
+
+    @GetMapping("/range")
+    public ResponseStd getRange(int beginId, int endId) throws IOException {
+        return new ResponseStd(originalDataService.getRange(beginId, endId));
+    }
+
+    @DeleteMapping("/range")
+    public ResponseStd deleteRange(int beginId, int endId) throws IOException {
+        return new ResponseStd(originalDataService.deleteRange(beginId, endId));
+    }
+
+    @PostMapping("/addBatch")
+    public void addBatchDoc(int batchId, int objId, String filepath) {
+        originalDataService.addBatchDoc(batchId, objId, filepath);
     }
 }

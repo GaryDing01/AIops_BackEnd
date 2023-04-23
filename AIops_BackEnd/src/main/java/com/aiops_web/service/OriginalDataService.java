@@ -10,9 +10,11 @@ import java.util.List;
  * @time 2023/4/17
  */
 public interface OriginalDataService {
-    public void createDocument(Integer batchId, String content, Integer objId) throws IOException;
+    List<OriginalData> getRange(int beginId, int endId) throws IOException;
 
-    public void addBatchDocument(List<OriginalData> data) throws IOException;
+    List<OriginalData> getAll();
 
+    boolean deleteRange(int beginId, int endId) throws IOException;
 
+    void addBatchDoc(int batchId, int objId, String filepath);
 }
