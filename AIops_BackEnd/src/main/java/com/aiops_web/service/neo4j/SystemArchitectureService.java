@@ -33,6 +33,7 @@ public class SystemArchitectureService {
         systemNode.setType("System");
         systemNode.setName(systemNamespace);
         systemNode.setContent(systemNamespace);
+        systemNode.setParentId(Long.valueOf(-1));
         Long systemId = knowledgeGraphService.addNode(systemNode); // 添加System节点
 
         sshJschService.CreateSession();
