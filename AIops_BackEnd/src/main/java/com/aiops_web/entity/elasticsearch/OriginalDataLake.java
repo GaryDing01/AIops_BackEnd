@@ -31,6 +31,8 @@ public class OriginalDataLake {
     @Id
     private Long calcId;
 
+    private Long relaId;
+
     private Integer deleted;
 
     /* 预配置索引的 _class 字段

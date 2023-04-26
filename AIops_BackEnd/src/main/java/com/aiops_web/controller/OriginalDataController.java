@@ -2,7 +2,10 @@ package com.aiops_web.controller;
 
 import com.aiops_web.service.OriginalDataService;
 import com.aiops_web.std.ResponseStd;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
@@ -21,23 +24,18 @@ public class OriginalDataController {
         this.originalDataService = originalDataService;
     }
 
-    @GetMapping("")
-    public ResponseStd getAll() {
-        return new ResponseStd(originalDataService.getAll());
-    }
-
     @GetMapping("/range")
     public ResponseStd getRange(int beginId, int endId) throws IOException {
         return new ResponseStd(originalDataService.getRange(beginId, endId));
     }
 
+    @GetMapping("/relativeRange")
+    public ResponseStd getRelativeRange(int batchId, int beginId, int endId) {
+        return new ResponseStd(originalDataService.getRelativeRange(batchId, beginId, endId));
+    }
+
     @DeleteMapping("/range")
     public ResponseStd deleteRange(int beginId, int endId) throws IOException {
         return new ResponseStd(originalDataService.deleteRange(beginId, endId));
-    }
-
-    @PostMapping("/addBatch")
-    public void addBatchDoc(int batchId, int objId, String filepath) {
-        originalDataService.addBatchDoc(batchId, objId, filepath);
     }
 }

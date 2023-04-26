@@ -39,48 +39,76 @@ public class OriginalDataServiceImpl implements OriginalDataService {
     }
 
     @Override
-    public List<OriginalData> getRange(int beginId, int endId) throws IOException {
+    public List<OriginalData> getRange(int beginId, int endId) {
         RestClient restClient = RestClient.builder(new HttpHost("82.157.145.14", 9200)).build();
         ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
         ElasticsearchClient client = new ElasticsearchClient(transport);
 
-        SearchResponse<OriginalData> searchResponse = client.search(
-                s -> s.index(index).query(
-                        q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))),
-                OriginalData.class);
         List<OriginalData> dataList = new ArrayList<>();
-        searchResponse.hits().hits().forEach(h -> dataList.add(h.source()));
+        try {
+            SearchResponse<OriginalData> searchResponse = client.search(
+                    s -> s.index(index).query(
+                            q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))),
+                    OriginalData.class);
 
-        transport.close();
-        restClient.close();
+            searchResponse.hits().hits().forEach(h -> dataList.add(h.source()));
+
+            transport.close();
+            restClient.close();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            System.out.println("连接出错，获取数据失败！");
+        }
         return dataList;
     }
 
     @Override
-    public List<OriginalData> getAll() {
-        Iterable<OriginalData> dataIterable = originalDataRepository.findAll();
-        List<OriginalData> dataList = new ArrayList<>();
-        dataIterable.forEach(dataList::add);
-        return dataList;
-    }
-
-    @Override
-    public boolean deleteRange(int beginId, int endId) throws IOException {
+    public List<OriginalData> getRelativeRange(int batchId, int beginId, int endId) {
         RestClient restClient = RestClient.builder(new HttpHost("82.157.145.14", 9200)).build();
         ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
         ElasticsearchClient client = new ElasticsearchClient(transport);
 
-        //查询 es 中符合条件的数据 id
-        SearchResponse<OriginalData> searchResponse = client.search(
-                s -> s.index(index).query(
-                        q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))),
-                OriginalData.class);
-        transport.close();
-        restClient.close();
+        List<OriginalData> dataList = new ArrayList<>();
+        try {
+            SearchResponse<OriginalData> searchResponse = client.search(
+                    s -> s.index(index).query(
+                            q -> q.bool(b -> b.
+                                    must(m -> m.match(u -> u.field("batchId").query(batchId))).
+                                    must(m -> m.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))))
+                    ),
+                    OriginalData.class); // must是必须满足所有条件
+            searchResponse.hits().hits().forEach(h -> dataList.add(h.source()));
 
+            transport.close();
+            restClient.close();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            System.out.println("连接出错，获取数据失败！");
+        }
+        return dataList;
+    }
+
+    @Override
+    public boolean deleteRange(int beginId, int endId) {
+        RestClient restClient = RestClient.builder(new HttpHost("82.157.145.14", 9200)).build();
+        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        ElasticsearchClient client = new ElasticsearchClient(transport);
 
         List<OriginalData> updateList = new ArrayList<>();
-        searchResponse.hits().hits().forEach(h -> updateList.add(h.source()));
+        try {
+            //查询 es 中符合条件的数据 id
+            SearchResponse<OriginalData> searchResponse = client.search(
+                    s -> s.index(index).query(
+                            q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))),
+                    OriginalData.class);
+
+            searchResponse.hits().hits().forEach(h -> updateList.add(h.source()));
+            transport.close();
+            restClient.close();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            System.out.println("连接出错，获取数据失败！");
+        }
         for (OriginalData data : updateList) {
             data.setDeleted(1);
         }
@@ -102,6 +130,7 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 
                 OriginalData originalData = new OriginalData();
                 originalData.setBatchId(batchId);
+                originalData.setRelaId(addNum);
                 originalData.setContent(line);
                 originalData.setDeleted(0);
                 originalData.setObjId(objId);
@@ -110,6 +139,7 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 
                 OriginalDataLake originalDataLake = new OriginalDataLake();
                 originalDataLake.setBatchId(batchId);
+                originalDataLake.setRelaId(addNum);
                 originalDataLake.setContent(line);
                 originalDataLake.setDeleted(0);
                 originalDataLake.setObjId(objId);
@@ -131,6 +161,6 @@ public class OriginalDataServiceImpl implements OriginalDataService {
         }
         originalDataRepository.saveAll(addList);
         originalDataLakeRepository.saveAll(addList2);
-        System.out.println("insert " + addNum + " in total");
+        System.out.println("insert " + (addNum - 1L) + " in total");
     }
 }

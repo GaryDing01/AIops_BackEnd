@@ -2,7 +2,6 @@ package com.aiops_web.service;
 
 import com.aiops_web.entity.elasticsearch.OriginalData;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -10,11 +9,11 @@ import java.util.List;
  * @time 2023/4/17
  */
 public interface OriginalDataService {
-    List<OriginalData> getRange(int beginId, int endId) throws IOException;
+    List<OriginalData> getRange(int beginId, int endId);
 
-    List<OriginalData> getAll();
+    List<OriginalData> getRelativeRange(int batchId, int beginId, int endId);
 
-    boolean deleteRange(int beginId, int endId) throws IOException;
+    boolean deleteRange(int beginId, int endId);
 
     void addBatchDoc(int batchId, int objId, String filepath);
 }
