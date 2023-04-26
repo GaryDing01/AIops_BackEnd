@@ -74,7 +74,7 @@ public class OriginalDataServiceImpl implements OriginalDataService {
                     s -> s.index(index).query(
                             q -> q.bool(b -> b.
                                     must(m -> m.match(u -> u.field("batchId").query(batchId))).
-                                    must(m -> m.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))))
+                                    must(m -> m.range(r -> r.field("relaId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))))
                     ),
                     OriginalData.class); // must是必须满足所有条件
             searchResponse.hits().hits().forEach(h -> dataList.add(h.source()));
