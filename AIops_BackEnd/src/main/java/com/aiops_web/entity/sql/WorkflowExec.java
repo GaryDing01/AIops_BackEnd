@@ -1,6 +1,8 @@
 package com.aiops_web.entity.sql;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+
+import java.sql.Timestamp;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -22,10 +24,10 @@ public class WorkflowExec implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "exec_id", type = IdType.AUTO)
+    @TableId(value = "exec_id", type = IdType.AUTO)
     private Integer execId;
 
-    private Date tstamp;
+    private Timestamp tstamp;
 
     private Integer reportId;
 
@@ -35,9 +37,9 @@ public class WorkflowExec implements Serializable {
 
     private Integer outputTypeId;
 
-    private Integer inputId;
+    private String inputId;
 
-    private Integer outputId;
+    private String outputId;
 
 
 }

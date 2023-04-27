@@ -2,4 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiops_web.dao.sql.WorkflowExecMapper">
 
+<!-- 查询某一个执行步骤 -->
+    <select id="selectOneExecStep" resultType="com.aiops_web.dto.ExecStepDTO">
+        SELECT we.*, sc.type_id, sc.step_num, sc.param, sc.alg_id, sc.wf_id
+        FROM workflow_exec we, step_config sc
+        WHERE we.step_id = sc.step_id AND sc.wf_id = #{wfId} AND sc.step_num = #{stepNum}
+    </select>
+
+    <select id="selectExecStepByWf" resultType="com.aiops_web.dto.ExecStepDTO">
+        SELECT we.*, sc.type_id, sc.step_num, sc.param, sc.alg_id, sc.wf_id
+        FROM workflow_exec we, step_config sc
+        WHERE we.step_id = sc.step_id AND sc.wf_id = #{wfId}
+    </select>
+
+    <select id="selectExecByWf" resultType="com.aiops_web.entity.sql.WorkflowExec">
+        SELECT we.*
+        FROM workflow_exec we, step_config sc
+        WHERE we.step_id = sc.step_id AND sc.wf_id = #{wfId}
+    </select>
+
 </mapper>

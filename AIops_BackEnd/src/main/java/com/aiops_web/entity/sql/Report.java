@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
+import java.sql.Timestamp;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,24 +19,21 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class WorkflowConfig implements Serializable {
+public class Report implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "wf_id", type = IdType.AUTO)
-    private Integer wfId;
+    @TableId(value = "report_id", type = IdType.AUTO)
+    private Integer reportId;
 
-    private String name;
+    private Timestamp tstamp;
 
-    private Integer statusId;
+    private String inputData;
 
-    private Integer currentStep;
+    private String outputData;
 
-    private Integer template;
+    private String situation;
 
-    private String reportIds;
-
-    private Integer userId;
-
+    private String remark;
 
 }
