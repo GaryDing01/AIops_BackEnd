@@ -2,6 +2,8 @@ package com.aiops_web.dao.sql;
 
 import com.aiops_web.entity.sql.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+import scala.Int;
 
 import java.util.List;
 
@@ -16,6 +18,10 @@ import java.util.List;
 public interface UserMapper extends BaseMapper<User> {
 
     List<User> getAllUsers();
+
+    User getUserById(int userId);
+
+    List<User> getUsersByIds(@Param("ids")List<Integer> ids);
 
     int createUser(User user);
 

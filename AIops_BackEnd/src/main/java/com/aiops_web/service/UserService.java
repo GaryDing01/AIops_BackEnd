@@ -1,9 +1,11 @@
 package com.aiops_web.service;
 
+import com.aiops_web.dto.UserPermissionDTO;
 import com.aiops_web.entity.sql.User;
 import com.aiops_web.std.LoginState;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import scala.Int;
 
 import java.util.List;
 
@@ -18,6 +20,10 @@ import java.util.List;
 public interface UserService extends IService<User> {
 
     List<User> getAllUsers();
+
+    UserPermissionDTO getUserById(int userId);
+
+    List<UserPermissionDTO> getUserByIds(List<Integer> ids);
 
     boolean createUser(User user);
 

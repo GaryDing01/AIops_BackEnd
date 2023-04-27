@@ -6,6 +6,19 @@
         select * from user;
     </select>
 
+    <select id="getUserById" resultType="User">
+        select * from user where user_id=#{userId};
+    </select>
+
+    <select id="getUsersByIds" resultType="User">
+        select *
+        from user
+        where user_id
+        in (
+            <foreach collection="ids" item="id" separator=","> #{id} </foreach>
+        );
+    </select>
+
     <insert id="createUser">
         insert into user (role, name, password, permit_ids)
         values (#{role}, #{name}, #{password}, #{permitIds});

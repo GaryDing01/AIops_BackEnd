@@ -60,8 +60,9 @@ public class AiopsAlgController {
     }
 
     @DeleteMapping()
-    public ResponseStd<Integer> deleteAlgByIds(@RequestBody List<Integer> ids) {
+    public ResponseStd<Integer> deleteAlgByIds(@RequestParam List<Integer> ids) {
         // test ids
+        System.out.println();
         if (ids.isEmpty()) {
             return new ResponseStd<>(ErrorCode.PARAMS_ERROR);
         }

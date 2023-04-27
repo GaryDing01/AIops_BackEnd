@@ -1,19 +1,18 @@
 package com.aiops_web.controller;
 
 
-import com.aiops_web.entity.sql.AiopsAlg;
+import com.aiops_web.dto.UserPermissionDTO;
 import com.aiops_web.entity.sql.User;
 import com.aiops_web.service.UserService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.LoginState;
 import com.aiops_web.std.ResponseStd;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bouncycastle.asn1.DERTaggedObject;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -34,6 +33,7 @@ public class UserController {
         return new ResponseStd(userService.list());
     }
 
+    // 查询所有用户
     @GetMapping()
     public ResponseStd<List<User>> getAllUsers() {
         List<User> alg = userService.getAllUsers();
@@ -44,6 +44,7 @@ public class UserController {
         return new ResponseStd<>(alg);
     }
 
+    // 查询用户状态
     @GetMapping("/{userId}/login")
     public ResponseStd<Boolean> login(@PathVariable long userId, @RequestParam String pwd) {
         LoginState loginState = userService.checkPwd(userId, pwd);
@@ -56,6 +57,23 @@ public class UserController {
         }
 
         return new ResponseStd<>(ErrorCode.PARAMS_ERROR, false);   // 密码错误
+    }
+
+    // 根据userid查询用户信息
+    @GetMapping("/{userId}")
+    public ResponseStd<UserPermissionDTO> getUserById(@PathVariable Integer userId) {
+        UserPermissionDTO userPermissionDTO = userService.getUserById(userId);
+        if (userPermissionDTO == null)
+            return new ResponseStd<>(ErrorCode.NULL_ERROR);
+        return new ResponseStd<>(userPermissionDTO);
+    }
+
+    @GetMapping("/batch")
+    public ResponseStd<List<UserPermissionDTO>> getUserBatch(@RequestParam List<Integer> ids) {
+        List<UserPermissionDTO> lists = userService.getUserByIds(ids);
+        if (lists == null)
+            return new ResponseStd<>(ErrorCode.NULL_ERROR);
+        return new ResponseStd<>(lists);
     }
 
     @PostMapping()

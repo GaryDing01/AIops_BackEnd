@@ -1,5 +1,6 @@
 package com.aiops_web.service.impl;
 
+import com.aiops_web.dto.UserPermissionDTO;
 import com.aiops_web.entity.sql.User;
 import com.aiops_web.dao.sql.UserMapper;
 import com.aiops_web.service.UserService;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.aiops_web.std.LoginState;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public List<User> getAllUsers() {
         return userMapper.getAllUsers();
     }
+
+    @Override
+    public UserPermissionDTO getUserById(int userId) {
+        User user = userMapper.getUserById(userId);
+        if (user == null)
+            return null;
+
+        return new UserPermissionDTO(user);
+    }
+
+    @Override
+    public List<UserPermissionDTO> getUserByIds(List<Integer> ids) {
+        List<User> users = userMapper.getUsersByIds(ids);
+        if (users.isEmpty())
+            return null;
+
+        // 如果查询到了数据
+        List<UserPermissionDTO> userPermissionDTOList = new ArrayList<>();
+        for (User user : users) {
+            userPermissionDTOList.add(new UserPermissionDTO(user));
+        }
+        return userPermissionDTOList;
+    }
+
 
     @Override
     public boolean createUser(User user) {
