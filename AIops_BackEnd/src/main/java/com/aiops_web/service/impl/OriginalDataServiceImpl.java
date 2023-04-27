@@ -1,96 +1,166 @@
 package com.aiops_web.service.impl;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.BulkResponse;
-import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.aiops_web.dao.elasticsearch.OriginalDataLakeRepository;
 import com.aiops_web.dao.elasticsearch.OriginalDataRepository;
 import com.aiops_web.entity.elasticsearch.OriginalData;
-import com.aiops_web.service.neo4j.OriginalDataService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.aiops_web.entity.elasticsearch.OriginalDataLake;
+import com.aiops_web.service.OriginalDataService;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
+/**
+ * @author DaiQL
+ * @time 2023/4/17
+ */
 @Service
 public class OriginalDataServiceImpl implements OriginalDataService {
-    @Resource
-    private OriginalDataRepository originalDataRepository;
-
-    // 创建低级客户端
-    private final RestClient restClient = RestClient.builder(new HttpHost("82.157.145.14", 9200)).build();
-
-    // 使用Jackson映射器创建传输层
-    private final ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
-
-    private final ElasticsearchClient client = new ElasticsearchClient(transport); // 创建API客户端
+    private final OriginalDataRepository originalDataRepository;
+    private final OriginalDataLakeRepository originalDataLakeRepository;
 
     private final String index = "origin_data";
 
-
-//    private static final String BASIC = "123456789qwertyuiopasdfghjklzxcvbnm";
-
-//    public static String random() {
-//        char[] basicArray = BASIC.toCharArray();
-//        Random random = new Random();
-//        char[] result = new char[6];
-//        for (int i = 0; i < 6; i++) {
-//            int index = random.nextInt(100) % (basicArray.length);
-//            result[i] = basicArray[index];
-//        }
-//        return new String(result);
-//    }
-
-    /**
-     * 添加单条文档
-     *
-     * @param batchId 导入源数据的批次编号
-     * @param content 源数据的具体内容
-     * @param objId   源数据的具体类型
-     */
-    @Override
-    public void createDocument(Integer batchId, String content, Integer objId) throws IOException {
-        OriginalData originalData = new OriginalData();
-        originalData.setBatchId(batchId);
-        originalData.setContent(content);
-        originalData.setObjId(objId);
-        originalData.setCalcId(1L);
-        originalDataRepository.save(originalData);
-//        System.out.println(originalDataRepository.count());
-//        //生成不重复的 id
-//        Date date = new Date(); //获取当前的日期
-//        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss"); //设置日期格式
-//        String str = df.format(date) + random(); //获取 String 类型的时间
-//        //向索引中添加数据
-//        CreateResponse createResponse = client.create(e -> e.index(index).id(str).document(originalData));
-//        System.out.println("createResponse.result() = " + createResponse.result());
-//
-//        SearchResponse<OriginalData> searchResponse = client.search(s -> s.index(index).query(q -> q.range(r -> r.field("batchId").gte(JsonData.of(1)))), OriginalData.class);
-//        searchResponse.hits().hits().forEach(h -> System.out.println(h.source().toString()));
+    public OriginalDataServiceImpl(OriginalDataRepository originalDataRepository, OriginalDataLakeRepository originalDataLakeRepository) {
+        this.originalDataRepository = originalDataRepository;
+        this.originalDataLakeRepository = originalDataLakeRepository;
     }
 
-    /**
-     * 批量插入文档
-     *
-     * @param data 源数据的集合
-     */
     @Override
-    public void addBatchDocument(List<OriginalData> data) throws IOException {
-        // 构建一个批量数据集合
-        List<BulkOperation> list = new ArrayList<>();
-        for (OriginalData origin : data) {
-            list.add(new BulkOperation.Builder().create(d -> d.document(origin).index(index)).build());
+    public List<OriginalData> getRange(int beginId, int endId) {
+        RestClient restClient = RestClient.builder(new HttpHost("82.157.145.14", 9200)).build();
+        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        ElasticsearchClient client = new ElasticsearchClient(transport);
+
+        List<OriginalData> dataList = new ArrayList<>();
+        try {
+            SearchResponse<OriginalData> searchResponse = client.search(
+                    s -> s.index(index).query(
+                            q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))),
+                    OriginalData.class);
+
+            searchResponse.hits().hits().forEach(h -> dataList.add(h.source()));
+
+            transport.close();
+            restClient.close();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            System.out.println("连接出错，获取数据失败！");
         }
-        // 调用 bulk 方法执行批量插入操作
-        BulkResponse bulkResponse = client.bulk(e -> e.index(index).operations(list));
-        System.out.println("bulkResponse.items() = " + bulkResponse.items());
+        return dataList;
+    }
+
+    @Override
+    public List<OriginalData> getRelativeRange(int batchId, int beginId, int endId) {
+        RestClient restClient = RestClient.builder(new HttpHost("82.157.145.14", 9200)).build();
+        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        ElasticsearchClient client = new ElasticsearchClient(transport);
+
+        List<OriginalData> dataList = new ArrayList<>();
+        try {
+            SearchResponse<OriginalData> searchResponse = client.search(
+                    s -> s.index(index).query(
+                            q -> q.bool(b -> b.
+                                    must(m -> m.match(u -> u.field("batchId").query(batchId))).
+                                    must(m -> m.range(r -> r.field("relaId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))))
+                    ),
+                    OriginalData.class); // must是必须满足所有条件
+            searchResponse.hits().hits().forEach(h -> dataList.add(h.source()));
+
+            transport.close();
+            restClient.close();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            System.out.println("连接出错，获取数据失败！");
+        }
+        return dataList;
+    }
+
+    @Override
+    public boolean deleteRange(int beginId, int endId) {
+        RestClient restClient = RestClient.builder(new HttpHost("82.157.145.14", 9200)).build();
+        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        ElasticsearchClient client = new ElasticsearchClient(transport);
+
+        List<OriginalData> updateList = new ArrayList<>();
+        try {
+            //查询 es 中符合条件的数据 id
+            SearchResponse<OriginalData> searchResponse = client.search(
+                    s -> s.index(index).query(
+                            q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))),
+                    OriginalData.class);
+
+            searchResponse.hits().hits().forEach(h -> updateList.add(h.source()));
+            transport.close();
+            restClient.close();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            System.out.println("连接出错，获取数据失败！");
+        }
+        for (OriginalData data : updateList) {
+            data.setDeleted(1);
+        }
+        originalDataRepository.saveAll(updateList);
+        return true;
+    }
+
+    @Override
+    public void addBatchDoc(int batchId, int objId, String filepath) {
+        long curNum = originalDataRepository.count();
+        System.out.println("当前已有" + curNum + "条源数据");
+        List<OriginalData> addList = new ArrayList<>();
+        List<OriginalDataLake> addList2 = new ArrayList<>();
+        long addNum = 1L;
+        try {
+            Scanner scanner = new Scanner(new File(filepath));
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+
+                OriginalData originalData = new OriginalData();
+                originalData.setBatchId(batchId);
+                originalData.setRelaId(addNum);
+                originalData.setContent(line);
+                originalData.setDeleted(0);
+                originalData.setObjId(objId);
+                originalData.setCalcId(curNum + addNum);
+                addList.add(originalData);
+
+                OriginalDataLake originalDataLake = new OriginalDataLake();
+                originalDataLake.setBatchId(batchId);
+                originalDataLake.setRelaId(addNum);
+                originalDataLake.setContent(line);
+                originalDataLake.setDeleted(0);
+                originalDataLake.setObjId(objId);
+                originalDataLake.setCalcId(curNum + addNum);
+                addList2.add(originalDataLake);
+
+                addNum++;
+                if (addNum % 200 == 0) {
+                    originalDataRepository.saveAll(addList);
+                    originalDataLakeRepository.saveAll(addList2);
+                    addList.clear();
+                    addList2.clear();
+                    System.out.println("insert 200 successfully");
+                }
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        originalDataRepository.saveAll(addList);
+        originalDataLakeRepository.saveAll(addList2);
+        System.out.println("insert " + (addNum - 1L) + " in total");
     }
 }
