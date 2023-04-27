@@ -1,6 +1,7 @@
 package com.aiops_web.service;
 
 import com.aiops_web.dto.TemplateDTO;
+import com.aiops_web.entity.sql.StepConfig;
 import com.aiops_web.entity.sql.WorkflowConfig;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -17,6 +18,9 @@ import java.util.List;
 public interface WorkflowConfigService extends IService<WorkflowConfig> {
     // 新增流程
     Integer saveWorkflows(Integer userId, String name);
+
+    // 查看已经结束的流程
+    List<WorkflowConfig> getEndedWorkflows();
 
     // 将流程保存为模板(新增模板)
     Integer saveTemplates(Integer wfId);

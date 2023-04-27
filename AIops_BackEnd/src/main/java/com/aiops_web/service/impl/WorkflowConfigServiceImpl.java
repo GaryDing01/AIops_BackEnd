@@ -2,6 +2,7 @@ package com.aiops_web.service.impl;
 
 import com.aiops_web.dao.sql.AiopsObjEnumMapper;
 import com.aiops_web.dao.sql.StepConfigMapper;
+import com.aiops_web.dao.sql.WorkflowStatusEnumMapper;
 import com.aiops_web.dto.TemplateDTO;
 import com.aiops_web.entity.sql.*;
 import com.aiops_web.dao.sql.WorkflowConfigMapper;
@@ -33,6 +34,9 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
     @Resource
     private AiopsObjEnumMapper aiopsObjEnumMapper;
 
+    @Resource
+    private WorkflowStatusEnumMapper workflowStatusEnumMapper;
+
     // 新增流程
     @Override
     public Integer saveWorkflows(Integer userId, String name) {
@@ -48,7 +52,7 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
 
         workflowConfigMapper.insert(workflowConfig);
         int wfId = workflowConfig.getWfId();
-        System.out.println("workflowConfig.getWfId()" + workflowConfig.getWfId());
+//        System.out.println("workflowConfig.getWfId()" + workflowConfig.getWfId());
 
         // 创建第一个步骤 -- 源数据 (固定)
         StepConfig stepConfig = new StepConfig();
@@ -75,6 +79,19 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
         stepConfigMapper.insert(stepConfig);
 
         return workflowConfig.getWfId();
+    }
+
+    @Override
+    public List<WorkflowConfig> getEndedWorkflows() {
+        // 先找到结束的枚举id
+        QueryWrapper<WorkflowStatusEnum> wrapper_1 = new QueryWrapper<>();
+        wrapper_1.eq("name","已完成");
+        int statusId = workflowStatusEnumMapper.selectOne(wrapper_1).getStatusId();
+
+        // 再找到所有对应已结束的流程
+        QueryWrapper<WorkflowConfig> wrapper_2 = new QueryWrapper<>();
+        wrapper_2.eq("status_id",statusId);
+        return workflowConfigMapper.selectList(wrapper_2);
     }
 
     @Override
@@ -132,7 +149,7 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
 
         workflowConfigMapper.insert(workflowConfig);
         int wfId_new = workflowConfig.getWfId();
-        System.out.println("workflowConfig.getWfId()" + wfId_new);
+//        System.out.println("workflowConfig.getWfId()" + wfId_new);
 
         // 拷贝步骤
         for (StepConfig stepConfig : templateDTO.getStepConfigList()) {
@@ -182,7 +199,7 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
         Map<String,Object> map = new HashMap<>();
         map.put("wf_id",wfId);
         int delete = stepConfigMapper.deleteByMap(map);
-        System.out.println("delete: " + delete);
+//        System.out.println("delete: " + delete);
         return delete > 0;
     }
 
@@ -192,7 +209,7 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
         for(StepConfig stepConfig : stepConfigList) {
             stepConfig.setWfId(wfId);
             int insert = stepConfigMapper.insert(stepConfig);
-            System.out.println("insert: " + insert);
+//            System.out.println("insert: " + insert);
             if (insert < 0) return false;
         }
         return true;

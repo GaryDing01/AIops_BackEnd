@@ -23,10 +23,8 @@ public class ParsedLog implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "parse_id", type = IdType.AUTO)
+    @TableId(value = "parse_id", type = IdType.AUTO)
     private Integer parseId;
-
-    private Date tstamp;
 
     private String logLineid;
 

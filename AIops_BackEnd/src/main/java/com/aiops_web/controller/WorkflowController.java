@@ -3,13 +3,18 @@ package com.aiops_web.controller;
 import com.aiops_web.dto.TemplateDTO;
 import com.aiops_web.entity.sql.StepConfig;
 import com.aiops_web.entity.sql.WorkflowConfig;
+import com.aiops_web.entity.sql.WorkflowExec;
+import com.aiops_web.service.ReportService;
 import com.aiops_web.service.StepConfigService;
 import com.aiops_web.service.WorkflowConfigService;
+import com.aiops_web.service.WorkflowExecService;
+import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 @RestController(value = "workflowController")
 @RequestMapping("/workflow")
@@ -20,6 +25,12 @@ public class WorkflowController {
 
     @Resource
     StepConfigService stepConfigService;
+
+    @Resource
+    WorkflowExecService workflowExecService;
+
+    @Resource
+    ReportService reportsService;
 
     // 新增流程
     @PostMapping("/{userId}")
@@ -40,6 +51,12 @@ public class WorkflowController {
     @GetMapping("/{wfId}")
     public ResponseStd<WorkflowConfig> selectOneWorkflow(@PathVariable Integer wfId) {
         return new ResponseStd<WorkflowConfig>(workflowConfigService.getById(wfId));
+    }
+
+    // 查找已结束的流程信息
+    @GetMapping("/end")
+    public ResponseStd<List<WorkflowConfig>> selectEndedWorkflows() {
+        return new ResponseStd<List<WorkflowConfig>>(workflowConfigService.getEndedWorkflows());
     }
 
     // 增加步骤
@@ -71,6 +88,12 @@ public class WorkflowController {
     @GetMapping("/step/batch")
     public ResponseStd<List<StepConfig>> selectBatchSteps(@RequestParam List<Integer> stepIdList) {
         return new ResponseStd<List<StepConfig>>(stepConfigService.listByIds(stepIdList));
+    }
+
+    // 根据流程id查询相应步骤
+    @GetMapping("/{wfId}/step")
+    public ResponseStd<List<StepConfig>> selectStepsByWf(@PathVariable Integer wfId) {
+        return new ResponseStd<List<StepConfig>>(stepConfigService.getStepsByWf(wfId));
     }
 
     // 更改步骤
@@ -134,4 +157,83 @@ public class WorkflowController {
         return new ResponseStd<Boolean>(true);
     }
 
+    // 开始执行!!!
+    // 单步执行步骤
+    @PostMapping("/exec/{stepId}")
+    public ResponseStd<Integer> addOneExec(@PathVariable Integer stepId, @RequestParam(required = false) Integer inputTypeId, @RequestParam(required = false) String inputId) {
+        return new ResponseStd<Integer>(workflowExecService.saveOneExec(stepId, inputTypeId, inputId));
+    }
+
+    // 步骤回退
+    @DeleteMapping("/exec/{execId}")
+    public ResponseStd<Boolean> deleteOneExec(@PathVariable Integer execId) {
+        return new ResponseStd<Boolean>(workflowExecService.removeById(execId));
+    }
+
+    // 根据步骤id（step_id ）获取到对应的执行的outputids
+    @GetMapping("/step/{stepId}/outputId")
+    public ResponseStd<String> findOutputId(@PathVariable Integer stepId) {
+        String outputId = workflowExecService.getOutputId(stepId);
+        if (Objects.equals(outputId, "")) {
+            return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, "");
+        }
+        else {
+            return new ResponseStd<String>(outputId);
+        }
+    }
+
+    // 结束流程
+    @PutMapping("/{wfId}")
+    public ResponseStd<Boolean> closeWorkflow(@PathVariable Integer wfId) {
+        return new ResponseStd<Boolean>(workflowExecService.closeWorkflow(wfId));
+    }
+
+    // 获取单步执行信息
+    @GetMapping("/exec/{execId}")
+    public ResponseStd<WorkflowExec> findOneExec(@PathVariable Integer execId) {
+        WorkflowExec workflowExec = workflowExecService.getById(execId);
+        if (workflowExec == null) {
+            return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, null);
+        }
+        else {
+            return new ResponseStd<WorkflowExec>(workflowExec);
+        }
+    }
+
+    // 根据流程id获取流程对应的执行信息
+    @GetMapping("/{wfId}/exec")
+    public ResponseStd<List<WorkflowExec>> findExecsByWf(@PathVariable Integer wfId) {
+        List<WorkflowExec> workflowExecList = workflowExecService.getExecsByWf(wfId);
+        if (workflowExecList == null) {
+            return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, null);
+        }
+        else {
+            return new ResponseStd<List<WorkflowExec>>(workflowExecList);
+        }
+    }
+
+    // 获取全部执行信息
+    @GetMapping("/exec")
+    public ResponseStd<List<WorkflowExec>> findAllExecs() {
+        List<WorkflowExec> workflowExecList = workflowExecService.list();
+        if (workflowExecList == null) {
+            return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, null);
+        }
+        else {
+            return new ResponseStd<List<WorkflowExec>>(workflowExecList);
+        }
+    }
+
+    // 检查
+    // 获取报告
+    @GetMapping("/report")
+    public ResponseStd<Boolean> checkOneReport(@RequestBody WorkflowExec workflowExec) {
+        boolean result = reportsService.saveOneReportByExec(workflowExec);
+        if (!result) {
+            return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, result);
+        }
+        else {
+            return new ResponseStd<Boolean>(result);
+        }
+    }
 }
