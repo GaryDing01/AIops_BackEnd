@@ -29,6 +29,7 @@
             <version>2.0.1</version>
         </dependency>
 
+
         <!-- Neo4j DAO -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -131,24 +132,27 @@
             <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
             <version>3.5.2</version>
         </dependency>
-
+        <!-- 热重载 -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.9.6</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
 
+        <!-- ssh -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.9.6</version>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.55</version>
         </dependency>
 
+        <!-- fastjson -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.9.6</version>
-        </dependency>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>fastjson</artifactId>
+		    <version>2.0.28</version>
+		</dependency>
 
     </dependencies>
 
@@ -157,8 +161,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-<!--                <version>2.6.3</version>-->
+                <!--                <version>2.6.3</version>-->
                 <configuration>
+                    <fork>true</fork>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
