@@ -20,7 +20,7 @@ public class UserPermissionDTO {
         if (user == null)
             return;
         this.userId = user.getUserId();
-        this.role = user.getRole();
+//        this.role = user.getRole();
         this.name = user.getName();
         this.permissions = permissionToList(user.getPermitIds());
     }

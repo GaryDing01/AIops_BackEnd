@@ -1,13 +1,8 @@
 package com.aiops_web.controller;
 
 import com.aiops_web.dto.TemplateDTO;
-import com.aiops_web.entity.sql.StepConfig;
-import com.aiops_web.entity.sql.WorkflowConfig;
-import com.aiops_web.entity.sql.WorkflowExec;
-import com.aiops_web.service.ReportService;
-import com.aiops_web.service.StepConfigService;
-import com.aiops_web.service.WorkflowConfigService;
-import com.aiops_web.service.WorkflowExecService;
+import com.aiops_web.entity.sql.*;
+import com.aiops_web.service.*;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
 import org.springframework.web.bind.annotation.*;
@@ -30,21 +25,76 @@ public class WorkflowController {
     WorkflowExecService workflowExecService;
 
     @Resource
-    ReportService reportsService;
+    ReportService reportService;
+
+    @Resource
+    AnodetectResultService anodetectResultService;
+
+    @Resource
+    ExecDataTypeEnumService execDataTypeEnumService;
+
+    @Resource
+    KnowledgegraphResultService knowledgegraphResultService;
+
+    @Resource
+    CleanedDataService cleanedDataService;
+
+    @Resource
+    ParsedLogService parsedLogService;
+
+    @Resource
+    RootcauseResultService rootcauseResultService;
+
+    @Resource
+    StepTypeEnumService stepTypeEnumService;
+
+    @Resource
+    VectorizedLogService vectorizedLogService;
 
     // 新增流程
-    @PostMapping("/{userId}")
-    public ResponseStd<Integer> addWorkflows(@PathVariable Integer userId, @RequestParam(value = "name", defaultValue = "") String name) {
-        System.out.println("userId: " + userId);
-        System.out.println("name: " + name);
-//        return new ResponseStd<Integer>(1);
-        return new ResponseStd<Integer>(workflowConfigService.saveWorkflows(userId, name));
+    @PostMapping("")
+    public ResponseStd<Integer> createWorkflows(@RequestBody WorkflowConfig workflowConfig) {
+        boolean saveResult = workflowConfigService.save(workflowConfig);
+        if (!saveResult) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Integer>(workflowConfig.getWfId());
+    }
+
+    // 新增流程-强调用户
+    @PostMapping("/user/{userId}")
+    public ResponseStd<Integer> createWorkflowsByUser(@PathVariable Integer userId, @RequestParam(required = false, defaultValue = "") String name) {
+//        System.out.println("userId: " + userId);
+//        System.out.println("name: " + name);
+        return new ResponseStd<Integer>(workflowConfigService.saveWorkflowsByUser(userId, name));
+    }
+
+    // 删除某一个流程
+    @DeleteMapping("/{wfId}")
+    public ResponseStd<Boolean> removeWorkflows(@PathVariable Integer wfId) {
+        return new ResponseStd<Boolean>(workflowConfigService.removeById(wfId));
+    }
+
+    // 修改某一个流程
+    @PutMapping("")
+    public ResponseStd<Boolean> updateWorkflows(@RequestBody WorkflowConfig workflowConfig) {
+        return new ResponseStd<Boolean>(workflowConfigService.removeById(workflowConfig));
+    }
+
+    // 结束流程
+    @PutMapping("/{wfId}/close")
+    public ResponseStd<Boolean> closeWorkflow(@PathVariable Integer wfId) {
+        return new ResponseStd<Boolean>(workflowExecService.closeWorkflow(wfId));
     }
 
     // 查找全部流程
     @GetMapping("")
     public ResponseStd<List<WorkflowConfig>> selectAllWorkflows() {
-        return new ResponseStd<List<WorkflowConfig>>(workflowConfigService.list());
+        List<WorkflowConfig> workflowConfigList = workflowConfigService.list();
+        if (workflowConfigList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<WorkflowConfig>>(workflowConfigList);
     }
 
     // 根据id查找某一个流程
@@ -98,7 +148,7 @@ public class WorkflowController {
 
     // 更改步骤
     // 可以空改数
-    // 不能数改空
+    // 也可以数改空 (应该？之前记得测试过)
     @PutMapping("/step/{stepId}")
     public ResponseStd<Boolean> updateSteps(@RequestBody StepConfig stepConfig) {
         return new ResponseStd<Boolean>(stepConfigService.updateById(stepConfig));
@@ -158,10 +208,21 @@ public class WorkflowController {
     }
 
     // 开始执行!!!
+
+    // 简单的新增步骤, 如果是单步执行尽量调用下方的单步执行步骤Api
+    @PostMapping("/exec")
+    public ResponseStd<Integer> createOneExec(@RequestBody WorkflowExec workflowExec) {
+        boolean saveResult = workflowExecService.save(workflowExec);
+        if(!saveResult) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Integer>(workflowExec.getExecId());
+    }
+
     // 单步执行步骤
-    @PostMapping("/exec/{stepId}")
-    public ResponseStd<Integer> addOneExec(@PathVariable Integer stepId, @RequestParam(required = false) Integer inputTypeId, @RequestParam(required = false) String inputId) {
-        return new ResponseStd<Integer>(workflowExecService.saveOneExec(stepId, inputTypeId, inputId));
+    @PostMapping("/exec/step/{stepId}")
+    public ResponseStd<Integer> createOneExecByStep(@PathVariable Integer stepId, @RequestParam(required = false) Integer inputTypeId, @RequestParam(required = false) String inputId) {
+        return new ResponseStd<Integer>(workflowExecService.saveOneExecByStep(stepId, inputTypeId, inputId));
     }
 
     // 步骤回退
@@ -170,30 +231,18 @@ public class WorkflowController {
         return new ResponseStd<Boolean>(workflowExecService.removeById(execId));
     }
 
-    // 根据步骤id（step_id ）获取到对应的执行的outputids
-    @GetMapping("/step/{stepId}/outputId")
-    public ResponseStd<String> findOutputId(@PathVariable Integer stepId) {
-        String outputId = workflowExecService.getOutputId(stepId);
-        if (Objects.equals(outputId, "")) {
-            return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, "");
-        }
-        else {
-            return new ResponseStd<String>(outputId);
-        }
-    }
-
-    // 结束流程
-    @PutMapping("/{wfId}")
-    public ResponseStd<Boolean> closeWorkflow(@PathVariable Integer wfId) {
-        return new ResponseStd<Boolean>(workflowExecService.closeWorkflow(wfId));
+    // 简单的修改步骤
+    @PutMapping("/exec")
+    public ResponseStd<Boolean> updateOneExec(@RequestBody WorkflowExec workflowExec) {
+        return new ResponseStd<Boolean>(workflowExecService.updateById(workflowExec));
     }
 
     // 获取单步执行信息
     @GetMapping("/exec/{execId}")
-    public ResponseStd<WorkflowExec> findOneExec(@PathVariable Integer execId) {
+    public ResponseStd<WorkflowExec> selectOneExec(@PathVariable Integer execId) {
         WorkflowExec workflowExec = workflowExecService.getById(execId);
         if (workflowExec == null) {
-            return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, null);
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
         else {
             return new ResponseStd<WorkflowExec>(workflowExec);
@@ -202,10 +251,10 @@ public class WorkflowController {
 
     // 根据流程id获取流程对应的执行信息
     @GetMapping("/{wfId}/exec")
-    public ResponseStd<List<WorkflowExec>> findExecsByWf(@PathVariable Integer wfId) {
+    public ResponseStd<List<WorkflowExec>> selectExecsByWf(@PathVariable Integer wfId) {
         List<WorkflowExec> workflowExecList = workflowExecService.getExecsByWf(wfId);
         if (workflowExecList == null) {
-            return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, null);
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
         else {
             return new ResponseStd<List<WorkflowExec>>(workflowExecList);
@@ -217,23 +266,390 @@ public class WorkflowController {
     public ResponseStd<List<WorkflowExec>> findAllExecs() {
         List<WorkflowExec> workflowExecList = workflowExecService.list();
         if (workflowExecList == null) {
-            return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, null);
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
         else {
             return new ResponseStd<List<WorkflowExec>>(workflowExecList);
         }
     }
 
+    // 根据步骤id（step_id ）获取到对应的执行的outputids
+    @GetMapping("/step/{stepId}/outputId")
+    public ResponseStd<String> selectOutputId(@PathVariable Integer stepId) {
+        String outputId = workflowExecService.getOutputId(stepId);
+        if (Objects.equals(outputId, "")) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, "");
+        }
+        else {
+            return new ResponseStd<String>(outputId);
+        }
+    }
+
     // 检查
     // 获取报告
-    @GetMapping("/report")
+    @GetMapping("/report/check")
     public ResponseStd<Boolean> checkOneReport(@RequestBody WorkflowExec workflowExec) {
-        boolean result = reportsService.saveOneReportByExec(workflowExec);
+        boolean result = reportService.saveOneReportByExec(workflowExec);
         if (!result) {
-            return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, result);
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, result);
         }
         else {
             return new ResponseStd<Boolean>(result);
         }
     }
+
+    // 其他表基本增删改查
+
+    // anodetect_result表
+    // 增加一个故障检测结果
+    @PostMapping("/adr")
+    public ResponseStd<Integer> createAdr(@RequestBody AnodetectResult anodetectResult) {
+        boolean saveResult = anodetectResultService.save(anodetectResult);
+        if (!saveResult) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Integer>(anodetectResult.getAdrId());
+    }
+
+    // 根据id删除一个故障检测结果
+    @DeleteMapping("/adr/{adrId}")
+    public ResponseStd<Boolean> deleteAdr(@PathVariable Integer adrId) {
+        return new ResponseStd<Boolean>(anodetectResultService.removeById(adrId));
+    }
+
+    // 修改一个故障检测结果
+    @PutMapping("/adr")
+    public ResponseStd<Boolean> updateAdr(@RequestBody AnodetectResult anodetectResult) {
+        return new ResponseStd<Boolean>(anodetectResultService.updateById(anodetectResult));
+    }
+
+    // 查找全部故障检测结果
+    @GetMapping("/adr")
+    public ResponseStd<List<AnodetectResult>> selectAllAdr() {
+        List<AnodetectResult> anodetectResultList = anodetectResultService.list();
+        if (anodetectResultList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<AnodetectResult>>(anodetectResultList);
+    }
+
+    // 根据id查找某一个故障检测结果
+    @GetMapping("/adr/{adrId}")
+    public ResponseStd<AnodetectResult> selectAdrById(@PathVariable Integer adrId) {
+        return new ResponseStd<AnodetectResult>(anodetectResultService.getById(adrId));
+    }
+
+    // cleaned_data表
+    // 增加一个日志清洗结果
+    @PostMapping("/cleaned")
+    public ResponseStd<Long> createCleanedData(@RequestBody CleanedData cleanedData) {
+        boolean saveResult = cleanedDataService.save(cleanedData);
+        if (!saveResult) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Long>(cleanedData.getCleanId());
+    }
+
+    // 根据id删除一个日志清洗结果
+    @DeleteMapping("/cleaned/{cleanId}")
+    public ResponseStd<Boolean> deleteCleanedData(@PathVariable Integer cleanId) {
+        return new ResponseStd<Boolean>(cleanedDataService.removeById(cleanId));
+    }
+
+    // 修改一个日志清洗结果
+    @PutMapping("/cleaned")
+    public ResponseStd<Boolean> updateAdr(@RequestBody CleanedData cleanedData) {
+        return new ResponseStd<Boolean>(cleanedDataService.updateById(cleanedData));
+    }
+
+    // 查找全部日志清洗结果
+    @GetMapping("/cleaned")
+    public ResponseStd<List<CleanedData>> selectAllCleanedData() {
+        List<CleanedData> cleanedDataList = cleanedDataService.list();
+        if (cleanedDataList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<CleanedData>>(cleanedDataList);
+//        return new ResponseStd<List<CleanedData>>(cleanedDataService.list());
+    }
+
+    // 根据id查找某一个算法类型
+    @GetMapping("/cleaned/{cleanId}")
+    public ResponseStd<CleanedData> selectCleanedDataById(@PathVariable Integer cleanId) {
+        return new ResponseStd<CleanedData>(cleanedDataService.getById(cleanId));
+    }
+
+    // exec_data_type_enum表
+    // 增加一个执行数据类型
+    @PostMapping("/execDataTypes")
+    public ResponseStd<Integer> createExecDataType(@RequestBody ExecDataTypeEnum execDataTypeEnum) {
+        boolean saveResult = execDataTypeEnumService.save(execDataTypeEnum);
+        if (!saveResult) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Integer>(execDataTypeEnum.getTypeId());
+    }
+
+    // 根据id删除一个执行数据类型
+    @DeleteMapping("/execDataTypes/{typeId}")
+    public ResponseStd<Boolean> deleteExecDataType(@PathVariable Integer typeId) {
+        return new ResponseStd<Boolean>(execDataTypeEnumService.removeById(typeId));
+    }
+
+    // 修改一个执行数据类型
+    @PutMapping("/execDataTypes")
+    public ResponseStd<Boolean> updateExecDataType(@RequestBody ExecDataTypeEnum execDataTypeEnum) {
+        return new ResponseStd<Boolean>(execDataTypeEnumService.updateById(execDataTypeEnum));
+    }
+
+    // 查找全部执行数据类型
+    @GetMapping("/execDataTypes")
+    public ResponseStd<List<ExecDataTypeEnum>> selectAllExecDataTypes() {
+        List<ExecDataTypeEnum> execDataTypeEnumList = execDataTypeEnumService.list();
+        if (execDataTypeEnumList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<ExecDataTypeEnum>>(execDataTypeEnumList);
+    }
+
+    // 根据id查找某一个执行数据类型
+    @GetMapping("/execDataTypes/{typeId}")
+    public ResponseStd<ExecDataTypeEnum> selectExecDataTypeById(@PathVariable Integer typeId) {
+        return new ResponseStd<ExecDataTypeEnum>(execDataTypeEnumService.getById(typeId));
+    }
+
+    // knowledgegraph_result表
+    // 增加一个知识图谱生成结果
+    @PostMapping("/kgr")
+    public ResponseStd<Integer> createKgr(@RequestBody KnowledgegraphResult knowledgegraphResult) {
+        boolean saveResult = knowledgegraphResultService.save(knowledgegraphResult);
+        if (!saveResult) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Integer>(knowledgegraphResult.getKgrId());
+    }
+
+    // 根据id删除一个知识图谱生成结果
+    @DeleteMapping("/kgr/{kgrId}")
+    public ResponseStd<Boolean> deleteKgr(@PathVariable Integer kgrId) {
+        return new ResponseStd<Boolean>(knowledgegraphResultService.removeById(kgrId));
+    }
+
+    // 修改一个知识图谱生成结果
+    @PutMapping("/kgr")
+    public ResponseStd<Boolean> updateKgr(@RequestBody KnowledgegraphResult knowledgegraphResult) {
+        return new ResponseStd<Boolean>(knowledgegraphResultService.updateById(knowledgegraphResult));
+    }
+
+    // 查找全部知识图谱生成结果
+    @GetMapping("/kgr")
+    public ResponseStd<List<KnowledgegraphResult>> selectAllKgr() {
+        List<KnowledgegraphResult> knowledgegraphResultList = knowledgegraphResultService.list();
+        if (knowledgegraphResultList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<KnowledgegraphResult>>(knowledgegraphResultList);
+    }
+
+    // 根据id查找某一个故障检测结果
+    @GetMapping("/kgr/{kgrId}")
+    public ResponseStd<KnowledgegraphResult> selectKgrById(@PathVariable Integer kgrId) {
+        return new ResponseStd<KnowledgegraphResult>(knowledgegraphResultService.getById(kgrId));
+    }
+
+    // parsed_log表
+    // 增加一个日志解析结果
+    @PostMapping("/parsed")
+    public ResponseStd<Long> createParsedLog(@RequestBody ParsedLog parsedLog) {
+        boolean saveResult = parsedLogService.save(parsedLog);
+        if (!saveResult) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Long>(parsedLog.getParseId());
+    }
+
+    // 根据id删除一个日志解析结果
+    @DeleteMapping("/parsed/{parseId}")
+    public ResponseStd<Boolean> deleteParsedLog(@PathVariable Integer parseId) {
+        return new ResponseStd<Boolean>(parsedLogService.removeById(parseId));
+    }
+
+    // 修改一个日志解析结果
+    @PutMapping("/parsed")
+    public ResponseStd<Boolean> updateParsedLog(@RequestBody ParsedLog parsedLog) {
+        return new ResponseStd<Boolean>(parsedLogService.updateById(parsedLog));
+    }
+
+    // 查找全部日志解析结果
+    @GetMapping("/parsed")
+    public ResponseStd<List<ParsedLog>> selectAllParsedLog() {
+        List<ParsedLog> parsedLogList = parsedLogService.list();
+        if (parsedLogList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<ParsedLog>>(parsedLogList);
+    }
+
+    // 根据id查找某一个日志解析结果
+    @GetMapping("/parsed/{parseId}")
+    public ResponseStd<ParsedLog> selectParsedLogById(@PathVariable Integer parseId) {
+        return new ResponseStd<ParsedLog>(parsedLogService.getById(parseId));
+    }
+
+    // report表
+    // 增加一个报告
+    @PostMapping("/report")
+    public ResponseStd<Integer> createReport(@RequestBody Report report) {
+        boolean saveResult = reportService.save(report);
+        if (!saveResult) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Integer>(report.getReportId());
+    }
+
+    // 根据id删除一个报告
+    @DeleteMapping("/report/{reportId}")
+    public ResponseStd<Boolean> deleteReport(@PathVariable Integer reportId) {
+        return new ResponseStd<Boolean>(reportService.removeById(reportId));
+    }
+
+    // 修改一个报告
+    @PutMapping("/report")
+    public ResponseStd<Boolean> updateReport(@RequestBody Report report) {
+        return new ResponseStd<Boolean>(reportService.updateById(report));
+    }
+
+    // 查找全部报告
+    @GetMapping("/report")
+    public ResponseStd<List<Report>> selectAllReports() {
+        List<Report> reportList = reportService.list();
+        if (reportList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<Report>>(reportList);
+    }
+
+    // 根据id查找某一个报告
+    @GetMapping("/report/{reportId}")
+    public ResponseStd<Report> selectReportById(@PathVariable Integer reportId) {
+        return new ResponseStd<Report>(reportService.getById(reportId));
+    }
+
+    // rootcause_result表
+    // 增加一个根因分析结果
+    @PostMapping("/rcr")
+    public ResponseStd<Integer> createRcr(@RequestBody RootcauseResult rootcauseResult) {
+        boolean saveResult = rootcauseResultService.save(rootcauseResult);
+        if (!saveResult) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Integer>(rootcauseResult.getRcrId());
+    }
+
+    // 根据id删除一个根因分析结果
+    @DeleteMapping("/rcr/{rcrId}")
+    public ResponseStd<Boolean> deleteRcr(@PathVariable Integer rcrId) {
+        return new ResponseStd<Boolean>(rootcauseResultService.removeById(rcrId));
+    }
+
+    // 修改一个根因分析结果
+    @PutMapping("/rcr")
+    public ResponseStd<Boolean> updateRcr(@RequestBody RootcauseResult rootcauseResult) {
+        return new ResponseStd<Boolean>(rootcauseResultService.updateById(rootcauseResult));
+    }
+
+    // 查找全部根因分析结果
+    @GetMapping("/rcr")
+    public ResponseStd<List<RootcauseResult>> selectAllRcr() {
+        List<RootcauseResult> rootcauseResultList = rootcauseResultService.list();
+        if (rootcauseResultList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<RootcauseResult>>(rootcauseResultList);
+    }
+
+    // 根据id查找某一个根因分析结果
+    @GetMapping("/rcr/{rcrId}")
+    public ResponseStd<RootcauseResult> selectRcrById(@PathVariable Integer rcrId) {
+        return new ResponseStd<RootcauseResult>(rootcauseResultService.getById(rcrId));
+    }
+
+    // step_type_enum表
+    // 增加一个步骤类型
+    @PostMapping("/stepTypes")
+    public ResponseStd<Integer> createStepType(@RequestBody StepTypeEnum stepTypeEnum) {
+        boolean saveResult = stepTypeEnumService.save(stepTypeEnum);
+        if (!saveResult) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Integer>(stepTypeEnum.getTypeId());
+    }
+
+    // 根据id删除一个步骤类型
+    @DeleteMapping("/stepTypes/{typeId}")
+    public ResponseStd<Boolean> deleteStepType(@PathVariable Integer typeId) {
+        return new ResponseStd<Boolean>(stepTypeEnumService.removeById(typeId));
+    }
+
+    // 修改一个步骤类型
+    @PutMapping("/stepTypes")
+    public ResponseStd<Boolean> updateStepType(@RequestBody StepTypeEnum stepTypeEnum) {
+        return new ResponseStd<Boolean>(stepTypeEnumService.updateById(stepTypeEnum));
+    }
+
+    // 查找全部执行数据类型
+    @GetMapping("/stepTypes")
+    public ResponseStd<List<StepTypeEnum>> selectAllStepTypes() {
+        List<StepTypeEnum> stepTypeEnumList = stepTypeEnumService.list();
+        if (stepTypeEnumList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<StepTypeEnum>>(stepTypeEnumList);
+    }
+
+    // 根据id查找某一个执行数据类型
+    @GetMapping("/stepTypes/{typeId}")
+    public ResponseStd<StepTypeEnum> selectStepTypeById(@PathVariable Integer typeId) {
+        return new ResponseStd<StepTypeEnum>(stepTypeEnumService.getById(typeId));
+    }
+
+    // vectorized_log表
+    // 增加一个日志向量化结果
+    @PostMapping("/vectorized")
+    public ResponseStd<Long> createVectorizedLog(@RequestBody VectorizedLog vectorizedLog) {
+        boolean saveResult = vectorizedLogService.save(vectorizedLog);
+        if (!saveResult) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Long>(vectorizedLog.getVectorId());
+    }
+
+    // 根据id删除一个日志向量化结果
+    @DeleteMapping("/vectorized/{vectorId}")
+    public ResponseStd<Boolean> deleteVectorizedLog(@PathVariable Integer vectorId) {
+        return new ResponseStd<Boolean>(vectorizedLogService.removeById(vectorId));
+    }
+
+    // 修改一个日志向量化结果
+    @PutMapping("/vectorized")
+    public ResponseStd<Boolean> updateVectorizedLog(@RequestBody VectorizedLog vectorizedLog) {
+        return new ResponseStd<Boolean>(vectorizedLogService.updateById(vectorizedLog));
+    }
+
+    // 查找全部日志向量化结果
+    @GetMapping("/vectorized")
+    public ResponseStd<List<VectorizedLog>> selectAllVectorizedLog() {
+        List<VectorizedLog> vectorizedLogList = vectorizedLogService.list();
+        if (vectorizedLogList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<VectorizedLog>>(vectorizedLogList);
+    }
+
+    // 根据id查找某一个日志向量化结果
+    @GetMapping("/vectorized/{vectorId}")
+    public ResponseStd<VectorizedLog> selectVectorizedLogById(@PathVariable Integer vectorId) {
+        return new ResponseStd<VectorizedLog>(vectorizedLogService.getById(vectorId));
+    }
+
 }

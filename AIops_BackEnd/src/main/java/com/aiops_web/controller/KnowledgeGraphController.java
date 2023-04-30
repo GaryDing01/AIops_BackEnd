@@ -2,16 +2,16 @@ package com.aiops_web.controller;
 
 import com.aiops_web.dto.Neo4jRelationshipDto;
 import com.aiops_web.entity.neo4j.Node;
+import com.aiops_web.entity.neo4j.Relationship;
+import com.aiops_web.entity.sql.AnodetectResult;
+import com.aiops_web.entity.sql.RelationshipEnum;
+import com.aiops_web.service.RelationshipEnumService;
 import com.aiops_web.service.neo4j.KnowledgeGraphService;
 import com.aiops_web.service.neo4j.SystemArchitectureService;
+import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
 
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -23,6 +23,9 @@ public class KnowledgeGraphController {
 
     @Resource
     private KnowledgeGraphService knowledgeGraphService;
+
+    @Resource
+    RelationshipEnumService relationshipEnumService;
 
     // Node
     @RequestMapping(value = "/nodes", method = RequestMethod.POST)
@@ -145,5 +148,46 @@ public class KnowledgeGraphController {
     public ResponseStd<Boolean> SystemArchitecture() {
         Boolean res = systemArchitectureService.configSystemArchitecture();
         return new ResponseStd<>(res, 200, "success", "返回是否成功!");
+    }
+
+    // 其他表基本增删改查
+
+    // relationship_enum表
+    // 增加一个关系类型
+    @PostMapping("/relaTypes")
+    public ResponseStd<Integer> createRelaType(@RequestBody RelationshipEnum relationshipEnum) {
+        boolean saveResult = relationshipEnumService.save(relationshipEnum);
+        if (!saveResult) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Integer>(relationshipEnum.getRelationId());
+    }
+
+    // 根据id删除一个关系类型
+    @DeleteMapping("/relaTypes/{relationId}")
+    public ResponseStd<Boolean> deleteRelaType(@PathVariable Integer relationId) {
+        return new ResponseStd<Boolean>(relationshipEnumService.removeById(relationId));
+    }
+
+    // 修改一个关系类型
+    @PutMapping("/relaTypes")
+    public ResponseStd<Boolean> updateRelaType(@RequestBody RelationshipEnum relationshipEnum) {
+        return new ResponseStd<Boolean>(relationshipEnumService.updateById(relationshipEnum));
+    }
+
+    // 查找全部关系类型
+    @GetMapping("/relaTypes")
+    public ResponseStd<List<RelationshipEnum>> selectAllRelaTypes() {
+        List<RelationshipEnum> relationshipEnumList = relationshipEnumService.list();
+        if (relationshipEnumList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<RelationshipEnum>>(relationshipEnumList);
+    }
+
+    // 根据id查找某一个关系类型
+    @GetMapping("/relaTypes/{relationId}")
+    public ResponseStd<RelationshipEnum> selectRelaTypesById(@PathVariable Integer relationId) {
+        return new ResponseStd<RelationshipEnum>(relationshipEnumService.getById(relationId));
     }
 }

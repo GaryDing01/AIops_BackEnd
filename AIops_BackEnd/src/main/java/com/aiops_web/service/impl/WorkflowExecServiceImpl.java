@@ -77,7 +77,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
 
     // 单步执行
     @Override
-    public Integer saveOneExec(Integer stepId, Integer inputTypeId, String inputId) {
+    public Integer saveOneExecByStep(Integer stepId, Integer inputTypeId, String inputId) {
         // 1. 先拿到步骤信息并完善信息
         System.out.println("1. 先拿到步骤信息并完善信息");
         StepConfig stepConfig = stepConfigMapper.selectById(stepId);

@@ -7,12 +7,14 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class AnodetectResult {
+public class RootcauseResult {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "adr_id", type = IdType.AUTO)
-    private Integer adrId;
+    @TableId(value = "rcr_id", type = IdType.AUTO)
+    private Integer rcrId;
 
-    private String sourceDataSections;
+    private String sourceDataSection;
+
+    private String path;
 }

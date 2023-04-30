@@ -21,7 +21,7 @@ public interface WorkflowExecService extends IService<WorkflowExec> {
     ExecStepDTO getOneExecStep(Integer wfId, Integer stepNum);
 
     // 单步执行流程
-    Integer saveOneExec(Integer stepId, Integer inputTypeId, String inputId);
+    Integer saveOneExecByStep(Integer stepId, Integer inputTypeId, String inputId);
 
     // 根据步骤id（step_id ）获取到对应的执行的outputids
     String getOutputId(Integer stepId);

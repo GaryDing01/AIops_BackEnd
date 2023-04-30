@@ -2,10 +2,7 @@ package com.aiops_web.controller;
 
 
 import com.aiops_web.dto.ExecStepDTO;
-import com.aiops_web.entity.sql.AnomalyInfo;
-import com.aiops_web.entity.sql.Report;
-import com.aiops_web.entity.sql.WorkflowConfig;
-import com.aiops_web.entity.sql.WorkflowExec;
+import com.aiops_web.entity.sql.*;
 import com.aiops_web.service.AnomalyInfoService;
 import com.aiops_web.service.ReportService;
 import com.aiops_web.service.WorkflowConfigService;
@@ -44,7 +41,7 @@ public class AnomalyInfoController {
     ReportService reportService;
 
     // 分页查找
-    @GetMapping()
+    @GetMapping("/page")
     public ResponseStd<List<AnomalyInfo>> getAnomalyInfos(@RequestParam int pageNum, @RequestParam int count,
                                                           @RequestParam(required = false) Integer ano_id, @RequestParam(required = false) Integer obj_id,
                                                           @RequestParam(required = false) Integer status_id, @RequestParam(required = false) Integer user_id,
@@ -75,6 +72,16 @@ public class AnomalyInfoController {
             return new ResponseStd<>(ErrorCode.NULL_ERROR);
         }
         return new ResponseStd<>(infos);
+    }
+
+    // 补, 获取所有故障信息
+    @GetMapping("")
+    public ResponseStd<List<AnomalyInfo>> selectAllAnoInfo() {
+        List<AnomalyInfo> anomalyInfoList = anomalyInfoService.list();
+        if (anomalyInfoList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<AnomalyInfo>>(anomalyInfoList);
     }
 
     // 更新故障状态

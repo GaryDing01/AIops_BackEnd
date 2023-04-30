@@ -17,7 +17,7 @@ import java.util.List;
  */
 public interface WorkflowConfigService extends IService<WorkflowConfig> {
     // 新增流程
-    Integer saveWorkflows(Integer userId, String name);
+    Integer saveWorkflowsByUser(Integer userId, String name);
 
     // 查看已经结束的流程
     List<WorkflowConfig> getEndedWorkflows();

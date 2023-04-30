@@ -39,7 +39,7 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
 
     // 新增流程
     @Override
-    public Integer saveWorkflows(Integer userId, String name) {
+    public Integer saveWorkflowsByUser(Integer userId, String name) {
 
         // 创建流程
         WorkflowConfig workflowConfig = new WorkflowConfig();
@@ -51,32 +51,26 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
         workflowConfig.setUserId(userId);
 
         workflowConfigMapper.insert(workflowConfig);
-        int wfId = workflowConfig.getWfId();
-//        System.out.println("workflowConfig.getWfId()" + workflowConfig.getWfId());
+//        int wfId = workflowConfig.getWfId();
 
-        // 创建第一个步骤 -- 源数据 (固定)
-        StepConfig stepConfig = new StepConfig();
-        stepConfig.setTypeId(1); // 固定编号1为最开始的源数据
-        stepConfig.setStepNum(1);
-
-        // 获取数据源对应编号
-        QueryWrapper<AiopsObjEnum> wrapper = new QueryWrapper<>();
-        wrapper.eq("name","log");
-        int dataTypeId = aiopsObjEnumMapper.selectOne(wrapper).getObjId();
-
-//        // 插入JSON数据
-//        Map<String, Object> map = new LinkedHashMap<>();
-//        map.put("dataType", dataType);
-//        stepConfig.setParam(map);
-
-        // 插入String数据，用数据类型代表param
-        String param_1 = "[{\"dataTypeId\": " + dataTypeId + "}]";
-        stepConfig.setParam(param_1);
-
-        stepConfig.setAlgId(-1); //此时没有算法
-        stepConfig.setWfId(wfId);
-
-        stepConfigMapper.insert(stepConfig);
+//        // 创建第一个步骤 -- 源数据 (固定)
+//        StepConfig stepConfig = new StepConfig();
+//        stepConfig.setTypeId(1); // 固定编号1为最开始的源数据
+//        stepConfig.setStepNum(1);
+//
+//        // 获取数据源对应编号
+//        QueryWrapper<AiopsObjEnum> wrapper = new QueryWrapper<>();
+//        wrapper.eq("name","log");
+//        int dataTypeId = aiopsObjEnumMapper.selectOne(wrapper).getObjId();
+//
+//        // 插入String数据，用数据类型代表param
+//        String param_1 = "[{\"dataTypeId\": " + dataTypeId + "}]";
+//        stepConfig.setParam(param_1);
+//
+//        stepConfig.setAlgId(-1); //此时没有算法
+//        stepConfig.setWfId(wfId);
+//
+//        stepConfigMapper.insert(stepConfig);
 
         return workflowConfig.getWfId();
     }

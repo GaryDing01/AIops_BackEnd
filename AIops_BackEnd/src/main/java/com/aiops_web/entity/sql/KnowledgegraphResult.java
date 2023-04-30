@@ -7,12 +7,18 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class AnodetectResult {
+public class KnowledgegraphResult {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "adr_id", type = IdType.AUTO)
-    private Integer adrId;
+    @TableId(value = "kgr_id", type = IdType.AUTO)
+    private Integer kgrId;
 
-    private String sourceDataSections;
+    private String sourceDataSection;
+
+    private String nodeIds;
+
+    private String relationIds;
+
+    private String rootcauseIds;
 }
