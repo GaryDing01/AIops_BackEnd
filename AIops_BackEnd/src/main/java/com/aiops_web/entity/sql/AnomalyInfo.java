@@ -1,10 +1,9 @@
 package com.aiops_web.entity.sql;
 
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.*;
+
+import java.sql.Timestamp;
 import java.util.Date;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,18 +22,23 @@ public class AnomalyInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "ano_id", type = IdType.AUTO)
+    @TableId(value = "ano_id", type = IdType.AUTO)
     private Integer anoId;
 
     private Integer objId;
 
     private Integer statusId;
 
-    private Date detectTstamp;
+    private Integer unitnodeTypeId;
 
-    private Date predictTstamp;
+    private String unitnodeName;
 
-    private Date updateTstamp;
+    private Timestamp detectTstamp;
+
+    @TableField(updateStrategy = FieldStrategy.IGNORED) // 为将来填写预期出现故障时间打算
+    private Timestamp predictTstamp;
+
+    private Timestamp updateTstamp;
 
     private String sourceDataIds;
 

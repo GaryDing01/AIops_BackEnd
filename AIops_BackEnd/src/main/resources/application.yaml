@@ -23,7 +23,7 @@ spring:
       datasource:
         # MySQL
         master:
-          url: jdbc:mysql://localhost:3306/aiops_db?useUnicode=true&&characterEncoding=UTF-8
+          url: jdbc:mysql://localhost:3306/aiops_db?useUnicode=true&&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
           driver-class-name: com.mysql.cj.jdbc.Driver
           username: AIops_Admin
           password: AIops_Admin
@@ -44,6 +44,10 @@ spring:
       password: neo4j
   elasticsearch:
     uris: 82.157.145.14:9200
+  # jpa:
+  #   show-sql: true
+  #   hibernate:
+  #     ddl-auto: none
 
 mybatis-plus:  # if mybatis, change this
   mapper-locations: classpath:/mapping/**/*.xml
@@ -51,3 +55,10 @@ mybatis-plus:  # if mybatis, change this
   # Only for mybatis-plus
 #  configuration:
 #    map-underscore-to-camel-case: false
+
+jsch:
+  username: serveradmin/root
+  ip: 10.60.38.173
+  port: 50022
+  password: Tongji409!
+  StrictHostKeyChecking: 'no'

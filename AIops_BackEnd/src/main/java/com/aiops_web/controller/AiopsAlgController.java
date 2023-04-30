@@ -2,26 +2,30 @@ package com.aiops_web.controller;
 
 
 import com.aiops_web.entity.sql.AiopsAlg;
-import com.aiops_web.service.AiopsAlgService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
+import com.aiops_web.service.AiopsAlgService;
+import scala.Int;
 
 import javax.annotation.Resource;
 import java.util.List;
+
 
 /**
  * <p>
  *  前端控制器
  * </p>
  *
- * @author 
+ * @author
  * @since 2023-04-12
  */
 @RestController
 @RequestMapping("/algorithm")
 public class AiopsAlgController {
+
     @Resource
     AiopsAlgService aiopsAlgService;
 
@@ -56,8 +60,9 @@ public class AiopsAlgController {
     }
 
     @DeleteMapping()
-    public ResponseStd<Integer> deleteAlgByIds(@RequestBody List<Integer> ids) {
+    public ResponseStd<Integer> deleteAlgByIds(@RequestParam List<Integer> ids) {
         // test ids
+        System.out.println();
         if (ids.isEmpty()) {
             return new ResponseStd<>(ErrorCode.PARAMS_ERROR);
         }
@@ -66,5 +71,6 @@ public class AiopsAlgController {
         int tupleNum = aiopsAlgService.deleteAlgByIds(ids);
         return new ResponseStd<>(tupleNum);
     }
+
 }
 
