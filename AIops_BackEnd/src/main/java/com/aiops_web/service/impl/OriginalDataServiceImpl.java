@@ -1,6 +1,7 @@
 package com.aiops_web.service.impl;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
@@ -48,7 +49,8 @@ public class OriginalDataServiceImpl implements OriginalDataService {
         try {
             SearchResponse<OriginalData> searchResponse = client.search(
                     s -> s.index(index).query(
-                            q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))),
+                            q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))
+                    ).sort(o -> o.field(f -> f.field("calcId").order(SortOrder.Asc))),
                     OriginalData.class);
 
             searchResponse.hits().hits().forEach(h -> dataList.add(h.source()));
@@ -75,7 +77,7 @@ public class OriginalDataServiceImpl implements OriginalDataService {
                             q -> q.bool(b -> b.
                                     must(m -> m.match(u -> u.field("batchId").query(batchId))).
                                     must(m -> m.range(r -> r.field("relaId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))))
-                    ),
+                    ).sort(o -> o.field(f -> f.field("relaId").order(SortOrder.Asc))),
                     OriginalData.class); // must是必须满足所有条件
             searchResponse.hits().hits().forEach(h -> dataList.add(h.source()));
 
@@ -99,7 +101,8 @@ public class OriginalDataServiceImpl implements OriginalDataService {
             //查询 es 中符合条件的数据 id
             SearchResponse<OriginalData> searchResponse = client.search(
                     s -> s.index(index).query(
-                            q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))),
+                            q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))
+                    ),
                     OriginalData.class);
 
             searchResponse.hits().hits().forEach(h -> updateList.add(h.source()));

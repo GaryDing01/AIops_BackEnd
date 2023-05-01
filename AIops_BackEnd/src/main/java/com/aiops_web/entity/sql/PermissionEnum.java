@@ -17,20 +17,14 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class User implements Serializable {
+public class PermissionEnum implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "user_id", type = IdType.AUTO)
-    private Integer userId;
+      @TableId(value = "permit_id", type = IdType.AUTO)
+    private Integer permitId;
 
-    private Integer roleId;
-
-    private String name;
-
-    private String password;
-
-    private String permitIds;
+    private String content;
 
 
 }

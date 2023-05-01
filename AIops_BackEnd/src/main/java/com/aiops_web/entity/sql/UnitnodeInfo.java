@@ -22,7 +22,7 @@ public class UnitnodeInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "unit_id", type = IdType.AUTO)
+    @TableId(value = "unit_id", type = IdType.AUTO)
     private Integer unitId;
 
     private Integer typeId;

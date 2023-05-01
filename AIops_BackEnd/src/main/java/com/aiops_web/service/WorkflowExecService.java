@@ -1,5 +1,6 @@
 package com.aiops_web.service;
 
+import com.aiops_web.dto.ExecStepDTO;
 import com.aiops_web.entity.sql.WorkflowExec;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -15,8 +16,12 @@ import java.util.List;
  */
 public interface WorkflowExecService extends IService<WorkflowExec> {
 
+    // 简单包装的工具方法
+    // 查一个执行步骤
+    ExecStepDTO getOneExecStep(Integer wfId, Integer stepNum);
+
     // 单步执行流程
-    Integer saveOneExec(Integer stepId, Integer inputTypeId, String inputId);
+    Integer saveOneExecByStep(Integer stepId, Integer inputTypeId, String inputId);
 
     // 根据步骤id（step_id ）获取到对应的执行的outputids
     String getOutputId(Integer stepId);

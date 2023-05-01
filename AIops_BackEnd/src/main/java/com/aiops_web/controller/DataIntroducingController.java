@@ -2,13 +2,17 @@ package com.aiops_web.controller;
 
 
 import com.aiops_web.entity.elasticsearch.OriginalData;
+import com.aiops_web.entity.sql.AnodetectResult;
+import com.aiops_web.entity.sql.CleanedData;
 import com.aiops_web.entity.sql.DataIntroducing;
+import com.aiops_web.service.CleanedDataService;
 import com.aiops_web.service.DataIntroducingService;
 import com.aiops_web.service.OriginalDataService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -24,6 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/dataIntro")
 public class DataIntroducingController {
+
     private final DataIntroducingService dataIntroducingService;
     private final OriginalDataService originalDataService;
 
@@ -71,5 +76,14 @@ public class DataIntroducingController {
     public ResponseStd<List<DataIntroducing>> getAll() {
         return new ResponseStd<>(dataIntroducingService.list());
     }
+
+    // 补
+    @GetMapping("/{batchId}")
+    public ResponseStd<DataIntroducing> selectDIById(@PathVariable Integer batchId) {
+        return new ResponseStd<DataIntroducing>(dataIntroducingService.getById(batchId));
+    }
+
+    // 其他表基本增删改查
+
 }
 

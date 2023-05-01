@@ -2,6 +2,7 @@ server:
   port: 8080
   tomcat:
     uri-encoding: UTF-8
+
 spring:
   datasource:
     druid:
@@ -28,20 +29,19 @@ spring:
           password: AIops_Admin
         # Neo4j
         neo4j:
-          url: jdbc:neo4j:bolt://localhost:7687/neo4j
+          url: jdbc:neo4j:bolt://localhost:7687
           driver-class-name: org.neo4j.jdbc.Driver
           username: neo4j
-          password: neo4j123
-          # Encounter Error but Okay
-          # druid:
-          #   test-while-idle: false
-          #   validation-query: MATCH(n)
+          password: neo4j
+#          #  Encounter Error but Okay
+#          druid:
+#            test-while-idle: false
+#            validation-query: MATCH(n) RETURN n
   neo4j:
-    url: bolt://localhost:7687/neo4j
+    url: bolt://localhost:7687
     authentication:
       username: neo4j
-      password: neo4j123
-
+      password: neo4j
   elasticsearch:
     uris: 82.157.145.14:9200
   # jpa:
@@ -62,4 +62,3 @@ jsch:
   port: 50022
   password: Tongji409!
   StrictHostKeyChecking: 'no'
-
