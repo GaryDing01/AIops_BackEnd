@@ -3,6 +3,7 @@ package com.aiops_web.service.impl;
 import com.aiops_web.dao.sql.*;
 import com.aiops_web.entity.sql.*;
 import com.aiops_web.service.AnomalyInfoService;
+import com.aiops_web.service.UnitnodeTypeEnumService;
 import com.aiops_web.utils.Utils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -40,6 +41,9 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
 
     @Resource
     AnodetectResultMapper anodetectResultMapper;
+
+    @Resource
+    UnitnodeTypeEnumMapper unitnodeTypeEnumMapper;
 
     Utils utils = new Utils();
 
@@ -80,7 +84,7 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
     // 根据故障检测(本次只涉及故障检测)的执行结果(此时workflowExec信息应该完成)来保存故障信息
     @Override
     public boolean saveAnoInfoByExec(WorkflowExec workflowExec) {
-        if (workflowExec.getOutputTypeId() != 4) { // 本项目只涉及故障检测
+        if (workflowExec.getOutputTypeId() != 5) { // 本项目只涉及故障检测
             return false;
         }
 
@@ -93,22 +97,41 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
         wrapper_2.eq("name", "未确认");
         int statusId = anomalyStatusEnumMapper.selectOne(wrapper_2).getStatusId();
 
+        QueryWrapper<UnitnodeTypeEnum> wrapper_3 = new QueryWrapper<>();
+        wrapper_3.eq("name", "Service");
+        int unitnodeTypeId = unitnodeTypeEnumMapper.selectOne(wrapper_3).getTypeId();
+
         StepConfig stepConfig = stepConfigMapper.selectById(workflowExec.getStepId());
         WorkflowConfig workflowConfig = workflowConfigMapper.selectById(stepConfig.getWfId());
 
-        long adrId = Long.parseLong(workflowExec.getOutputId());
-        String[] temp = anodetectResultMapper.selectById(adrId).getSourceDataSections().split("\\|");
-        int anoNum = temp.length; // 该次执行发现了多少个故障
-        for (int i = 0; i < temp.length; i++) {
+//        long adrId = Long.parseLong(workflowExec.getOutputId());
+//        String[] temp = anodetectResultMapper.selectById(adrId).getSourceDataSections().split("\\|");
+//        int anoNum = temp.length; // 该次执行发现了多少个故障
+
+        String[] anodetectOutputArray = workflowExec.getOutputId().split("\\|");
+        if (anodetectOutputArray.length != 2) {
+            return false;
+        }
+        long startId = Long.parseLong(anodetectOutputArray[0]);
+        long endId = Long.parseLong(anodetectOutputArray[1]);
+        QueryWrapper<AnodetectResult> wrapper_4 = new QueryWrapper<>();
+        wrapper_4.between("adr_id", startId, endId);
+        List<AnodetectResult> anodetectResultList = anodetectResultMapper.selectList(wrapper_4);
+
+        int anoNum = anodetectResultList.size(); // 该次执行发现了多少个故障
+
+        for (int i = 0; i < anoNum; i++) {
 
             AnomalyInfo anomalyInfo = new AnomalyInfo();
 
             // 先解析故障对应的源日志id
-            String sourceDataIds = temp[i].replace("-", "|");
+            String sourceDataIds = anodetectResultList.get(i).getSourceDataSection();
 
             // 填写故障信息记录的基本信息
             anomalyInfo.setObjId(objId);
             anomalyInfo.setStatusId(statusId);
+            anomalyInfo.setUnitnodeTypeId(unitnodeTypeId);
+            anomalyInfo.setUnitnodeName("cart" + i);
             anomalyInfo.setSourceDataIds(sourceDataIds);
             anomalyInfo.setUserId(workflowConfig.getUserId());
             anomalyInfo.setWfId(workflowConfig.getWfId());
@@ -118,6 +141,8 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
             anomalyInfo.setUpdateTstamp(currentTimestamp);
 
             // 插入数据
+            System.out.println("Anomaly Info: ");
+            System.out.println(anomalyInfo);
             int insertResult = anomalyInfoMapper.insert(anomalyInfo);
             if (insertResult < 0) {
                 return false;

@@ -2,6 +2,7 @@ package com.aiops_web.entity.sql;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -21,4 +22,7 @@ public class KnowledgegraphResult {
     private String relationIds;
 
     private String rootcauseIds;
+
+    @TableLogic
+    private Integer deleted;
 }

@@ -298,17 +298,27 @@ public class WorkflowController {
         }
     }
 
+    // 查看一个流程的所有报告
+    @GetMapping("/{wfId}/report")
+    public ResponseStd<List<Report>> selectReportByWf(@PathVariable Integer wfId) {
+        List<Report> reportList = reportService.list();
+        if (reportList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<Report>>(reportList);
+    }
+
     // 其他表基本增删改查
 
     // anodetect_result表
     // 增加一个故障检测结果
     @PostMapping("/adr")
-    public ResponseStd<Integer> createAdr(@RequestBody AnodetectResult anodetectResult) {
+    public ResponseStd<Long> createAdr(@RequestBody AnodetectResult anodetectResult) {
         boolean saveResult = anodetectResultService.save(anodetectResult);
         if (!saveResult) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
-        return new ResponseStd<Integer>(anodetectResult.getAdrId());
+        return new ResponseStd<Long>(anodetectResult.getAdrId());
     }
 
     // 根据id删除一个故障检测结果

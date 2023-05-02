@@ -35,6 +35,8 @@ public class DataIntroducing implements Serializable {
 
     private Integer objId;
 
+    private Long dataNum;
+
     private String dataSample;
 
     private Integer userId;
