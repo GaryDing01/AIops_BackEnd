@@ -32,16 +32,16 @@ spring:
           url: jdbc:neo4j:bolt://localhost:7687
           driver-class-name: org.neo4j.jdbc.Driver
           username: neo4j
-          password: neo4j
+          password: neo4j123
 #          #  Encounter Error but Okay
 #          druid:
 #            test-while-idle: false
 #            validation-query: MATCH(n) RETURN n
   neo4j:
-    url: bolt://localhost:7687
+    url: bolt://localhost:7687/neo4j
     authentication:
       username: neo4j
-      password: neo4j
+      password: neo4j123
   elasticsearch:
     uris: 82.157.145.14:9200
   # jpa:
