@@ -29,7 +29,7 @@ spring:
           password: AIops_Admin
         # Neo4j
         neo4j:
-          url: jdbc:neo4j:bolt://localhost:7687
+          url: jdbc:neo4j:bolt://localhost:7687/neo4j
           driver-class-name: org.neo4j.jdbc.Driver
           username: neo4j
           password: neo4j123
