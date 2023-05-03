@@ -10,7 +10,7 @@ import java.util.List;
 public class UserPermissionDTO {
     private Integer userId;
 
-    private String role;
+    private Integer roleId;
 
     private String name;
 
@@ -20,7 +20,7 @@ public class UserPermissionDTO {
         if (user == null)
             return;
         this.userId = user.getUserId();
-        this.role = user.getRole();
+        this.roleId = user.getRoleId();
         this.name = user.getName();
         this.permissions = permissionToList(user.getPermitIds());
     }

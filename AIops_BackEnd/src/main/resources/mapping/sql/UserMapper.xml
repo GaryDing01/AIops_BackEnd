@@ -20,9 +20,13 @@
     </select>
 
     <insert id="createUser">
-        insert into user (role, name, password, permit_ids)
-        values (#{role}, #{name}, #{password}, #{permitIds});
+        insert into user (role_id, name, password, permit_ids)
+        values (#{roleId}, #{name}, #{password}, #{permitIds});
     </insert>
+    
+    <select id="getInitPermits" resultType="String">
+        select permit_ids from role_enum where role_id=#{roleId};
+    </select>
 
     <delete id="deleteUserById" >
         delete
@@ -58,8 +62,11 @@
             <if test="name!=null and name!=''">
                 name = #{name},
             </if>
-            <if test="role!=null and role!=''">
-                role = #{role},
+            <if test="roleId!=null and roleId!=''">
+                role_id = #{roleId},
+            </if>
+            <if test="permitIds!=null and permitIds!=''">
+                permit_ids = #{permitIds},
             </if>
         </set>
         where user_id=#{userId};

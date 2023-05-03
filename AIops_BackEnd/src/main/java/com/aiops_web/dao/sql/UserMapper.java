@@ -25,6 +25,8 @@ public interface UserMapper extends BaseMapper<User> {
 
     int createUser(User user);
 
+    String getInitPermits(int roleId);
+
     int deleteUserById(long userId);
 
     String getPassword(long userId);

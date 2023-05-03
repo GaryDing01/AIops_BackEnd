@@ -5,8 +5,6 @@ import com.aiops_web.entity.sql.AnomalyInfo;
 import com.aiops_web.service.AnomalyInfoService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
-import org.assertj.core.internal.bytebuddy.asm.Advice;
-import org.neo4j.annotations.Public;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +31,7 @@ public class AnomalyInfoController {
                                                           @RequestParam(required = false) Integer ano_id, @RequestParam(required = false) Integer obj_id,
                                                           @RequestParam(required = false) Integer status_id, @RequestParam(required = false) Integer user_id,
                                                           @RequestParam(required = false) Integer wf_id, @RequestParam(required = false) Integer deleted,
+                                                          @RequestParam(required = false) Integer unitnode_type_id, @RequestParam(required = false) String unitnode_name,
                                                           @RequestParam(required = false) String source_data_id, @RequestParam(required = false) String detect_tstamp,
                                                           @RequestParam(required = false) String predict_tstamp, @RequestParam(required = false) String update_tstamp) {
         // 收集查询的条件
@@ -40,6 +39,8 @@ public class AnomalyInfoController {
         info.setAnoId(ano_id);
         info.setObjId(obj_id);
         info.setStatusId(status_id);
+        info.setUnitnodeName(unitnode_name);
+        info.setUnitnodeTypeId(unitnode_type_id);
         info.setUserId(user_id);
         info.setWfId(wf_id);
         info.setDeleted(deleted);

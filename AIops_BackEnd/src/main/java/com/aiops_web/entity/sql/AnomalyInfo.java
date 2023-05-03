@@ -30,6 +30,10 @@ public class AnomalyInfo implements Serializable {
 
     private Integer statusId;
 
+    private Integer unitnodeTypeId;
+
+    private String unitnodeName;
+
     private Date detectTstamp;
 
     private Date predictTstamp;

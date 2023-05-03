@@ -79,7 +79,6 @@ public class UserController {
     @PostMapping()
     public ResponseStd<Boolean> createUser(@RequestBody User user) {
         boolean res = userService.createUser(user);
-        System.out.println();
         return new ResponseStd<>(res);
     }
 

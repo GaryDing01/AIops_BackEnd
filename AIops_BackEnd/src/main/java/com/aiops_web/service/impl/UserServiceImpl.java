@@ -62,8 +62,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public boolean createUser(User user) {
-        if (!permissionVerify(user.getPermitIds()))
+//        if (!permissionVerify(user.getPermitIds()))
+//            return false;
+        //   创建的时候不需要permitIds  根据roleId 拉取初始化permits
+        String permitIds = userMapper.getInitPermits(user.getRoleId());
+        if (permitIds == null || permitIds.equals("")) {
             return false;
+        }
+
+        user.setPermitIds(permitIds);
+
         return userMapper.createUser(user) > 0;
     }
 
@@ -109,7 +117,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         if (type.equals("role")) {
-            user.setRole(content);
+            // 这里更改role  同时把 role 的初始permits给这个user
+            String permits = userMapper.getInitPermits(Integer.parseInt(content));
+            if (permits == null || permits.equals("")) {
+                return false;
+            }
+
+            user.setRoleId(Integer.parseInt(content));
+            user.setPermitIds(permits);
         }
         if (type.equals("name")) {
             user.setName(content);
