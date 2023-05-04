@@ -13,7 +13,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OriginalData {
+public class OriginalData implements Comparable<OriginalData> {
 
     private Integer batchId;
 
@@ -38,4 +38,10 @@ public class OriginalData {
     @Field(name = "_class", type = FieldType.Keyword, index = false)
     @JsonIgnore
     private String _class;
+
+    @Override
+    public int compareTo(OriginalData o) {
+        long minus = this.getCalcId() - o.getCalcId();
+        return new Long(minus).intValue();
+    }
 }
