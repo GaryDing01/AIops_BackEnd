@@ -45,6 +45,25 @@ public class KnowledgeGraphController {
         return new ResponseStd<>(nodes, 200, "success", "返回节点!");
     }
 
+    @RequestMapping(value = "/nodes/multiple", method = RequestMethod.GET)
+    public ResponseStd<List<Node>> getNodeListByNodeIds(
+            @RequestParam(required = true) List<Long> ids) {
+        List<Node> nodes = knowledgeGraphService.getNodeListByNodeIds(ids);
+        return new ResponseStd<>(nodes, 200, "success", "返回节点!");
+    }
+
+    @RequestMapping(value = "/nodes/ServiceName", method = RequestMethod.GET)
+    public ResponseStd<Node> getNodeByName(@RequestParam(required = true) String name) {
+        Node nodes = knowledgeGraphService.getNodeByNameInService(name);
+        return new ResponseStd<>(nodes, 200, "success", "返回节点!");
+    }
+
+    @RequestMapping(value = "/nodes/relevantNodesIds", method = RequestMethod.GET)
+    public ResponseStd<List<Long>> getRelevantNodesIdsByNodeIds(@RequestParam(required = true) List<Long> ids) {
+        List<Long> nodesIds = knowledgeGraphService.getRelevantNodesIdsByNodeIds(ids);
+        return new ResponseStd<>(nodesIds, 200, "success", "返回节点id列表!");
+    }
+
     @RequestMapping(value = "/nodes/{nodeId}", method = RequestMethod.DELETE)
     public ResponseStd<Boolean> deleteNodeById(@PathVariable Long nodeId) {
         Boolean res = knowledgeGraphService.deleteNodeById(nodeId);
@@ -103,12 +122,26 @@ public class KnowledgeGraphController {
         return new ResponseStd<>(relationship, 200, "success", "返回关系!");
     }
 
+    @RequestMapping(value = "/relationships/multiple", method = RequestMethod.GET)
+    public ResponseStd<List<Neo4jRelationshipDto>> getAllRelationshipByIds(
+            @RequestParam(required = true) List<Long> ids) {
+        List<Neo4jRelationshipDto> relationship = knowledgeGraphService.getAllRelationshipByIds(ids);
+        return new ResponseStd<>(relationship, 200, "success", "返回关系!");
+    }
+
     @RequestMapping(value = "/relationships/nodeId", method = RequestMethod.GET)
     public ResponseStd<List<Neo4jRelationshipDto>> getRelationshipByStartIdAndEndId(
             @RequestParam Long startId,
             @RequestParam Long endId) {
         List<Neo4jRelationshipDto> relationship = knowledgeGraphService.getRelationshipByStartIdAndEndId(startId,
                 endId);
+        return new ResponseStd<>(relationship, 200, "success", "返回关系!");
+    }
+
+    @RequestMapping(value = "/relationships/nodeIds", method = RequestMethod.GET)
+    public ResponseStd<List<Neo4jRelationshipDto>> getRelevantRelationshipsByNodeIds(
+            @RequestParam List<Long> ids) {
+        List<Neo4jRelationshipDto> relationship = knowledgeGraphService.getRelevantRelationshipsByNodeIds(ids);
         return new ResponseStd<>(relationship, 200, "success", "返回关系!");
     }
 
