@@ -2,13 +2,11 @@ package com.aiops_web.controller;
 
 
 import com.aiops_web.dto.UserPermissionDTO;
-import com.aiops_web.entity.sql.User;
 import com.aiops_web.service.UserService;
 import com.aiops_web.std.ErrorCode;
-import com.aiops_web.std.LoginState;
+import com.aiops_web.std.JWTUtils;
 import com.aiops_web.std.ResponseStd;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.bouncycastle.asn1.DERTaggedObject;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -28,15 +26,10 @@ public class UserController {
     @Resource
     UserService userService;
 
-    @GetMapping("/findAll")
-    public ResponseStd<List<User>> findAll() {
-        return new ResponseStd(userService.list());
-    }
-
     // 查询所有用户
     @GetMapping()
-    public ResponseStd<List<User>> getAllUsers() {
-        List<User> alg = userService.getAllUsers();
+    public ResponseStd<List<UserPermissionDTO>> getAllUsers() {
+        List<UserPermissionDTO> alg = userService.getAllUsers();
         // 没有user  (数据库问题)
         if (alg.isEmpty()) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
@@ -44,20 +37,21 @@ public class UserController {
         return new ResponseStd<>(alg);
     }
 
-    // 查询用户状态
-    @GetMapping("/{userId}/login")
-    public ResponseStd<Boolean> login(@PathVariable long userId, @RequestParam String pwd) {
-        LoginState loginState = userService.checkPwd(userId, pwd);
-        if (loginState == LoginState.SUCCESS) {
-            return new ResponseStd<>(true);  //登录成功
-        }
-
-        if (loginState == LoginState.NOUSER) {
-            return new ResponseStd<>(ErrorCode.NULL_ERROR, false); // 用户不存在
-        }
-
-        return new ResponseStd<>(ErrorCode.PARAMS_ERROR, false);   // 密码错误
+    /**
+     * 用户 登录  和 token状态查询
+     */
+    @PostMapping("/login")
+    public ResponseStd<UserPermissionDTO> login(@RequestBody UserPermissionDTO userPermissionDTO) {
+        UserPermissionDTO dto = userService.login(userPermissionDTO);
+        return new ResponseStd<>(dto);
     }
+
+    @GetMapping("/login")
+    public ResponseStd<Boolean> checkToken(@RequestHeader("Authorization") String authorization) {
+        Boolean res = JWTUtils.checkToken(authorization);
+        return new ResponseStd<>(res);
+    }
+
 
     // 根据userid查询用户信息
     @GetMapping("/{userId}")
@@ -77,7 +71,7 @@ public class UserController {
     }
 
     @PostMapping()
-    public ResponseStd<Boolean> createUser(@RequestBody User user) {
+    public ResponseStd<Boolean> createUser(@RequestBody UserPermissionDTO user) {
         boolean res = userService.createUser(user);
         return new ResponseStd<>(res);
     }

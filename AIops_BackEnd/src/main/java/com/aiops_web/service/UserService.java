@@ -19,7 +19,7 @@ import java.util.List;
  */
 public interface UserService extends IService<User> {
 
-    List<User> getAllUsers();
+    List<UserPermissionDTO> getAllUsers();
 
     UserPermissionDTO getUserById(int userId);
 
@@ -29,12 +29,14 @@ public interface UserService extends IService<User> {
 
     boolean deleteUserById(long userId);
 
-    LoginState checkPwd(long userId, String pwd);
-
     boolean updatePermissions(long userId, String permissions);
 
     boolean updatePwd(long userId, String pwd);
 
     boolean updateInfo(String info) throws JsonProcessingException;
+
+    //  登录
+    UserPermissionDTO login(UserPermissionDTO userPermissionDTO);
+
 
 }

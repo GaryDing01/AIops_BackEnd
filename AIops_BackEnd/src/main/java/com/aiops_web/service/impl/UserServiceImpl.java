@@ -4,6 +4,7 @@ import com.aiops_web.dto.UserPermissionDTO;
 import com.aiops_web.entity.sql.User;
 import com.aiops_web.dao.sql.UserMapper;
 import com.aiops_web.service.UserService;
+import com.aiops_web.std.JWTUtils;
 import com.aiops_web.std.ResponseStd;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.aiops_web.std.LoginState;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +34,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private UserMapper userMapper;
 
     @Override
-    public List<User> getAllUsers() {
-        return userMapper.getAllUsers();
+    public List<UserPermissionDTO> getAllUsers() {
+        List<UserPermissionDTO> userDTOs = new ArrayList<>();
+        List<User> users = userMapper.getAllUsers();
+        for ( User user : users) {
+            userDTOs.add(new UserPermissionDTO(user));
+        }
+        return userDTOs;
     }
 
     @Override
@@ -80,12 +87,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userMapper.deleteUserById(userId) > 0;
     }
 
-    @Override
-    public LoginState checkPwd(long userId, String pwd) {
-        String realPwd = userMapper.getPassword(userId);
-        if (realPwd==null)
-            return LoginState.NOUSER;
-        return realPwd.equals(pwd)? LoginState.SUCCESS: LoginState.WRONGPWD;
+    public UserPermissionDTO login(UserPermissionDTO userPermissionDTO) {
+        LoginState loginState = checkPwd(userPermissionDTO.getUserId(), userPermissionDTO.getPassword());
+
+        UserPermissionDTO dto = new UserPermissionDTO();
+        if (loginState == LoginState.SUCCESS) {
+            dto = getUserById(userPermissionDTO.getUserId());
+            String token = JWTUtils.createJWT(dto.getUserId(), dto.getRoleId());
+            dto.setToken(token);
+        } else if (loginState == LoginState.NOUSER){
+            dto.setToken("NoUser");
+        } else if (loginState == LoginState.WRONGPWD) {
+            dto.setToken("WrongPwd");
+        }
+        return dto;
     }
 
     @Override
@@ -145,5 +160,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         return true;
+    }
+
+    public LoginState checkPwd(long userId, String pwd) {
+        String realPwd = userMapper.getPassword(userId);
+        if (realPwd==null)
+            return LoginState.NOUSER;
+        return realPwd.equals(pwd)? LoginState.SUCCESS: LoginState.WRONGPWD;
     }
 }
