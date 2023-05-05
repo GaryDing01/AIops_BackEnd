@@ -47,13 +47,13 @@ public class DataIntroducingController {
         if (!file.exists()) {
             return new ResponseStd<>(ErrorCode.PARAMS_ERROR);
         }
-        originalDataService.addBatchDoc(batchId, objId, filePath);
+        long addNum = originalDataService.addBatchDoc(batchId, objId, filePath);
+        dataIntroducing.setDataNum(addNum);
         List<OriginalData> sampleList = originalDataService.getRelativeRange(batchId, 1, 5);
         dataIntroducing.setDataSample(sampleList.toString());
         // 获得当前时间
         Date date = new Date();
-        Timestamp t = new Timestamp(date.getTime()); //将时间转换成 Timestamp 类型，这样便可以存入到 Mysql 数据库中
-        dataIntroducing.setTstamp(t);
+        dataIntroducing.setTstamp(date);
         // 刚导入的源数据放在 OriginalData 中
         dataIntroducing.setPlace("OriginalData");
         return new ResponseStd<>(dataIntroducingService.save(dataIntroducing));

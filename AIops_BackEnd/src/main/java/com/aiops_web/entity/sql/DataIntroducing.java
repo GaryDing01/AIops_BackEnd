@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * <p>
@@ -27,7 +27,7 @@ public class DataIntroducing implements Serializable {
     @Column(name = "batch_id")
     private Integer batchId;
 
-    private Timestamp tstamp;
+    private Date tstamp;
 
     private String source;
 
@@ -45,4 +45,6 @@ public class DataIntroducing implements Serializable {
     private Integer userId;
 
     private String place;
+
+    private Long dataNum;
 }

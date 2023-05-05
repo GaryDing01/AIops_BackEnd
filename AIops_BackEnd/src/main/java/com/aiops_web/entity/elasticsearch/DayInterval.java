@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletContextListener;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -36,11 +35,10 @@ public class DayInterval implements ServletContextListener {
 
         if (dataList.size() > 0) {
             // 获取 7天前的日期
-            Date last_7 = new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 10)); //7
-            Timestamp stamp_7 = new Timestamp(last_7.getTime());
-            System.out.println(stamp_7);
+            Date last_7 = new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 7));
+            System.out.println(last_7);
             for (DataIntroducing data : dataList) {
-                int result = data.getTstamp().compareTo(stamp_7);
+                int result = data.getTstamp().compareTo(last_7);
                 System.out.println(result);
                 if (result > 0) {
                     int batchId = data.getBatchId();
