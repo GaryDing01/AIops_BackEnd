@@ -32,7 +32,7 @@ public class SystemArchitectureService {
         Node systemNode = new Node();
         systemNode.setType("System");
         systemNode.setName(systemNamespace);
-        systemNode.setContent(systemNamespace);
+        systemNode.setContent("{}");
         systemNode.setParentId(Long.valueOf(-1));
         Long systemId = knowledgeGraphService.addNode(systemNode); // 添加System节点
 
@@ -213,7 +213,9 @@ public class SystemArchitectureService {
             neo4jRelationshipDto.setStartId(node.getParentId());
             neo4jRelationshipDto.setEndId(node.getId());
             neo4jRelationshipDto.setType("contains");
-            neo4jRelationshipDto.setContent("{name:'contains'}");
+            JSONObject content = new JSONObject();
+            content.put("name", "contains");
+            neo4jRelationshipDto.setContent(content.toJSONString());
             knowledgeGraphService.addRelationship(neo4jRelationshipDto);
         }
 
@@ -227,7 +229,9 @@ public class SystemArchitectureService {
                     neo4jRelationshipDto.setStartId(pod.getId());
                     neo4jRelationshipDto.setEndId(node.getId());
                     neo4jRelationshipDto.setType("runs_in");
-                    neo4jRelationshipDto.setContent("{name:'runs_in'}");
+                    JSONObject content = new JSONObject();
+                    content.put("name", "runs_in");
+                    neo4jRelationshipDto.setContent(content.toJSONString());
                     knowledgeGraphService.addRelationship(neo4jRelationshipDto);
                 }
             }
@@ -244,7 +248,9 @@ public class SystemArchitectureService {
                     neo4jRelationshipDto.setStartId(service.getId());
                     neo4jRelationshipDto.setEndId(pod.getId());
                     neo4jRelationshipDto.setType("logical_abstracts");
-                    neo4jRelationshipDto.setContent("{name:'logical_abstracts'}");
+                    JSONObject content = new JSONObject();
+                    content.put("name", "logical_abstracts");
+                    neo4jRelationshipDto.setContent(content.toJSONString());
                     knowledgeGraphService.addRelationship(neo4jRelationshipDto);
                 }
             }

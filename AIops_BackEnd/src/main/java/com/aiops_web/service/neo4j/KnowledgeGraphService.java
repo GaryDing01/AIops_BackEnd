@@ -14,6 +14,7 @@ import com.aiops_web.dao.neo4j.Neo4jNodeDao;
 import com.aiops_web.dao.neo4j.Neo4jRelationshipDao;
 import com.aiops_web.dto.Neo4jRelationshipDto;
 import com.aiops_web.entity.neo4j.Node;
+import com.alibaba.fastjson.JSONObject;
 
 @Service
 public class KnowledgeGraphService {
@@ -65,6 +66,18 @@ public class KnowledgeGraphService {
         return true;
     }
 
+    public Boolean deleteNodeAndChildrenNodeById(Long id) {
+        Node node = neo4jNodeDao.findById(id).orElse(null);
+        if (node == null)
+            return false;
+        List<Long> nodeList = new ArrayList<>();
+        nodeList.add(id);
+        List<Long> childrenids = getChildrenNodesIdsByNodesIds(nodeList);
+        nodeList.addAll(childrenids);
+        neo4jNodeDao.deleteByIds(nodeList);
+        return true;
+    }
+
     public Boolean deleteNodesByIds(List<Long> ids) {
         neo4jNodeDao.deleteByIds(ids);
         return true;
@@ -81,6 +94,31 @@ public class KnowledgeGraphService {
         if (oldN == null)
             return false;
 
+        neo4jNodeDao.save(node);
+        return true;
+    }
+
+    public Boolean changeNodeRelationship(Long nodeId, Long oldParentId, Long newParentId) {
+        Node node = neo4jNodeDao.findById(nodeId).orElse(null);
+        Node oldParentNode = neo4jNodeDao.findById(oldParentId).orElse(null);
+        Node newParentNode = neo4jNodeDao.findById(newParentId).orElse(null);
+        if (node == null || oldParentNode == null || newParentNode == null)
+            return false;
+        // 删除旧的contains关系
+        List<Neo4jRelationshipDto> oldRs = neo4jRelationshipDao.findRelationshipByStartIdAndEndIdAndType(oldParentId,
+                nodeId, "contains");
+        List<Long> oldRIds = new ArrayList<>();
+        for (Neo4jRelationshipDto r : oldRs) {
+            oldRIds.add(r.getRId());
+        }
+        neo4jRelationshipDao.deleteRelationshipsByIds(oldRIds);
+
+        // 添加新的contains关系
+        JSONObject content = new JSONObject();
+        content.put("name", "contains");
+        neo4jRelationshipDao.addRelationship("contains", content.toJSONString(), newParentId, nodeId);
+
+        node.setParentId(newParentId);
         neo4jNodeDao.save(node);
         return true;
     }

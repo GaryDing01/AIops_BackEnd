@@ -76,6 +76,12 @@ public class KnowledgeGraphController {
         return new ResponseStd<>(res, 200, "success", "执行删除!");
     }
 
+    @RequestMapping(value = "/nodes/{nodeId}/children", method = RequestMethod.DELETE)
+    public ResponseStd<Boolean> deleteNodeAndChildrenNodeById(@PathVariable Long nodeId) {
+        Boolean res = knowledgeGraphService.deleteNodeAndChildrenNodeById(nodeId);
+        return new ResponseStd<>(res, 200, "success", "执行删除节点和子节点!");
+    }
+
     @RequestMapping(value = "/nodes", method = RequestMethod.PUT)
     public ResponseStd<Boolean> updateNodeByNode(@RequestBody(required = true) Node node) {
         Boolean res = knowledgeGraphService.updateNodeByNode(node);
@@ -181,6 +187,17 @@ public class KnowledgeGraphController {
     public ResponseStd<Boolean> SystemArchitecture() {
         Boolean res = systemArchitectureService.configSystemArchitecture();
         return new ResponseStd<>(res, 200, "success", "返回是否成功!");
+    }
+
+    // 知识图谱拖拽节点，更新相应的节点关系以及节点的parentId
+    @RequestMapping(value = "/nodes/{nodeId}/changeRelationship", method = RequestMethod.GET)
+    public ResponseStd<Boolean> changeNodeRelationship(
+            @PathVariable Long nodeId,
+            @RequestParam Long oldParentId,
+            @RequestParam Long newParentId) {
+        Boolean relationship = knowledgeGraphService.changeNodeRelationship(nodeId,
+                oldParentId, newParentId);
+        return new ResponseStd<>(relationship, 200, "success", "返回节点关系更改是否成功!");
     }
 
     // 其他表基本增删改查

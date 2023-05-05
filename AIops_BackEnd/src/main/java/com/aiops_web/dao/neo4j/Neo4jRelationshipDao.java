@@ -26,6 +26,9 @@ public interface Neo4jRelationshipDao extends Neo4jRepository<Relationship, Long
     @Query("MATCH (m:Node)-[r:Relationship]->(n:Node) WHERE id(m) = $startId AND id(n) = $EndId RETURN id(r) as rId, r.type as type, id(m) as startId, id(n) as endId, r.content as content")
     List<Neo4jRelationshipDto> findRelationshipByStartIdAndEndId(Long startId, Long EndId);
 
+    @Query("MATCH (m:Node)-[r:Relationship]->(n:Node) WHERE id(m) = $startId AND id(n) = $EndId AND r.type = $type RETURN id(r) as rId, r.type as type, id(m) as startId, id(n) as endId, r.content as content")
+    List<Neo4jRelationshipDto> findRelationshipByStartIdAndEndIdAndType(Long startId, Long EndId, String type);
+
     @Query("MATCH (m:Node)-[r:Relationship]->(n:Node) WHERE id(r) = $id DELETE r ")
     Boolean deleteRelationshipById(Long id);
 
