@@ -27,7 +27,7 @@ public class WorkflowExec implements Serializable {
     @TableId(value = "exec_id", type = IdType.AUTO)
     private Integer execId;
 
-    private Timestamp tstamp;
+    private Date tstamp;
 
     private Integer reportId;
 

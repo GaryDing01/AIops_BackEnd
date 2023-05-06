@@ -2,6 +2,7 @@ package com.aiops_web.entity.sql;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,4 +18,7 @@ public class RootcauseResult {
     private String sourceDataSection;
 
     private String path;
+
+    @TableLogic
+    private Integer deleted;
 }

@@ -45,6 +45,25 @@ public class KnowledgeGraphController {
         return new ResponseStd<>(nodes, 200, "success", "返回节点!");
     }
 
+    @RequestMapping(value = "/nodes/multiple", method = RequestMethod.GET)
+    public ResponseStd<List<Node>> getNodeListByNodeIds(
+            @RequestParam(required = true) List<Long> ids) {
+        List<Node> nodes = knowledgeGraphService.getNodeListByNodeIds(ids);
+        return new ResponseStd<>(nodes, 200, "success", "返回节点!");
+    }
+
+    @RequestMapping(value = "/nodes/ServiceName", method = RequestMethod.GET)
+    public ResponseStd<Node> getNodeByName(@RequestParam(required = true) String name) {
+        Node nodes = knowledgeGraphService.getNodeByNameInService(name);
+        return new ResponseStd<>(nodes, 200, "success", "返回节点!");
+    }
+
+    @RequestMapping(value = "/nodes/relevantNodesIds", method = RequestMethod.GET)
+    public ResponseStd<List<Long>> getRelevantNodesIdsByNodeIds(@RequestParam(required = true) List<Long> ids) {
+        List<Long> nodesIds = knowledgeGraphService.getRelevantNodesIdsByNodeIds(ids);
+        return new ResponseStd<>(nodesIds, 200, "success", "返回节点id列表!");
+    }
+
     @RequestMapping(value = "/nodes/{nodeId}", method = RequestMethod.DELETE)
     public ResponseStd<Boolean> deleteNodeById(@PathVariable Long nodeId) {
         Boolean res = knowledgeGraphService.deleteNodeById(nodeId);
@@ -55,6 +74,12 @@ public class KnowledgeGraphController {
     public ResponseStd<Boolean> deleteNodesByIds(@RequestParam(required = true) List<Long> ids) {
         Boolean res = knowledgeGraphService.deleteNodesByIds(ids);
         return new ResponseStd<>(res, 200, "success", "执行删除!");
+    }
+
+    @RequestMapping(value = "/nodes/{nodeId}/children", method = RequestMethod.DELETE)
+    public ResponseStd<Boolean> deleteNodeAndChildrenNodeById(@PathVariable Long nodeId) {
+        Boolean res = knowledgeGraphService.deleteNodeAndChildrenNodeById(nodeId);
+        return new ResponseStd<>(res, 200, "success", "执行删除节点和子节点!");
     }
 
     @RequestMapping(value = "/nodes", method = RequestMethod.PUT)
@@ -103,12 +128,26 @@ public class KnowledgeGraphController {
         return new ResponseStd<>(relationship, 200, "success", "返回关系!");
     }
 
+    @RequestMapping(value = "/relationships/multiple", method = RequestMethod.GET)
+    public ResponseStd<List<Neo4jRelationshipDto>> getAllRelationshipByIds(
+            @RequestParam(required = true) List<Long> ids) {
+        List<Neo4jRelationshipDto> relationship = knowledgeGraphService.getAllRelationshipByIds(ids);
+        return new ResponseStd<>(relationship, 200, "success", "返回关系!");
+    }
+
     @RequestMapping(value = "/relationships/nodeId", method = RequestMethod.GET)
     public ResponseStd<List<Neo4jRelationshipDto>> getRelationshipByStartIdAndEndId(
             @RequestParam Long startId,
             @RequestParam Long endId) {
         List<Neo4jRelationshipDto> relationship = knowledgeGraphService.getRelationshipByStartIdAndEndId(startId,
                 endId);
+        return new ResponseStd<>(relationship, 200, "success", "返回关系!");
+    }
+
+    @RequestMapping(value = "/relationships/nodeIds", method = RequestMethod.GET)
+    public ResponseStd<List<Neo4jRelationshipDto>> getRelevantRelationshipsByNodeIds(
+            @RequestParam List<Long> ids) {
+        List<Neo4jRelationshipDto> relationship = knowledgeGraphService.getRelevantRelationshipsByNodeIds(ids);
         return new ResponseStd<>(relationship, 200, "success", "返回关系!");
     }
 
@@ -148,6 +187,17 @@ public class KnowledgeGraphController {
     public ResponseStd<Boolean> SystemArchitecture() {
         Boolean res = systemArchitectureService.configSystemArchitecture();
         return new ResponseStd<>(res, 200, "success", "返回是否成功!");
+    }
+
+    // 知识图谱拖拽节点，更新相应的节点关系以及节点的parentId
+    @RequestMapping(value = "/nodes/{nodeId}/changeRelationship", method = RequestMethod.GET)
+    public ResponseStd<Boolean> changeNodeRelationship(
+            @PathVariable Long nodeId,
+            @RequestParam Long oldParentId,
+            @RequestParam Long newParentId) {
+        Boolean relationship = knowledgeGraphService.changeNodeRelationship(nodeId,
+                oldParentId, newParentId);
+        return new ResponseStd<>(relationship, 200, "success", "返回节点关系更改是否成功!");
     }
 
     // 其他表基本增删改查

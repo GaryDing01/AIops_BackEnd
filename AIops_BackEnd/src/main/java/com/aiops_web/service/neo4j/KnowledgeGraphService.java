@@ -1,5 +1,9 @@
 package com.aiops_web.service.neo4j;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.ws.rs.BadRequestException;
@@ -10,6 +14,7 @@ import com.aiops_web.dao.neo4j.Neo4jNodeDao;
 import com.aiops_web.dao.neo4j.Neo4jRelationshipDao;
 import com.aiops_web.dto.Neo4jRelationshipDto;
 import com.aiops_web.entity.neo4j.Node;
+import com.alibaba.fastjson.JSONObject;
 
 @Service
 public class KnowledgeGraphService {
@@ -48,11 +53,28 @@ public class KnowledgeGraphService {
         return nodes;
     }
 
+    public List<Node> getNodeListByNodeIds(List<Long> ids) {
+        List<Node> nodes = neo4jNodeDao.findAllByIds(ids);
+        return nodes;
+    }
+
     public Boolean deleteNodeById(Long id) {
         Node node = neo4jNodeDao.findById(id).orElse(null);
         if (node == null)
             return false;
         neo4jNodeDao.deleteById(id);
+        return true;
+    }
+
+    public Boolean deleteNodeAndChildrenNodeById(Long id) {
+        Node node = neo4jNodeDao.findById(id).orElse(null);
+        if (node == null)
+            return false;
+        List<Long> nodeList = new ArrayList<>();
+        nodeList.add(id);
+        List<Long> childrenids = getChildrenNodesIdsByNodesIds(nodeList);
+        nodeList.addAll(childrenids);
+        neo4jNodeDao.deleteByIds(nodeList);
         return true;
     }
 
@@ -76,6 +98,31 @@ public class KnowledgeGraphService {
         return true;
     }
 
+    public Boolean changeNodeRelationship(Long nodeId, Long oldParentId, Long newParentId) {
+        Node node = neo4jNodeDao.findById(nodeId).orElse(null);
+        Node oldParentNode = neo4jNodeDao.findById(oldParentId).orElse(null);
+        Node newParentNode = neo4jNodeDao.findById(newParentId).orElse(null);
+        if (node == null || oldParentNode == null || newParentNode == null)
+            return false;
+        // 删除旧的contains关系
+        List<Neo4jRelationshipDto> oldRs = neo4jRelationshipDao.findRelationshipByStartIdAndEndIdAndType(oldParentId,
+                nodeId, "contains");
+        List<Long> oldRIds = new ArrayList<>();
+        for (Neo4jRelationshipDto r : oldRs) {
+            oldRIds.add(r.getRId());
+        }
+        neo4jRelationshipDao.deleteRelationshipsByIds(oldRIds);
+
+        // 添加新的contains关系
+        JSONObject content = new JSONObject();
+        content.put("name", "contains");
+        neo4jRelationshipDao.addRelationship("contains", content.toJSONString(), newParentId, nodeId);
+
+        node.setParentId(newParentId);
+        neo4jNodeDao.save(node);
+        return true;
+    }
+
     // Relationship
     public Long addRelationship(Neo4jRelationshipDto relationshipDto) {
         relationshipDto.setRId(null);
@@ -92,6 +139,11 @@ public class KnowledgeGraphService {
     public Neo4jRelationshipDto getRelationshipById(Long id) {
         Neo4jRelationshipDto relationship = neo4jRelationshipDao.findRelationshipById(id);
         return relationship;
+    }
+
+    public List<Neo4jRelationshipDto> getAllRelationshipByIds(List<Long> ids) {
+        List<Neo4jRelationshipDto> relationships = neo4jRelationshipDao.findAllRelationshipByIds(ids);
+        return relationships;
     }
 
     public List<Neo4jRelationshipDto> getRelationshipByStartIdAndEndId(Long startId, Long EndId) {
@@ -136,4 +188,57 @@ public class KnowledgeGraphService {
         neo4jNodeDao.deleteAllData();
         return true;
     }
+
+    // 知识图谱补充功能
+
+    // 根据Service节点的名字获取节点信息
+    public Node getNodeByNameInService(String name) {
+        Node nodes = neo4jNodeDao.findNodeByNameInService(name);
+        return nodes;
+    }
+
+    // 根据节点ids递归获取节点列表中节点的所有子节点ids
+    private List<Long> getChildrenNodesIdsByNodesIds(List<Long> ids) {
+        List<Long> nodesIds = neo4jNodeDao.findChildrenNodesIdsByNodesIds(ids);
+        return nodesIds;
+    }
+
+    // 根据节点ids递归获取节点列表中节点的所有父节点ids
+    private List<Long> getParentNodesIdsByNodeIds(List<Long> ids) {
+        List<Long> parentids = neo4jNodeDao.findParentNodesIdsByNodesIds(ids);
+        return parentids;
+    }
+
+    // 根据Service节点ids获取节点列表中节点的所有相关Pod、Node节点ids
+    private List<Long> getServiceIdsRelevantPodAndNode(List<Long> ids) {
+        List<Long> NodesIds = neo4jNodeDao.findServiceIdsRelevantNode(ids);
+        List<Long> PodsIds = neo4jNodeDao.findServiceIdsRelevantPod(ids);
+        List<Long> allList = new ArrayList<>();
+        allList.addAll(NodesIds);
+        allList.addAll(PodsIds);
+        return allList;
+    }
+
+    // 根据Service节点ids获取节点列表中节点的所有相关节点ids。返回值包含传入的ids，已去重
+    public List<Long> getRelevantNodesIdsByNodeIds(List<Long> ids) {
+        // 获取子节点ids
+        List<Long> childrenNodesIds = getChildrenNodesIdsByNodesIds(ids);
+        // 获取父节点ids
+        List<Long> parentNodesIds = getParentNodesIdsByNodeIds(ids);
+        // 获取Pod、Node节点ids
+        List<Long> PodAndNodeNodesIds = getServiceIdsRelevantPodAndNode(ids);
+        Set<Long> allIds = new HashSet<>();
+        allIds.addAll(childrenNodesIds);
+        allIds.addAll(parentNodesIds);
+        allIds.addAll(PodAndNodeNodesIds);
+        allIds.addAll(ids);
+        return new ArrayList<>(allIds);
+    }
+
+    // 根据节点ids获取相关的relationshipdto
+    public List<Neo4jRelationshipDto> getRelevantRelationshipsByNodeIds(List<Long> ids) {
+        List<Neo4jRelationshipDto> relationships = neo4jRelationshipDao.findRelevantRelationshipsByNodeIds(ids);
+        return relationships;
+    }
+
 }

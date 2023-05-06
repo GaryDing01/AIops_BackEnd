@@ -2,15 +2,11 @@ package com.aiops_web.controller;
 
 
 import com.aiops_web.dto.UserPermissionDTO;
-import com.aiops_web.entity.sql.*;
-import com.aiops_web.service.PermissionEnumService;
-import com.aiops_web.service.RoleEnumService;
 import com.aiops_web.service.UserService;
 import com.aiops_web.std.ErrorCode;
-import com.aiops_web.std.LoginState;
+import com.aiops_web.std.JWTUtils;
 import com.aiops_web.std.ResponseStd;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.bouncycastle.asn1.DERTaggedObject;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -30,18 +26,10 @@ public class UserController {
     @Resource
     UserService userService;
 
-    @Resource
-    RoleEnumService roleEnumService;
-
-    @GetMapping("/findAll")
-    public ResponseStd<List<User>> findAll() {
-        return new ResponseStd(userService.list());
-    }
-
     // 查询所有用户
     @GetMapping()
-    public ResponseStd<List<User>> getAllUsers() {
-        List<User> alg = userService.getAllUsers();
+    public ResponseStd<List<UserPermissionDTO>> getAllUsers() {
+        List<UserPermissionDTO> alg = userService.getAllUsers();
         // 没有user  (数据库问题)
         if (alg.isEmpty()) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
@@ -49,20 +37,21 @@ public class UserController {
         return new ResponseStd<>(alg);
     }
 
-    // 查询用户状态
-    @GetMapping("/{userId}/login")
-    public ResponseStd<Boolean> login(@PathVariable long userId, @RequestParam String pwd) {
-        LoginState loginState = userService.checkPwd(userId, pwd);
-        if (loginState == LoginState.SUCCESS) {
-            return new ResponseStd<>(true);  //登录成功
-        }
-
-        if (loginState == LoginState.NOUSER) {
-            return new ResponseStd<>(ErrorCode.NULL_ERROR, false); // 用户不存在
-        }
-
-        return new ResponseStd<>(ErrorCode.PARAMS_ERROR, false);   // 密码错误
+    /**
+     * 用户 登录  和 token状态查询
+     */
+    @PostMapping("/login")
+    public ResponseStd<UserPermissionDTO> login(@RequestBody UserPermissionDTO userPermissionDTO) {
+        UserPermissionDTO dto = userService.login(userPermissionDTO);
+        return new ResponseStd<>(dto);
     }
+
+    @GetMapping("/login")
+    public ResponseStd<Boolean> checkToken(@RequestHeader("Authorization") String authorization) {
+        Boolean res = JWTUtils.checkToken(authorization);
+        return new ResponseStd<>(res);
+    }
+
 
     // 根据userid查询用户信息
     @GetMapping("/{userId}")
@@ -82,9 +71,8 @@ public class UserController {
     }
 
     @PostMapping()
-    public ResponseStd<Boolean> createUser(@RequestBody User user) {
+    public ResponseStd<Boolean> createUser(@RequestBody UserPermissionDTO user) {
         boolean res = userService.createUser(user);
-        System.out.println();
         return new ResponseStd<>(res);
     }
 
@@ -109,47 +97,6 @@ public class UserController {
     public ResponseStd<Boolean> updatePwd(@PathVariable long userId, @RequestParam String password) {
         boolean res = userService.updatePwd(userId, password);
         return new ResponseStd<>(res);
-    }
-
-    // 其他表基本增删改查
-
-    // role_enum表
-    // 增加一个角色类型
-    @PostMapping("/roleTypes")
-    public ResponseStd<Integer> createRoleType(@RequestBody RoleEnum roleEnum) {
-        boolean saveResult = roleEnumService.save(roleEnum);
-        if (!saveResult) {
-            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
-        }
-        return new ResponseStd<Integer>(roleEnum.getRoleId());
-    }
-
-    // 根据id删除一个角色类型
-    @DeleteMapping("/roleTypes/{roleId}")
-    public ResponseStd<Boolean> deleteRoleType(@PathVariable Integer roleId) {
-        return new ResponseStd<Boolean>(roleEnumService.removeById(roleId));
-    }
-
-    // 修改一个角色类型
-    @PutMapping("/roleTypes")
-    public ResponseStd<Boolean> updateRoleType(@RequestBody RoleEnum roleEnum) {
-        return new ResponseStd<Boolean>(roleEnumService.updateById(roleEnum));
-    }
-
-    // 查找全部角色类型
-    @GetMapping("/roleTypes")
-    public ResponseStd<List<RoleEnum>> selectRoleTypes() {
-        List<RoleEnum> roleEnumList = roleEnumService.list();
-        if (roleEnumList.isEmpty()) {
-            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
-        }
-        return new ResponseStd<List<RoleEnum>>(roleEnumList);
-    }
-
-    // 根据id查找某一个角色类型
-    @GetMapping("/roleTypes/{roleId}")
-    public ResponseStd<RoleEnum> selectRoleTypeById(@PathVariable Integer roleId) {
-        return new ResponseStd<RoleEnum>(roleEnumService.getById(roleId));
     }
 }
 
