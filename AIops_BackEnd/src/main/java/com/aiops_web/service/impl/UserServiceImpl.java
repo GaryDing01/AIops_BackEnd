@@ -113,7 +113,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public boolean updatePwd(long userId, String pwd) {
+    public boolean updatePwd(long userId, String pwd, String oldPassword) {
+        String curPwd = userMapper.getPassword(userId);
+        if (!curPwd.equals(oldPassword)) {
+            return false;
+        }
         return userMapper.updatePassword(userId, pwd) > 0;
     }
 

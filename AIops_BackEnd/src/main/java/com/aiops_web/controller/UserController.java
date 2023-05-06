@@ -106,8 +106,8 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/pwds")
-    public ResponseStd<Boolean> updatePwd(@PathVariable long userId, @RequestParam String password) {
-        boolean res = userService.updatePwd(userId, password);
+    public ResponseStd<Boolean> updatePwd(@PathVariable long userId, @RequestParam String password, @RequestParam String oldPassword) {
+        boolean res = userService.updatePwd(userId, password, oldPassword);
         return new ResponseStd<>(res);
     }
 
