@@ -1,5 +1,6 @@
 package com.aiops_web.service;
 
+import com.aiops_web.dto.RoleEnumDTO;
 import com.aiops_web.dto.UserPermissionDTO;
 import com.aiops_web.entity.sql.User;
 import com.aiops_web.std.LoginState;
@@ -37,6 +38,5 @@ public interface UserService extends IService<User> {
 
     //  登录
     UserPermissionDTO login(UserPermissionDTO userPermissionDTO);
-
-
+    
 }

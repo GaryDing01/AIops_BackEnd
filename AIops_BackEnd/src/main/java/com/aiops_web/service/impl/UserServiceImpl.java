@@ -1,6 +1,9 @@
 package com.aiops_web.service.impl;
 
+import com.aiops_web.dao.sql.RoleEnumMapper;
+import com.aiops_web.dto.RoleEnumDTO;
 import com.aiops_web.dto.UserPermissionDTO;
+import com.aiops_web.entity.sql.RoleEnum;
 import com.aiops_web.entity.sql.User;
 import com.aiops_web.dao.sql.UserMapper;
 import com.aiops_web.service.UserService;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.aiops_web.std.LoginState;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

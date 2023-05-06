@@ -1,6 +1,7 @@
 package com.aiops_web.controller;
 
 
+import com.aiops_web.dto.RoleEnumDTO;
 import com.aiops_web.dto.UserPermissionDTO;
 import com.aiops_web.entity.sql.RoleEnum;
 import com.aiops_web.service.RoleEnumService;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -116,12 +118,12 @@ public class UserController {
     // role_enum表
     // 增加一个角色类型
     @PostMapping("/roleTypes")
-    public ResponseStd<Integer> createRoleType(@RequestBody RoleEnum roleEnum) {
-        boolean saveResult = roleEnumService.save(roleEnum);
-        if (!saveResult) {
+    public ResponseStd<Integer> createRoleType(@RequestBody RoleEnumDTO roleEnumDTO) {
+        int saveResult = roleEnumService.createRoleType(roleEnumDTO);
+        if (saveResult == 0) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
-        return new ResponseStd<Integer>(roleEnum.getRoleId());
+        return new ResponseStd<Integer>(saveResult);
     }
 
     // 根据id删除一个角色类型
@@ -132,24 +134,24 @@ public class UserController {
 
     // 修改一个角色类型
     @PutMapping("/roleTypes")
-    public ResponseStd<Boolean> updateRoleType(@RequestBody RoleEnum roleEnum) {
-        return new ResponseStd<Boolean>(roleEnumService.updateById(roleEnum));
+    public ResponseStd<Boolean> updateRoleType(@RequestBody RoleEnumDTO roleEnumDTO) {
+        return new ResponseStd<Boolean>(roleEnumService.updateRoleType(roleEnumDTO));
     }
 
     // 查找全部角色类型
     @GetMapping("/roleTypes")
-    public ResponseStd<List<RoleEnum>> selectRoleTypes() {
-        List<RoleEnum> roleEnumList = roleEnumService.list();
-        if (roleEnumList.isEmpty()) {
+    public ResponseStd<List<RoleEnumDTO>> selectRoleTypes() {
+        List<RoleEnumDTO> roleEnumDTOList = roleEnumService.selectRoleTypes();
+        if (roleEnumDTOList.isEmpty()) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
-        return new ResponseStd<List<RoleEnum>>(roleEnumList);
+        return new ResponseStd<List<RoleEnumDTO>>(roleEnumDTOList);
     }
 
     // 根据id查找某一个角色类型
     @GetMapping("/roleTypes/{roleId}")
-    public ResponseStd<RoleEnum> selectRoleTypeById(@PathVariable Integer roleId) {
-        return new ResponseStd<RoleEnum>(roleEnumService.getById(roleId));
+    public ResponseStd<RoleEnumDTO> selectRoleTypeById(@PathVariable Integer roleId) {
+        return new ResponseStd<RoleEnumDTO>(roleEnumService.selectRoleTypeById(roleId));
     }
 }
 
