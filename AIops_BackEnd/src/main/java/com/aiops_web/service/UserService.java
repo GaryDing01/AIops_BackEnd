@@ -31,7 +31,7 @@ public interface UserService extends IService<User> {
 
     boolean updatePermissions(long userId, String permissions);
 
-    boolean updatePwd(long userId, String pwd);
+    boolean updatePwd(long userId, String pwd, String oldPassword);
 
     boolean updateInfo(String info) throws JsonProcessingException;
 
