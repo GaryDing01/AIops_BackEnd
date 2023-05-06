@@ -308,6 +308,17 @@ public class WorkflowController {
         return new ResponseStd<List<Report>>(reportList);
     }
 
+    // 其他相关
+    // 后端生成知识图谱需要(自查)
+    @GetMapping("/KG/check")
+    public ResponseStd<List<String>> selectAllRCIds() {
+        List<String> allRCIds = workflowExecService.getAllRCIds();
+        if (allRCIds.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<String>>(allRCIds);
+    }
+
     // 其他表基本增删改查
 
     // anodetect_result表

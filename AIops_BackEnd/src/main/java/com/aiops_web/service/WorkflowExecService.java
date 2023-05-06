@@ -32,4 +32,7 @@ public interface WorkflowExecService extends IService<WorkflowExec> {
     // 根据流程id获取流程对应的执行信息
     List<WorkflowExec> getExecsByWf(Integer wfId);
 
+    // 从生成知识图谱的表中获取所有根因路径，然后组成一个大的List<String>
+    public List<String> getAllRCIds();
+
 }

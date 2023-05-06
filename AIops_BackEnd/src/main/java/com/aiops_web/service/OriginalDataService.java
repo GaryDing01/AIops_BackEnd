@@ -16,4 +16,6 @@ public interface OriginalDataService {
     boolean deleteRange(int beginId, int endId);
 
     void addBatchDoc(int batchId, int objId, String filepath);
+
+    void TransferDataToLake(int batchId);
 }

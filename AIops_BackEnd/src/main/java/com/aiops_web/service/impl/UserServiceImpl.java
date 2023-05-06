@@ -4,6 +4,7 @@ import com.aiops_web.dto.UserPermissionDTO;
 import com.aiops_web.entity.sql.User;
 import com.aiops_web.dao.sql.UserMapper;
 import com.aiops_web.service.UserService;
+import com.aiops_web.std.JWTUtils;
 import com.aiops_web.std.ResponseStd;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.aiops_web.std.LoginState;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,12 +30,17 @@ import java.util.Map;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
-    @Resource
+    @Autowired
     private UserMapper userMapper;
 
     @Override
-    public List<User> getAllUsers() {
-        return userMapper.getAllUsers();
+    public List<UserPermissionDTO> getAllUsers() {
+        List<UserPermissionDTO> userDTOs = new ArrayList<>();
+        List<User> users = userMapper.getAllUsers();
+        for ( User user : users) {
+            userDTOs.add(new UserPermissionDTO(user));
+        }
+        return userDTOs;
     }
 
     @Override
@@ -63,8 +69,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public boolean createUser(User user) {
-        if (!permissionVerify(user.getPermitIds()))
+//        if (!permissionVerify(user.getPermitIds()))
+//            return false;
+        //   创建的时候不需要permitIds  根据roleId 拉取初始化permits
+        String permitIds = userMapper.getInitPermits(user.getRoleId());
+        if (permitIds == null || permitIds.equals("")) {
             return false;
+        }
+
+        user.setPermitIds(permitIds);
+
         return userMapper.createUser(user) > 0;
     }
 
@@ -73,12 +87,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userMapper.deleteUserById(userId) > 0;
     }
 
-    @Override
-    public LoginState checkPwd(long userId, String pwd) {
-        String realPwd = userMapper.getPassword(userId);
-        if (realPwd==null)
-            return LoginState.NOUSER;
-        return realPwd.equals(pwd)? LoginState.SUCCESS: LoginState.WRONGPWD;
+    public UserPermissionDTO login(UserPermissionDTO userPermissionDTO) {
+        LoginState loginState = checkPwd(userPermissionDTO.getUserId(), userPermissionDTO.getPassword());
+
+        UserPermissionDTO dto = new UserPermissionDTO();
+        if (loginState == LoginState.SUCCESS) {
+            dto = getUserById(userPermissionDTO.getUserId());
+            String token = JWTUtils.createJWT(dto.getUserId(), dto.getRoleId());
+            dto.setToken(token);
+        } else if (loginState == LoginState.NOUSER){
+            dto.setToken("NoUser");
+        } else if (loginState == LoginState.WRONGPWD) {
+            dto.setToken("WrongPwd");
+        }
+        return dto;
     }
 
     @Override
@@ -110,7 +132,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         if (type.equals("role")) {
-//            user.setRole(content);
+            // 这里更改role  同时把 role 的初始permits给这个user
+            String permits = userMapper.getInitPermits(Integer.parseInt(content));
+            if (permits == null || permits.equals("")) {
+                return false;
+            }
+
+            user.setRoleId(Integer.parseInt(content));
+            user.setPermitIds(permits);
         }
         if (type.equals("name")) {
             user.setName(content);
@@ -131,5 +160,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         return true;
+    }
+
+    public LoginState checkPwd(long userId, String pwd) {
+        String realPwd = userMapper.getPassword(userId);
+        if (realPwd==null)
+            return LoginState.NOUSER;
+        return realPwd.equals(pwd)? LoginState.SUCCESS: LoginState.WRONGPWD;
     }
 }

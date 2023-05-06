@@ -205,7 +205,7 @@ public class SystemArchitectureService {
 
     // 保存所有节点之间的关系
     private Boolean saveAllRelationship(List<Node> nodeList, List<Node> podList, List<Node> containerList,
-            List<Node> serviceList) {
+                                        List<Node> serviceList) {
 
         // 保存Node与Node之间的contains关系
         for (Node node : allNodeList) {

@@ -2,25 +2,26 @@ package com.aiops_web.dto;
 
 import com.aiops_web.entity.sql.User;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class UserPermissionDTO {
-    private Integer userId;
-
-    private String role;
-
-    private String name;
-
+@NoArgsConstructor
+public class UserPermissionDTO extends User implements Serializable {
     private List<Integer> permissions;
+
+    private String token;
+
+
 
     public UserPermissionDTO(User user) {
         if (user == null)
             return;
         this.userId = user.getUserId();
-//        this.role = user.getRole();
+        this.roleId = user.getRoleId();
         this.name = user.getName();
         this.permissions = permissionToList(user.getPermitIds());
     }

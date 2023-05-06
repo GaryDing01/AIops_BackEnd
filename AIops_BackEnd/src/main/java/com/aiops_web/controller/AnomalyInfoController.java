@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -46,6 +48,7 @@ public class AnomalyInfoController {
                                                           @RequestParam(required = false) Integer ano_id, @RequestParam(required = false) Integer obj_id,
                                                           @RequestParam(required = false) Integer status_id, @RequestParam(required = false) Integer user_id,
                                                           @RequestParam(required = false) Integer wf_id, @RequestParam(required = false) Integer deleted,
+                                                          @RequestParam(required = false) Integer unitnode_type_id, @RequestParam(required = false) String unitnode_name,
                                                           @RequestParam(required = false) String source_data_id, @RequestParam(required = false) String detect_tstamp,
                                                           @RequestParam(required = false) String predict_tstamp, @RequestParam(required = false) String update_tstamp) {
         // 收集查询的条件
@@ -53,10 +56,12 @@ public class AnomalyInfoController {
         info.setAnoId(ano_id);
         info.setObjId(obj_id);
         info.setStatusId(status_id);
+        info.setUnitnodeName(unitnode_name);
+        info.setUnitnodeTypeId(unitnode_type_id);
         info.setUserId(user_id);
         info.setWfId(wf_id);
         info.setDeleted(deleted);
-        info.setSourceDataIds(source_data_id);
+        info.setSourceDataId(source_data_id);
         if (detect_tstamp != null) {
             info.setDetectTstamp(new Timestamp(Long.parseLong(detect_tstamp)));
         }
@@ -99,7 +104,40 @@ public class AnomalyInfoController {
     @PutMapping()
     public ResponseStd<Boolean>  updateAnoInfo(@RequestBody AnomalyInfo info) {
         System.out.println();
-        boolean res = anomalyInfoService.updateInfo(info);
+        System.out.println(info);
+//        boolean res = anomalyInfoService.updateInfo(info);
+        boolean res = anomalyInfoService.updateById(info);
+        System.out.println(anomalyInfoService.getById(info.getAnoId()));
+        if (res == false) {
+            return new ResponseStd<>(ErrorCode.PARAMS_ERROR);
+        }
+
+        return new ResponseStd<>(res);
+    }
+
+//    // 更新故障信息(后端自查)
+//    @PutMapping("/check/{anoId}")
+//    public ResponseStd<Boolean>  updateAnoInfoCheck(@PathVariable Integer anoId) throws ParseException {
+//        AnomalyInfo anomalyInfo = anomalyInfoService.getById(anoId);
+//        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        String time = "2023-05-02 17:05:58";
+//        Date date_1 = ft.parse(time);
+////        System.out.println(date_1.getTime());
+//        anomalyInfo.setDetectTstamp(date_1);
+//        anomalyInfo.setUpdateTstamp(date_1);
+//
+//        boolean res = anomalyInfoService.updateInfo(anomalyInfo);
+//        if (res == false) {
+//            return new ResponseStd<>(ErrorCode.PARAMS_ERROR);
+//        }
+//
+//        return new ResponseStd<>(res);
+//    }
+
+    @PostMapping("/autocheck")
+    public ResponseStd<Boolean>  updateAnoInfoAutoCheck(@RequestBody WorkflowExec workflowExec) {
+
+        boolean res = anomalyInfoService.saveAnoInfoByExec(workflowExec);
         if (res == false) {
             return new ResponseStd<>(ErrorCode.PARAMS_ERROR);
         }

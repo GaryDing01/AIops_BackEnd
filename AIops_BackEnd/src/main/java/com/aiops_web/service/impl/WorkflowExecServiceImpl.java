@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -65,6 +66,12 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
 
     @Resource
     AnomalyInfoService anomalyInfoService;
+
+    @Resource
+    RootcauseResultMapper rootcauseResultMapper;
+
+    @Resource
+    KnowledgegraphResultMapper knowledgegraphResultMapper;
 
     Utils utils = new Utils();
 
@@ -315,6 +322,48 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         return true;
     }
 
+    // 日志故障检测
+    public boolean execAIops_Rootcause(AiopsAlg aiopsAlg, String params, WorkflowExec workflowExec) {
+        // 先获取输入值
+        if (workflowExec.getInputTypeId() == 5) { // 故障检测结果
+            List<AnodetectResult> anodetectResultList = getInOutData(workflowExec.getInputTypeId(),workflowExec.getInputId(),0);
+        }
+        else { // 其他都不可能了
+            return false;
+        }
+
+        // 2. 调用算法
+        // 此处应该用到aiopsAlg, params等, 目前进攻模拟
+
+        // 3. 生成输出结果
+        // 只剩下outputId需要更新，看下和inputId的对应关系
+        String anodetectOutput = "100-200|300-400";
+
+        // 4. 插入故障检测结果表并更新执行输出OutputId
+        String[] anodetectOutputArray = anodetectOutput.split("\\|");
+        long startId = 0;
+        long endId = 0;
+        for (int i = 0; i < anodetectOutputArray.length; i++) {
+            AnodetectResult anodetectResult = new AnodetectResult();
+            anodetectResult.setSourceDataSection(anodetectOutputArray[i]);
+            anodetectResult.setDeleted(0);
+            System.out.println(anodetectResult);
+            anodetectResultMapper.insert(anodetectResult);
+            if (i == 0) {
+                startId = anodetectResult.getAdrId();
+//                startId = i + 1;
+            }
+            else if (i == anodetectOutputArray.length - 1) {
+                endId = anodetectResult.getAdrId();
+//                endId = i + 1;
+            }
+        }
+        workflowExec.setOutputId(startId + "|" + endId);
+        System.out.println("After Ano Detection, the Workflow is: " + workflowExec);
+
+        return true;
+    }
+
     // 获取相关数据调度
     // result == 1表示返回的是报告, result == 0 表示是拿真实数据
     public List getInOutData(Integer dataTypeId, String dataIds, Integer result) {
@@ -465,6 +514,29 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
             return anodetectStringList;
         }
         return anodetectStringList;
+    }
+
+    // 从生成知识图谱的表中获取所有根因路径，然后组成一个大的List<String>
+    @Override
+    public List<String> getAllRCIds() {
+        List<String> allRCIdsList = new ArrayList<>();
+        List<KnowledgegraphResult> knowledgegraphResultList = knowledgegraphResultMapper.selectList(null);
+        for (KnowledgegraphResult knowledgegraphResult : knowledgegraphResultList) {
+            String rootcauseIds = knowledgegraphResult.getRootcauseIds();
+            if (rootcauseIds.length() < 2) {
+                System.out.println("rootcauseIds存在问题");
+                return null;
+            }
+            String rootcauseIds_temp = rootcauseIds.substring(1, rootcauseIds.length() - 1);
+            List<String> rcIdsList = Arrays.asList(rootcauseIds_temp.split(", "));
+            System.out.println("rcIdsList: ");
+            System.out.println(rcIdsList);
+            System.out.println();
+            System.out.println("rcIdsList: ");
+            allRCIdsList.addAll(rcIdsList);
+            System.out.println();
+        }
+        return allRCIdsList;
     }
 
     // 根据步骤id（step_id ）获取到对应的执行的outputids
