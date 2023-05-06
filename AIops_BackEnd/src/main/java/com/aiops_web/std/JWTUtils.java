@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JWTUtils {
-    private static final String JWT_SECRET = "aiopsSystemJwtSecret";
+    private static final String JWT_SECRET = "aiopsSystemJwtSecretfggdjhbjbnjkljlkkbhvxdaweqwrdytcucyvub";
     private static final long JWT_TTL = 1000 * 60 * 60 * 24;
 
     private static final SignatureAlgorithm alg = SignatureAlgorithm.HS256;
