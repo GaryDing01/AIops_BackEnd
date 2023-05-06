@@ -43,6 +43,13 @@ public class UserController {
     @PostMapping("/login")
     public ResponseStd<UserPermissionDTO> login(@RequestBody UserPermissionDTO userPermissionDTO) {
         UserPermissionDTO dto = userService.login(userPermissionDTO);
+        // 根据dto的token的信息返回正确信息或者错误编码
+        if (dto.getToken().equals("NoUser")) {
+            return new ResponseStd<>(null, 40000, "NoUser");
+        } else if (dto.getToken().equals("WrongPwd")) {
+            return new ResponseStd<>(null, 40000, "WrongPwd");
+        }
+
         return new ResponseStd<>(dto);
     }
 
