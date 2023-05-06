@@ -1,6 +1,7 @@
 package com.aiops_web.service.neo4j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8,6 +9,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 import javax.ws.rs.BadRequestException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import com.aiops_web.dao.neo4j.Neo4jNodeDao;
@@ -106,7 +108,7 @@ public class KnowledgeGraphService {
             return false;
         // 删除旧的contains关系
         List<Neo4jRelationshipDto> oldRs = neo4jRelationshipDao.findRelationshipByStartIdAndEndIdAndType(oldParentId,
-                nodeId, "contains");
+                nodeId, Neo4jRelationshipEnum.Contains);
         List<Long> oldRIds = new ArrayList<>();
         for (Neo4jRelationshipDto r : oldRs) {
             oldRIds.add(r.getRId());
@@ -115,8 +117,9 @@ public class KnowledgeGraphService {
 
         // 添加新的contains关系
         JSONObject content = new JSONObject();
-        content.put("name", "contains");
-        neo4jRelationshipDao.addRelationship("contains", content.toJSONString(), newParentId, nodeId);
+        content.put("name", Neo4jRelationshipEnum.Contains);
+        neo4jRelationshipDao.addRelationship(Neo4jRelationshipEnum.Contains, content.toJSONString(), newParentId,
+                nodeId);
 
         node.setParentId(newParentId);
         neo4jNodeDao.save(node);
@@ -241,4 +244,38 @@ public class KnowledgeGraphService {
         return relationships;
     }
 
+    public List<String> saveRelationshipsByNodeIdsStringList(List<String> RCNodeIdsList) {
+        List<String> RCRelationshipIdsList = new ArrayList<>();
+        for (String ids : RCNodeIdsList) {
+            // 一条根因路径的节点ids
+            Long[] idsArray = Arrays.stream(ids.split("\\|")).map(s -> Long.parseLong(s.trim())).toArray(Long[]::new);
+            System.out.println("idsArray:" + idsArray);
+            // 一条根因路径的关系ids
+            Long[] RIds = new Long[idsArray.length - 1];
+            // 判断每两个id之间是否存在关系，若不存在，则生成一个新的relationship
+            for (int i = 0; i < idsArray.length - 1; i++) {
+                Long startId = idsArray[i];
+                Long endId = idsArray[i + 1];
+                List<Neo4jRelationshipDto> relationships = neo4jRelationshipDao
+                        .findRelationshipByStartIdAndEndIdAndType(startId, endId, Neo4jRelationshipEnum.Invokes);
+                if (relationships.size() == 0) {
+                    Neo4jRelationshipDto neo4jRelationshipDto = new Neo4jRelationshipDto();
+                    neo4jRelationshipDto.setStartId(startId);
+                    neo4jRelationshipDto.setEndId(endId);
+                    neo4jRelationshipDto.setType(Neo4jRelationshipEnum.Invokes);
+                    JSONObject content = new JSONObject();
+                    content.put("name", Neo4jRelationshipEnum.Invokes);
+                    neo4jRelationshipDto.setContent(content.toJSONString());
+                    Long newRId = addRelationship(neo4jRelationshipDto);
+                    RIds[i] = newRId;
+                } else {
+                    RIds[i] = relationships.get(0).getRId();
+                }
+            }
+            // 将一条根因路径的关系ids以'|'分隔形成字符串，存入RCRelationshipIdsList
+            String RCRelationshipIds = StringUtils.join(RIds, "|");
+            RCRelationshipIdsList.add(RCRelationshipIds);
+        }
+        return RCRelationshipIdsList;
+    }
 }

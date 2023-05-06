@@ -30,7 +30,7 @@ public class SystemArchitectureService {
     public Boolean configSystemArchitecture() {
         knowledgeGraphService.deleteAllData(); // 清空neo4j数据库
         Node systemNode = new Node();
-        systemNode.setType("System");
+        systemNode.setType(Neo4jNodeEnum.System);
         systemNode.setName(systemNamespace);
         systemNode.setContent("{}");
         systemNode.setParentId(Long.valueOf(-1));
@@ -54,7 +54,7 @@ public class SystemArchitectureService {
     private List<Node> getSystemNodesBaseInfo(Long systemId) {
         String command = "kubectl get nodes -o wide -n " + systemNamespace;
         String result = sshJschService.commandExec(command);
-        List<Node> nodeList = parseTableStringToNodeList(result, "Node", systemId);
+        List<Node> nodeList = parseTableStringToNodeList(result, Neo4jNodeEnum.Node, systemId);
 
         List<Node> newNodeList = saveNodeList(nodeList);
         allNodeList.addAll(newNodeList);
@@ -66,7 +66,7 @@ public class SystemArchitectureService {
         String command = "kubectl get pods -o wide -n " + systemNamespace;
         // kubectl get node k8s-pm-4 -o json -n train-ticket 获取一些更详细信息
         String result = sshJschService.commandExec(command);
-        List<Node> podList = parseTableStringToNodeList(result, "Pod", systemId);
+        List<Node> podList = parseTableStringToNodeList(result, Neo4jNodeEnum.Pod, systemId);
 
         List<Node> newNodeList = saveNodeList(podList);
         allNodeList.addAll(newNodeList);
@@ -77,7 +77,7 @@ public class SystemArchitectureService {
     private List<Node> getSystemServicesBaseInfo(Long systemId) {
         String command = "kubectl get services -o wide -n " + systemNamespace;
         String result = sshJschService.commandExec(command);
-        List<Node> serviceList = parseTableStringToNodeList(result, "Service", systemId);
+        List<Node> serviceList = parseTableStringToNodeList(result, Neo4jNodeEnum.Service, systemId);
 
         List<Node> newNodeList = saveNodeList(serviceList);
         allNodeList.addAll(newNodeList);
@@ -146,7 +146,7 @@ public class SystemArchitectureService {
                 Node container = new Node();
                 String containerName = podContainerStatus.getString("name");
                 container.setName(containerName);
-                container.setType("Container");
+                container.setType(Neo4jNodeEnum.Container);
                 container.setContent(podContainerStatus.toJSONString());
                 container.setParentId(podId);
                 containerList.add(container);
@@ -157,7 +157,7 @@ public class SystemArchitectureService {
                 Node container = new Node();
                 String containerName = podInitContainerStatus.getString("name");
                 container.setName(containerName);
-                container.setType("Container");
+                container.setType(Neo4jNodeEnum.Container);
                 container.setContent(podInitContainerStatus.toJSONString());
                 container.setParentId(podId);
                 containerList.add(container);
@@ -205,16 +205,16 @@ public class SystemArchitectureService {
 
     // 保存所有节点之间的关系
     private Boolean saveAllRelationship(List<Node> nodeList, List<Node> podList, List<Node> containerList,
-                                        List<Node> serviceList) {
+            List<Node> serviceList) {
 
         // 保存Node与Node之间的contains关系
         for (Node node : allNodeList) {
             Neo4jRelationshipDto neo4jRelationshipDto = new Neo4jRelationshipDto();
             neo4jRelationshipDto.setStartId(node.getParentId());
             neo4jRelationshipDto.setEndId(node.getId());
-            neo4jRelationshipDto.setType("contains");
+            neo4jRelationshipDto.setType(Neo4jRelationshipEnum.Contains);
             JSONObject content = new JSONObject();
-            content.put("name", "contains");
+            content.put("name", Neo4jRelationshipEnum.Contains);
             neo4jRelationshipDto.setContent(content.toJSONString());
             knowledgeGraphService.addRelationship(neo4jRelationshipDto);
         }
@@ -228,9 +228,9 @@ public class SystemArchitectureService {
                     Neo4jRelationshipDto neo4jRelationshipDto = new Neo4jRelationshipDto();
                     neo4jRelationshipDto.setStartId(pod.getId());
                     neo4jRelationshipDto.setEndId(node.getId());
-                    neo4jRelationshipDto.setType("runs_in");
+                    neo4jRelationshipDto.setType(Neo4jRelationshipEnum.RunsIn);
                     JSONObject content = new JSONObject();
-                    content.put("name", "runs_in");
+                    content.put("name", Neo4jRelationshipEnum.RunsIn);
                     neo4jRelationshipDto.setContent(content.toJSONString());
                     knowledgeGraphService.addRelationship(neo4jRelationshipDto);
                 }
@@ -247,9 +247,9 @@ public class SystemArchitectureService {
                     Neo4jRelationshipDto neo4jRelationshipDto = new Neo4jRelationshipDto();
                     neo4jRelationshipDto.setStartId(service.getId());
                     neo4jRelationshipDto.setEndId(pod.getId());
-                    neo4jRelationshipDto.setType("logical_abstracts");
+                    neo4jRelationshipDto.setType(Neo4jRelationshipEnum.LogicalAbstracts);
                     JSONObject content = new JSONObject();
-                    content.put("name", "logical_abstracts");
+                    content.put("name", Neo4jRelationshipEnum.LogicalAbstracts);
                     neo4jRelationshipDto.setContent(content.toJSONString());
                     knowledgeGraphService.addRelationship(neo4jRelationshipDto);
                 }

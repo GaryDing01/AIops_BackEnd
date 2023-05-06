@@ -183,6 +183,7 @@ public class KnowledgeGraphController {
     @Resource
     private SystemArchitectureService systemArchitectureService;
 
+    // 生成知识图谱系统信息
     @RequestMapping(value = "/system/architecture", method = RequestMethod.POST)
     public ResponseStd<Boolean> SystemArchitecture() {
         Boolean res = systemArchitectureService.configSystemArchitecture();
@@ -198,6 +199,14 @@ public class KnowledgeGraphController {
         Boolean relationship = knowledgeGraphService.changeNodeRelationship(nodeId,
                 oldParentId, newParentId);
         return new ResponseStd<>(relationship, 200, "success", "返回节点关系更改是否成功!");
+    }
+
+    // 传入List<String>形式的多条根因路径，由节点ids的string形式组成；生成相应的边，同时返回多条根因路径，由关系ids的string形式组成
+    @RequestMapping(value = "/relationships/RCNodeIdsList", method = RequestMethod.POST)
+    public ResponseStd<List<String>> saveRelationshipsByNodeIdsStringList(
+            @RequestParam List<String> RCNodeIdsList) {
+        List<String> res = knowledgeGraphService.saveRelationshipsByNodeIdsStringList(RCNodeIdsList);
+        return new ResponseStd<>(res, 200, "success", "返回多条根因路径,由关系ids的string形式组成!");
     }
 
     // 其他表基本增删改查
