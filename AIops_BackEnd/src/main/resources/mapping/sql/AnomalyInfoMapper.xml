@@ -2,9 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiops_web.dao.sql.AnomalyInfoMapper">
 
-    <select id="getAnomalyInfos" resultType="AnomalyInfo" parameterType="java.util.Map">
-        select *
-        from anomaly_info
+    <select id="getAnomalyInfos" resultType="com.aiops_web.dto.AnomalyInfoUserDTO" parameterType="java.util.Map">
+        select ano_id, obj_id, status_id, unitnode_type_id, unitnode_name, detect_tstamp,
+        predict_tstamp, update_tstamp, source_data_id, anomaly_info.user_id, wf_id, deleted, name as username
+        from anomaly_info, user
         <where>
             <if test="info.anoId != null and info.anoId!=''">
                 ano_id=#{info.anoId} and
@@ -34,8 +35,8 @@
             <if test="info.sourceDataId != null and info.sourceDataId != ''">
                 source_data_id=#{info.sourceDataId} and
             </if>
-            <if test="info.userId != null and info.userId != ''">
-                user_id=#{info.userId} and
+            <if test="info.username != null and info.username != ''">
+                user.name=#{info.username} and
             </if>
             <if test="info.wfId != null and info.wfId != ''">
                 wf_id=#{info.wfId} and
@@ -43,7 +44,10 @@
             <if test="info.deleted != null and info.deleted != ''">
                 deleted=#{info.deleted} and
             </if>
-            1=1
+            <if test="info.userId != null and info.userId != ''">
+                user.user_id=#{info.userId} and
+            </if>
+            user.user_id = anomaly_info.user_id
         </where>
         limit #{start}, #{size};
     </select>
@@ -73,9 +77,6 @@
             <if test="objId != null and objId != ''">
                 obj_id=#{objId},
             </if>
-            <!--            <if test="statusId != null and statusId != ''">-->
-            <!--                status_id=#{statusId},-->
-            <!--            </if>-->
             <if test="unitnodeName != null and unitnodeName != ''">
                 unitnode_name=#{unitnodeName},
             </if>

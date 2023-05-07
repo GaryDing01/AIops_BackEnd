@@ -3,11 +3,10 @@ package com.aiops_web.controller;
 
 import com.aiops_web.dto.RoleEnumDTO;
 import com.aiops_web.dto.UserPermissionDTO;
-import com.aiops_web.entity.sql.RoleEnum;
 import com.aiops_web.service.RoleEnumService;
 import com.aiops_web.service.UserService;
 import com.aiops_web.std.ErrorCode;
-import com.aiops_web.std.JWTUtils;
+import com.aiops_web.utils.JWTUtils;
 import com.aiops_web.std.LoginState;
 import com.aiops_web.std.ResponseStd;
 import com.alibaba.fastjson.JSONObject;
@@ -15,7 +14,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
