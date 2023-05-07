@@ -11,7 +11,7 @@ import java.util.List;
  *  服务类
  * </p>
  *
- * @author 
+ * @author
  * @since 2023-04-12
  */
 public interface AiopsAlgService extends IService<AiopsAlg> {
@@ -24,4 +24,7 @@ public interface AiopsAlgService extends IService<AiopsAlg> {
     boolean updateAlg(AiopsAlg alg) throws JsonProcessingException;
 
     boolean createAlg(AiopsAlg alg) throws JsonProcessingException;
+
+    // 新修改
+    int createAlg_new(AiopsAlg alg);
 }

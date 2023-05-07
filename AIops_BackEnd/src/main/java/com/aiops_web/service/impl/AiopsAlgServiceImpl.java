@@ -18,7 +18,7 @@ import java.util.Map;
  *  服务实现类
  * </p>
  *
- * @author 
+ * @author
  * @since 2023-04-12
  */
 @Service
@@ -68,5 +68,14 @@ public class AiopsAlgServiceImpl extends ServiceImpl<AiopsAlgMapper, AiopsAlg> i
 //        // robustness
         alg.setUpdateTstamp(new Date(System.currentTimeMillis()));
         return algMapper.createAlg(alg) > 0;
+    }
+
+    @Override
+    public int createAlg_new(AiopsAlg alg) {
+        int saveResult = algMapper.insert(alg);
+        if (saveResult == 0) {
+            return 0;
+        }
+        return alg.getAlgId();
     }
 }

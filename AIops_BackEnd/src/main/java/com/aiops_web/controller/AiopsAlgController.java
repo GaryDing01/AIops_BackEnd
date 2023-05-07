@@ -1,10 +1,7 @@
 package com.aiops_web.controller;
 
 
-import com.aiops_web.entity.sql.AiopsAlg;
-import com.aiops_web.entity.sql.AlgTypeEnum;
-import com.aiops_web.entity.sql.StepConfig;
-import com.aiops_web.entity.sql.WorkflowConfig;
+import com.aiops_web.entity.sql.*;
 import com.aiops_web.service.AlgTypeEnumService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
@@ -54,10 +51,14 @@ public class AiopsAlgController {
     }
 
     @PostMapping
-    public ResponseStd<Boolean> createAlg(@RequestBody AiopsAlg alg) throws JsonProcessingException {
+    public ResponseStd<Integer> createAlg(@RequestBody AiopsAlg alg) throws JsonProcessingException {
         // 在 Service 中解析参数
-        boolean res = aiopsAlgService.createAlg(alg);
-        return  new ResponseStd<>(res);
+//        boolean res = aiopsAlgService.createAlg(alg);
+        int saveResult = aiopsAlgService.createAlg_new(alg);
+        if (saveResult == 0) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<Integer>(saveResult);
     }
 
     @DeleteMapping("/{algId}")
@@ -67,7 +68,7 @@ public class AiopsAlgController {
     }
 
     @DeleteMapping()
-    public ResponseStd<Integer> deleteAlgByIds(@RequestParam List<Integer> ids) {
+    public ResponseStd<Boolean> deleteAlgByIds(@RequestParam List<Integer> ids) {
         // test ids
         System.out.println();
         if (ids.isEmpty()) {
@@ -76,7 +77,18 @@ public class AiopsAlgController {
 
         // return number of deleted tuples
         int tupleNum = aiopsAlgService.deleteAlgByIds(ids);
-        return new ResponseStd<>(tupleNum);
+        if (tupleNum < 1) {
+            return new ResponseStd<Boolean>(false);
+        }
+
+        return new ResponseStd<Boolean>(true);
+    }
+
+    // 补
+    // 根据id查找某一个算法
+    @GetMapping("/{algId}")
+    public ResponseStd<AiopsAlg> selectAlgById(@PathVariable Integer algId) {
+        return new ResponseStd<AiopsAlg>(aiopsAlgService.getById(algId));
     }
 
     // 其他表基本增删改查
