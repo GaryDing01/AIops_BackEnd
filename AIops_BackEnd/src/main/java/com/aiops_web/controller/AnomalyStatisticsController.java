@@ -6,8 +6,11 @@ import com.aiops_web.entity.sql.WorkflowExec;
 import com.aiops_web.service.AnomalyInfoService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,10 +28,12 @@ public class AnomalyStatisticsController {
     AnomalyInfoService anomalyInfoService;
 
     // 返回故障统计数据
-    @GetMapping("")
-    public ResponseStd<List<AnomalyInfo>> getAnomalyStatistics(@RequestParam(required = false) String startTstamp, @RequestParam(required = false) String endTstamp,
-                                                               @RequestParam(required = false) List<Integer> objIdList, @RequestParam(required = false) Integer unitnodeTypeId
-                                                               ) {
+    @PostMapping("")
+    public ResponseStd<List<AnomalyInfo>> getAnomalyStatistics(@RequestBody(required = true) JSONObject jsonObject) {
+        String startTstamp = jsonObject.getString("startTstamp");
+        String endTstamp = jsonObject.getString("endTstamp");
+        List<Integer> objIdList = jsonObject.getJSONArray("objIdList").toJavaList(Integer.class);
+        Integer unitnodeTypeId = jsonObject.getInteger("unitnodeTypeId");
 
         QueryWrapper<AnomalyInfo> wrapper = new QueryWrapper<>();
 
@@ -43,7 +48,7 @@ public class AnomalyStatisticsController {
             Date date = new Date(eTstamp);
             wrapper.le("detect_tstamp", date);
         }
-        if (objIdList != null) {
+        if (objIdList != null && objIdList.size() > 0) {
             wrapper.in("obj_id", objIdList);
         }
         if (unitnodeTypeId != null) {
