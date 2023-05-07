@@ -4,10 +4,9 @@ package com.aiops_web.controller;
 import com.aiops_web.dto.UserPermissionDTO;
 import com.aiops_web.service.UserService;
 import com.aiops_web.std.ErrorCode;
-import com.aiops_web.std.JWTUtils;
+import com.aiops_web.utils.JWTUtils;
 import com.aiops_web.std.LoginState;
 import com.aiops_web.std.ResponseStd;
-import com.baomidou.mybatisplus.extension.api.R;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,5 +1,6 @@
 package com.aiops_web.service;
 
+import com.aiops_web.dto.AnomalyInfoUserDTO;
 import com.aiops_web.entity.sql.AnomalyInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -15,7 +16,7 @@ import java.util.List;
  */
 public interface AnomalyInfoService extends IService<AnomalyInfo> {
 
-    List<AnomalyInfo> getAnomalyInfos(AnomalyInfo info, int pageNum, int pageSize);
+    List<AnomalyInfoUserDTO> getAnomalyInfos(AnomalyInfo info, int pageNum, int pageSize);
 
     boolean deleteByAnoId(int anoId);
 

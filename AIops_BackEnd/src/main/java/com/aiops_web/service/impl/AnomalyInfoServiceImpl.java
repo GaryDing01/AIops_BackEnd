@@ -1,5 +1,6 @@
 package com.aiops_web.service.impl;
 
+import com.aiops_web.dto.AnomalyInfoUserDTO;
 import com.aiops_web.entity.sql.AnomalyInfo;
 import com.aiops_web.dao.sql.AnomalyInfoMapper;
 import com.aiops_web.service.AnomalyInfoService;
@@ -26,7 +27,7 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
     private AnomalyInfoMapper anomalyInfoMapper;
 
     @Override
-    public List<AnomalyInfo> getAnomalyInfos(AnomalyInfo info, int pageNum, int pageSize) {
+    public List<AnomalyInfoUserDTO> getAnomalyInfos(AnomalyInfo info, int pageNum, int pageSize) {
         pageNum = pageNum > 1? pageNum : 1;
         pageSize = pageSize > 0? pageSize : 5;   // 默认5
         // 参数类型 不用map了
