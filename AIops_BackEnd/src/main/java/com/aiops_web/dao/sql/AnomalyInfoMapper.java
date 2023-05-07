@@ -4,10 +4,15 @@ import com.aiops_web.dto.AnomalyInfoUserDTO;
 import com.aiops_web.entity.sql.AnomalyInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+<<<<<<< HEAD
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Map;
+=======
+
+import java.util.List;
+>>>>>>> temp
 
 /**
  * <p>

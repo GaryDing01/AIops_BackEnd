@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+<<<<<<< HEAD
 import java.util.Map;
+=======
+>>>>>>> temp
 
 /**
  * <p>
@@ -16,9 +19,13 @@ import java.util.Map;
  * @since 2023-04-12
  */
 public interface AiopsAlgMapper extends BaseMapper<AiopsAlg> {
-
     List<AiopsAlg> getAllAlgs();
 
+<<<<<<< HEAD
+    List<AiopsAlg> getAllAlgs();
+
+=======
+>>>>>>> temp
     int deleteAlgById(int algId);
 
     int deleteAlgByIds(@Param("ids")List<Integer> ids);
@@ -26,6 +33,9 @@ public interface AiopsAlgMapper extends BaseMapper<AiopsAlg> {
     int createAlg(AiopsAlg alg);
 
     int updateAlg(AiopsAlg alg);
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> temp
 }

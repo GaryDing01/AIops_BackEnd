@@ -29,19 +29,25 @@ spring:
           password: YuRan2022
         # Neo4j
         neo4j:
-          url: jdbc:neo4j:bolt://localhost:7687
+          url: jdbc:neo4j:bolt://localhost:7687/neo4j
           driver-class-name: org.neo4j.jdbc.Driver
           username: neo4j
           password: neo4j123
-          # Encounter Error but Okay
-          druid:
-            test-while-idle: true
-            validation-query: MATCH(n) RETURN n
+#          #  Encounter Error but Okay
+#          druid:
+#            test-while-idle: false
+#            validation-query: MATCH(n) RETURN n
   neo4j:
-    url: bolt://localhost:7687/apifox
+    url: bolt://localhost:7687/neo4j
     authentication:
       username: neo4j
       password: neo4j123
+  elasticsearch:
+    uris: 82.157.145.14:9200
+  # jpa:
+  #   show-sql: true
+  #   hibernate:
+  #     ddl-auto: none
 
 mybatis-plus:  # if mybatis, change this
   mapper-locations: classpath:/mapping/**/*.xml
@@ -49,3 +55,10 @@ mybatis-plus:  # if mybatis, change this
   # Only for mybatis-plus
 #  configuration:
 #    map-underscore-to-camel-case: false
+
+jsch:
+  username: serveradmin/root
+  ip: 10.60.38.173
+  port: 50022
+  password: Tongji409!
+  StrictHostKeyChecking: 'no'

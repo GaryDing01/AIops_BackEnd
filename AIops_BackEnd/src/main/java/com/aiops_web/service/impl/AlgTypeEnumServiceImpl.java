@@ -16,5 +16,4 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AlgTypeEnumServiceImpl extends ServiceImpl<AlgTypeEnumMapper, AlgTypeEnum> implements AlgTypeEnumService {
-
 }

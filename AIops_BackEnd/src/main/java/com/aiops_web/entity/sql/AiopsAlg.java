@@ -49,10 +49,15 @@ public class AiopsAlg implements Serializable {
 
     private String content;
 
-
     public AiopsAlg() {
     }
 
+<<<<<<< HEAD
+    public AiopsAlg() {
+    }
+
+=======
+>>>>>>> temp
     /**
      * 把 json 解析成 map  之后用map初始化 alg
      * 因为 param 是 String  因此不能直接把json解析成AiopsAlg对象

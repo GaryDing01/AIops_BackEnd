@@ -29,6 +29,10 @@ public class ResponseStd<T> implements Serializable {
 
     public ResponseStd( T data) {
         this(data, ErrorCode.SUCCESS.getCode(), "", "");
+        if (data == null) {
+            this.code = ErrorCode.NULL_ERROR.getCode();
+            this.message = "数据为空";
+        }
     }
 
     public ResponseStd(ErrorCode errorCode) {

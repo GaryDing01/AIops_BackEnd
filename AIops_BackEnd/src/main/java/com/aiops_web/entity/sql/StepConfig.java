@@ -1,9 +1,7 @@
 package com.aiops_web.entity.sql;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -28,16 +26,19 @@ public class StepConfig implements Serializable {
     @TableId(value = "step_id", type = IdType.AUTO)
     private Integer stepId;
 
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Integer typeId;
 
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Integer stepNum;
 
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private Map<String, Object> param;
+//    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    private String param;
 
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Integer algId;
 
     private Integer wfId;
-
 
 }

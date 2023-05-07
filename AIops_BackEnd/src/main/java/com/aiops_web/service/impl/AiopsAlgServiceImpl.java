@@ -5,18 +5,26 @@ import com.aiops_web.dao.sql.AiopsAlgMapper;
 import com.aiops_web.service.AiopsAlgService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
+<<<<<<< HEAD
+=======
+import com.fasterxml.jackson.databind.ObjectMapper;
+>>>>>>> temp
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+<<<<<<< HEAD
+=======
+import java.util.Map;
+>>>>>>> temp
 
 /**
  * <p>
  *  服务实现类
  * </p>
  *
- * @author 
+ * @author
  * @since 2023-04-12
  */
 @Service
@@ -67,4 +75,16 @@ public class AiopsAlgServiceImpl extends ServiceImpl<AiopsAlgMapper, AiopsAlg> i
         alg.setUpdateTstamp(new Date(System.currentTimeMillis()));
         return algMapper.createAlg(alg) > 0;
     }
+<<<<<<< HEAD
+=======
+
+    @Override
+    public int createAlg_new(AiopsAlg alg) {
+        int saveResult = algMapper.insert(alg);
+        if (saveResult == 0) {
+            return 0;
+        }
+        return alg.getAlgId();
+    }
+>>>>>>> temp
 }

@@ -21,7 +21,7 @@ public class WorkflowConfig implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "wf_id", type = IdType.AUTO)
+    @TableId(value = "wf_id", type = IdType.AUTO)
     private Integer wfId;
 
     private String name;

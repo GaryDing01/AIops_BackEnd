@@ -11,7 +11,11 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class UserPermissionDTO extends User implements Serializable {
+<<<<<<< HEAD
     private List<Integer> permissions;
+=======
+    private List<Long> permissions;
+>>>>>>> temp
 
     private String token;
 
@@ -31,12 +35,21 @@ public class UserPermissionDTO extends User implements Serializable {
      * @param permitStr
      * @return
      */
+<<<<<<< HEAD
     private List<Integer> permissionToList(String permitStr) {
         List<Integer> list = new ArrayList<>();
         String[] strArr = permitStr.split("[|]");
         for (int i = 0; i < strArr.length; i++) {
             if (strArr[i].equals("1")) {
                 list.add(i+1);
+=======
+    private List<Long> permissionToList(String permitStr) {
+        List<Long> list = new ArrayList<>();
+        String[] strArr = permitStr.split("[|]");
+        for (int i = 0; i < strArr.length; i++) {
+            if (strArr[i].equals("1")) {
+                list.add(i + 1L);
+>>>>>>> temp
             }
         }
 

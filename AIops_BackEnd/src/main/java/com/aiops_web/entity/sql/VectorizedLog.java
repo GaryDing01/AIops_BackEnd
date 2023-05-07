@@ -22,8 +22,8 @@ public class VectorizedLog implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "vector_id", type = IdType.AUTO)
-    private Integer vectorId;
+    @TableId(value = "vector_id", type = IdType.AUTO)
+    private Long vectorId;
 
     private String embedding;
 
