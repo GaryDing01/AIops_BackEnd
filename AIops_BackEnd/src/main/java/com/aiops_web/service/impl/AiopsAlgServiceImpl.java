@@ -1,5 +1,6 @@
 package com.aiops_web.service.impl;
 
+import com.aiops_web.dto.AlgUserDTO;
 import com.aiops_web.entity.sql.AiopsAlg;
 import com.aiops_web.dao.sql.AiopsAlgMapper;
 import com.aiops_web.service.AiopsAlgService;
@@ -52,11 +53,20 @@ public class AiopsAlgServiceImpl extends ServiceImpl<AiopsAlgMapper, AiopsAlg> i
     }
 
     @Override
-    public boolean updateAlg(AiopsAlg alg) throws JsonProcessingException {
+    public boolean updateAlg(AlgUserDTO algUserDTO) throws JsonProcessingException {
 //        ObjectMapper mapper = new ObjectMapper();
 //        Map<String, Object> map = mapper.readValue(param, Map.class);
 //        // robustness
-//        AiopsAlg alg = new AiopsAlg(map);
+        AiopsAlg alg = new AiopsAlg();
+        alg.setAlgId(algUserDTO.getAlgId());
+        alg.setTypeId(algUserDTO.getTypeId());
+        alg.setName(algUserDTO.getName());
+        alg.setIntro(algUserDTO.getIntro());
+        alg.setSource(algUserDTO.getSource());
+        alg.setUpdateNum(algUserDTO.getUpdateNum());
+        alg.setUserId(algUserDTO.getUserId());
+        alg.setParam(algUserDTO.getParam());
+        alg.setContent(algUserDTO.getContent());
         alg.setUpdateTstamp(new Date(System.currentTimeMillis()));
         return algMapper.updateAlg(alg) > 0;
     }
@@ -71,11 +81,33 @@ public class AiopsAlgServiceImpl extends ServiceImpl<AiopsAlgMapper, AiopsAlg> i
     }
 
     @Override
-    public int createAlg_new(AiopsAlg alg) {
+    public int createAlg_new(AlgUserDTO algUserDTO) {
+        AiopsAlg alg = new AiopsAlg();
+        alg.setTypeId(algUserDTO.getTypeId());
+        alg.setName(algUserDTO.getName());
+        alg.setIntro(algUserDTO.getIntro());
+        alg.setSource(algUserDTO.getSource());
+        alg.setUserId(algUserDTO.getUserId());
+        alg.setParam(algUserDTO.getParam());
+        alg.setContent(algUserDTO.getContent());
+        alg.setUpdateTstamp(new Date(System.currentTimeMillis()));
+        alg.setUpdateNum(0);
         int saveResult = algMapper.insert(alg);
         if (saveResult == 0) {
             return 0;
         }
         return alg.getAlgId();
+    }
+
+    // DTO相关
+    // 根据algId获取一个AlgUserDTO
+    @Override
+    public AlgUserDTO getAlgUserDTOById(Integer algId) {
+        return algMapper.getAlgUserDTOById(algId);
+    }
+    // 获取所有的AlgUserDTO
+    @Override
+    public List<AlgUserDTO> getAllAlgUserDTO() {
+        return algMapper.getAllAlgUserDTO();
     }
 }

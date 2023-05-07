@@ -1,6 +1,7 @@
 package com.aiops_web.controller;
 
 
+import com.aiops_web.dto.AlgUserDTO;
 import com.aiops_web.entity.sql.*;
 import com.aiops_web.service.AlgTypeEnumService;
 import com.aiops_web.std.ErrorCode;
@@ -34,27 +35,28 @@ public class AiopsAlgController {
     AlgTypeEnumService algTypeEnumService;
 
     @GetMapping()
-    public ResponseStd<List<AiopsAlg>> getAlg() {
-        List<AiopsAlg> alg = aiopsAlgService.getAllAlgs();
+    public ResponseStd<List<AlgUserDTO>> getAlg() {
+        List<AlgUserDTO> algUserDTOList = aiopsAlgService.getAllAlgUserDTO();
         // 没有算法
-        if (alg.isEmpty()) {
+        if (algUserDTOList.isEmpty()) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
-        return  new ResponseStd<>(alg);
+        return  new ResponseStd<>(algUserDTOList);
     }
 
+    // 改
     @PutMapping
-    public ResponseStd<Boolean> updateAlg(@RequestBody AiopsAlg alg) throws JsonProcessingException {
+    public ResponseStd<Boolean> updateAlg(@RequestBody AlgUserDTO algUserDTO) throws JsonProcessingException {
         // 在 Service 中解析参数
-        boolean res = aiopsAlgService.updateAlg(alg);
+        boolean res = aiopsAlgService.updateAlg(algUserDTO);
         return  new ResponseStd<>(res);
     }
 
     @PostMapping
-    public ResponseStd<Integer> createAlg(@RequestBody AiopsAlg alg) throws JsonProcessingException {
+    public ResponseStd<Integer> createAlg(@RequestBody AlgUserDTO algUserDTO) throws JsonProcessingException {
         // 在 Service 中解析参数
 //        boolean res = aiopsAlgService.createAlg(alg);
-        int saveResult = aiopsAlgService.createAlg_new(alg);
+        int saveResult = aiopsAlgService.createAlg_new(algUserDTO);
         if (saveResult == 0) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
@@ -85,10 +87,10 @@ public class AiopsAlgController {
     }
 
     // 补
-    // 根据id查找某一个算法
+    // 根据id查找某一个AlgUserDTO
     @GetMapping("/{algId}")
-    public ResponseStd<AiopsAlg> selectAlgById(@PathVariable Integer algId) {
-        return new ResponseStd<AiopsAlg>(aiopsAlgService.getById(algId));
+    public ResponseStd<AlgUserDTO> selectAlgUserDTOById(@PathVariable Integer algId) {
+        return new ResponseStd<AlgUserDTO>(aiopsAlgService.getAlgUserDTOById(algId));
     }
 
     // 其他表基本增删改查

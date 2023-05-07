@@ -60,4 +60,37 @@
         where alg_id = #{algId};
     </update>
 
+    <!-- 新增DTO相关 -->
+    <resultMap id="AlgUserDTO" type="com.aiops_web.dto.AlgUserDTO">
+        <id property="algId" column="alg_id" />
+        <result property="typeId" column="type_id" />
+        <result property="name" column="name" />
+        <result property="intro" column="intro" />
+        <result property="source" column="source" />
+        <result property="updateTstamp" column="update_tstamp" />
+        <result property="updateNum" column="update_num" />
+        <result property="param" column="param" />
+        <result property="content" column="content" />
+        <result property="userId" column="user_id" />
+        <association property="userName" column="user_id" select="getUserName" />
+    </resultMap>
+
+    <!--DTO连接语句-->
+    <select id="getUserName" resultType="string">
+        select name userName from user where user_id = #{user_id};
+    </select>
+    <!--查询一个DTO-->
+    <select id="getAlgUserDTOById" resultMap="AlgUserDTO">
+        select *
+        from aiops_alg
+        where alg_id = #{algId}
+    </select>
+
+    <!--查询所有DTO-->
+    <select id="getAllAlgUserDTO" resultMap="AlgUserDTO">
+        select *
+        from aiops_alg
+    </select>
+
+
 </mapper>
