@@ -29,12 +29,8 @@ class AIopsWebApplicationTests {
 
     @Test
     void JWTTest() {
-        boolean a = JWTUtils.checkToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsb2dpbiIsInJvbGUiOjEsImV4cCI6MTY4MzI3NDE5MSwidXNlcklkIjoxLCJpYXQiOjE2ODMxODc3OTEsImp0aSI6IjEyZWU1OWY0LTE0MDctNDdlNi1iNDViLTYxOTdkNWU4MDJhNSJ9.SW6UXPmps9DAIVrgKnBzp6fgY2tRPDICXzV9e1JuIQU");
-        if (a) {
-            System.out.println("Successfully login");
-        } else {
-            System.out.println("unsuccessfully login");
-        }
+
+
     }
 
 }
