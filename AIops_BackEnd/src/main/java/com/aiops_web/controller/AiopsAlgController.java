@@ -4,11 +4,9 @@ package com.aiops_web.controller;
 import com.aiops_web.entity.sql.AiopsAlg;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
 import com.aiops_web.service.AiopsAlgService;
-import scala.Int;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -40,16 +38,16 @@ public class AiopsAlgController {
     }
 
     @PutMapping
-    public ResponseStd<Boolean> updateAlg(@RequestBody String param) throws JsonProcessingException {
+    public ResponseStd<Boolean> updateAlg(@RequestBody AiopsAlg alg) throws JsonProcessingException {
         // 在 Service 中解析参数
-        boolean res = aiopsAlgService.updateAlg(param);
+        boolean res = aiopsAlgService.updateAlg(alg);
         return  new ResponseStd<>(res);
     }
 
     @PostMapping
-    public ResponseStd<Boolean> createAlg(@RequestBody String param) throws JsonProcessingException {
+    public ResponseStd<Boolean> createAlg(@RequestBody AiopsAlg alg) throws JsonProcessingException {
         // 在 Service 中解析参数
-        boolean res = aiopsAlgService.createAlg(param);
+        boolean res = aiopsAlgService.createAlg(alg);
         return  new ResponseStd<>(res);
     }
 

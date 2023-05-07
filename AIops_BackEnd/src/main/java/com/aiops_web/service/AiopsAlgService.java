@@ -1,10 +1,8 @@
 package com.aiops_web.service;
 
-import com.aiops_web.controller.AiopsAlgController;
 import com.aiops_web.entity.sql.AiopsAlg;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import scala.Int;
 
 import java.util.List;
 
@@ -24,7 +22,7 @@ public interface AiopsAlgService extends IService<AiopsAlg> {
 
     int deleteAlgByIds(List<Integer> ids);
 
-    boolean updateAlg(String param) throws JsonProcessingException;
+    boolean updateAlg(AiopsAlg alg) throws JsonProcessingException;
 
-    boolean createAlg(String param) throws JsonProcessingException;
+    boolean createAlg(AiopsAlg alg) throws JsonProcessingException;
 }
