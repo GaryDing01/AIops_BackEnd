@@ -62,13 +62,6 @@ public class AiopsAlg implements Serializable {
         this.name = (String) map.get("name");
         this.intro = (String) map.get("intro");
         this.source = (String) map.get("source");
-
-        // Long.parseLong can be given a ""
-//        String tmp = (String)map.get("updateTstamp");
-//        if (tmp != null && tmp.length()>0) {
-//            this.updateTstamp = new Date(Long.parseLong(tmp));
-//        }
-
         // perhaps time should be set at backend
         this.updateTstamp = new Date(System.currentTimeMillis());
 

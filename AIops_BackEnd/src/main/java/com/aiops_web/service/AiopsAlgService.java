@@ -21,7 +21,7 @@ public interface AiopsAlgService extends IService<AiopsAlg> {
 
     int deleteAlgByIds(List<Integer> ids);
 
-    boolean updateAlg(String param) throws JsonProcessingException;
+    boolean updateAlg(AiopsAlg alg) throws JsonProcessingException;
 
-    boolean createAlg(String param) throws JsonProcessingException;
+    boolean createAlg(AiopsAlg alg) throws JsonProcessingException;
 }

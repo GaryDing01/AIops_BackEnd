@@ -32,6 +32,8 @@ public class DataIntroducing implements Serializable {
 
     private String source;
 
+    private String filePath;
+
     private String intro;
 
     private String name;

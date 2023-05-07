@@ -8,6 +8,7 @@ import com.aiops_web.service.AnomalyInfoService;
 import com.aiops_web.service.OriginalDataService;
 import com.aiops_web.service.ReportService;
 import com.aiops_web.service.WorkflowExecService;
+import com.aiops_web.service.neo4j.KnowledgeGraphService;
 import com.aiops_web.utils.Utils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -24,7 +25,7 @@ import java.util.List;
  *  服务实现类
  * </p>
  *
- * @author 
+ * @author
  * @since 2023-04-12
  */
 @Service
@@ -72,6 +73,9 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
 
     @Resource
     KnowledgegraphResultMapper knowledgegraphResultMapper;
+
+    @Resource
+    KnowledgeGraphService knowledgeGraphService;
 
     Utils utils = new Utils();
 
@@ -136,6 +140,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         }
         workflowExec.setTstamp(utils.getCurrentTstamp());
         System.out.println("The final workflowExec is: " + workflowExec);
+//        return -1;
 
         // 3. 结束执行，根据workflowExec的情况生成报告
         // 此时，workflowExec的信息应已完成, 可以插入
@@ -188,7 +193,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
                 return execAIops_LogAnoDetecting(aiopsAlg, stepConfig.getParam(), workflowExec);
             case 6:
                 System.out.println("Execute a Root Cause Analyzing Algorithm.");
-                break;
+                return execAIops_Rootcause(aiopsAlg, stepConfig.getParam(), workflowExec);
             case 7:
                 System.out.println("Execute a Knowledge Graph Generating Algorithm.");
                 break;
@@ -322,11 +327,12 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         return true;
     }
 
-    // 日志故障检测
+    // 日志根因分析
     public boolean execAIops_Rootcause(AiopsAlg aiopsAlg, String params, WorkflowExec workflowExec) {
         // 先获取输入值
+        List<AnodetectResult> anodetectResultList = new ArrayList<>();
         if (workflowExec.getInputTypeId() == 5) { // 故障检测结果
-            List<AnodetectResult> anodetectResultList = getInOutData(workflowExec.getInputTypeId(),workflowExec.getInputId(),0);
+            anodetectResultList = getInOutData(workflowExec.getInputTypeId(),workflowExec.getInputId(),0);
         }
         else { // 其他都不可能了
             return false;
@@ -337,31 +343,152 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
 
         // 3. 生成输出结果
         // 只剩下outputId需要更新，看下和inputId的对应关系
-        String anodetectOutput = "100-200|300-400";
+        if (anodetectResultList.isEmpty()) {
+            return false;
+        }
 
         // 4. 插入故障检测结果表并更新执行输出OutputId
-        String[] anodetectOutputArray = anodetectOutput.split("\\|");
         long startId = 0;
         long endId = 0;
-        for (int i = 0; i < anodetectOutputArray.length; i++) {
-            AnodetectResult anodetectResult = new AnodetectResult();
-            anodetectResult.setSourceDataSection(anodetectOutputArray[i]);
-            anodetectResult.setDeleted(0);
-            System.out.println(anodetectResult);
-            anodetectResultMapper.insert(anodetectResult);
+        for (int i = 0; i < anodetectResultList.size(); i++) {
+            AnodetectResult anodetectResult = anodetectResultList.get(i);
+            RootcauseResult rootcauseResult = new RootcauseResult();
+            rootcauseResult.setSourceDataSection(anodetectResult.getSourceDataSection());
+            String path = genRootCausePath(anodetectResult.getSourceDataSection());
+            rootcauseResult.setPath(path);
+            rootcauseResult.setDeleted(0);
+//            System.out.println(rootcauseResult);
+            rootcauseResultMapper.insert(rootcauseResult);
             if (i == 0) {
-                startId = anodetectResult.getAdrId();
-//                startId = i + 1;
+                startId = rootcauseResult.getRcrId();
             }
-            else if (i == anodetectOutputArray.length - 1) {
-                endId = anodetectResult.getAdrId();
-//                endId = i + 1;
+            else if (i == anodetectResultList.size() - 1) {
+                endId = rootcauseResult.getRcrId();
             }
         }
         workflowExec.setOutputId(startId + "|" + endId);
-        System.out.println("After Ano Detection, the Workflow is: " + workflowExec);
+//        System.out.println("After Root Cause Analysis, the Workflow is: " + workflowExec);
 
         return true;
+    }
+
+    public String genRootCausePath(String sourceDataSection) {
+        List<String> path = new ArrayList<>();
+        switch (sourceDataSection){
+            case "100-200":
+                path.add("ts-train-service->ts-travel-service->ts-travel2-service");
+                path.add("ts-station-service->ts-station-food-service");
+                break;
+            case "200-300":
+                path.add("ts-order-service->ts-order-other-service");
+                path.add("ts-price-service->ts-payment-service");
+                break;
+            case "300-400":
+                path.add("nacosdb-mysql->nacosdb-mysql-leader->nacosdb-mysql-follower");
+                path.add("skywalking->skywalking-ui");
+                break;
+            case "400-500":
+                path.add("ts-food-service->ts-delivery-service");
+                path.add("ts-consign-service->ts-consign-price-service");
+                break;
+            default:
+                path.add("ts-preserve-service->ts-preserve-other-service");
+                break;
+        }
+        return path.toString();
+    }
+
+    // 根据日志根因分析生成知识图谱
+    public boolean execAIops_genKGByLog(AiopsAlg aiopsAlg, String params, WorkflowExec workflowExec) {
+        // 先获取输入值
+        List<RootcauseResult> rootcauseResultList = new ArrayList<>();
+        if (workflowExec.getInputTypeId() == 6) { // 故障检测结果
+            rootcauseResultList = getInOutData(workflowExec.getInputTypeId(),workflowExec.getInputId(),0);
+        }
+        else { // 其他都不可能了
+            return false;
+        }
+
+        // 2. 调用算法
+        // 此处应该用到aiopsAlg, params等, 目前进攻模拟
+
+        // 3. 生成输出结果(需要到第4步后才能生成outputId)
+        // 只剩下outputId需要更新，看下和inputId的对应关系
+        if (rootcauseResultList.isEmpty()) {
+            return false;
+        }
+
+        // 4. 插入故障检测结果表并更新执行输出OutputId
+        long startId = 0;
+        long endId = 0;
+        for (int i = 0; i < rootcauseResultList.size(); i++) {
+            // 每一条根因数据new一个kgR数据, 存入List<Name>
+            RootcauseResult rootcauseResult = rootcauseResultList.get(i);
+            KnowledgegraphResult knowledgegraphResult = new KnowledgegraphResult();
+            List<String> rcNodeNameList = utils.String2List(rootcauseResult.getPath());
+            knowledgegraphResult.setSourceDataSection(rootcauseResult.getSourceDataSection()); // 1. 这部分表示故障数据的序号，不需要更新
+            // 调用genKG, 更新KnowledgegraphResult表中的一条数据(还未插入)
+//            rootcauseResult.setSourceDataSection(anodetectResult.getSourceDataSection());
+//            String path = genRootCausePath(anodetectResult.getSourceDataSection());
+//            rootcauseResult.setPath(path);
+//            rootcauseResult.setDeleted(0);
+//            System.out.println(rootcauseResult);
+            // 将knowledgegraphResult插入KnowledgegraphResult表
+            knowledgegraphResultMapper.insert(knowledgegraphResult);
+            if (i == 0) {
+                startId = knowledgegraphResult.getKgrId();
+            }
+            else if (i == rootcauseResultList.size() - 1) {
+                endId = knowledgegraphResult.getKgrId();
+            }
+        }
+        // 生成输出结果
+        workflowExec.setOutputId(startId + "|" + endId);
+//        System.out.println("After Knowledge Graph Generation, the Workflow is: " + workflowExec);
+
+        return true;
+    }
+
+    // 根据KnowledgegraphResult表中的一条记录中的List<Name>(rootcause_node_names)更新该记录中的其他数据
+    public boolean genKG(KnowledgegraphResult knowledgegraphResult, List<String> rcNodeNameList) {
+        if (rcNodeNameList.isEmpty()) {
+            return false;
+        }
+        // 2. kgR表中的rootcause_node_names字段和rcR表中的path字段应相同 (1. 为source_data_section, 不需要更新)
+        knowledgegraphResult.setRootcauseNodeNames(rcNodeNameList.toString());
+
+        // 3 根据上述name, 生成rootcause_node_ids字段
+        List<String> rcNodeIdList = new ArrayList<>();
+        List<Long> rcNodeIDList_rd = new ArrayList<>(); // 去重nodeids, 为第5步准备
+        for (int i = 0; i < rcNodeNameList.size(); i++) {
+            String[] nodeNameList = rcNodeNameList.get(i).split("->");
+            StringBuilder rcNodeIdsSb = new StringBuilder("");
+            for (String nodeName : nodeNameList) {
+                Long rcNodeId = knowledgeGraphService.getNodeByNameInService(nodeName).getId();
+
+                // 判断是否加到rcNodeIDList_rd中
+                if (!rcNodeIDList_rd.contains(rcNodeId)) {
+                    rcNodeIDList_rd.add(rcNodeId);
+                }
+
+                rcNodeIdsSb.append(rcNodeId);
+                rcNodeIdsSb.append("|");
+            }
+            rcNodeIdsSb.deleteCharAt(rcNodeIdsSb.length() - 1); // 删除最后一个|
+            rcNodeIdList.add(rcNodeIdsSb.toString());
+        }
+        knowledgegraphResult.setRootcauseNodeIds(rcNodeIdList.toString());
+
+        // 4. 根据上述rootcause_node_ids, 生成rootcause_relation_ids字段(并存入neo4j)
+        List<String> rcRelationIdList = knowledgeGraphService.saveRelationshipsByNodeIdsStringList(rcNodeIdList);
+        knowledgegraphResult.setRootcauseRelationIds(rcRelationIdList.toString());
+
+        // 5. 根据rcNodeIdList得到去重的nodeIds
+        // 所有去重的nodeIds都已在rcNodeIDList_rd中
+
+        // 6. 根据rcNodeIDList_rd获取all_node_ids, 并生成表中all_node_ids字段
+        return true;
+
     }
 
     // 获取相关数据调度
@@ -390,7 +517,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
             case 5: // 异常检测结果
                 return getInOutData_AnodetectResult(startId, endId, result);
             case 6: // 根因分析结果
-                break;
+                return getInOutData_RootCauseResult(startId, endId, result);
             case 7: // 知识图谱结果
                 break;
             default:
@@ -417,10 +544,10 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         for (OriginalData originalData : originalLogList) {
             originalLogStringList.add(
                     "{\"OriginalDataId\": \"" + originalData.getCalcId()
-                    + "\", \"BatchId\": \"" + originalData.getBatchId()
-                    + "\", \"RelativeId\": \"" + originalData.getRelaId()
-                    + "\", \"Content\": \"" + originalData.getContent()
-                    + "\"}"
+                            + "\", \"BatchId\": \"" + originalData.getBatchId()
+                            + "\", \"RelativeId\": \"" + originalData.getRelaId()
+                            + "\", \"Content\": \"" + originalData.getContent()
+                            + "\"}"
             );
         }
         if (result == 0) {
@@ -443,17 +570,17 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         for (ParsedLog parsedLog : parsedLogList) {
             parsedLogResult.add(
                     "{\"ParsedId\": \"" + parsedLog.getParseId()
-                    + "\", \"LineId\": \"" + parsedLog.getLogLineid()
-                    + "\", \"Datetime\": \"" + parsedLog.getLogDate()
-                    + "\", \"Timestamp\": \"" + parsedLog.getLogTimestamp()
-                    + "\", \"TraceId\": \"" + parsedLog.getLogTraceid()
-                    + "\", \"SpanId\": \"" + parsedLog.getLogSpanid()
-                    + "\", \"Unknown\": \"" + parsedLog.getLogUnknown()
-                    + "\", \"Level\": \"" + parsedLog.getLogLevel()
-                    + "\", \"Content\": \"" + parsedLog.getLogContent()
-                    + "\", \"EventId\": \"" + parsedLog.getLogEventid()
-                    + "\", \"EventTemplate\": \"" + parsedLog.getLogEventtemplate()
-                    + "\"}"
+                            + "\", \"LineId\": \"" + parsedLog.getLogLineid()
+                            + "\", \"Datetime\": \"" + parsedLog.getLogDate()
+                            + "\", \"Timestamp\": \"" + parsedLog.getLogTimestamp()
+                            + "\", \"TraceId\": \"" + parsedLog.getLogTraceid()
+                            + "\", \"SpanId\": \"" + parsedLog.getLogSpanid()
+                            + "\", \"Unknown\": \"" + parsedLog.getLogUnknown()
+                            + "\", \"Level\": \"" + parsedLog.getLogLevel()
+                            + "\", \"Content\": \"" + parsedLog.getLogContent()
+                            + "\", \"EventId\": \"" + parsedLog.getLogEventid()
+                            + "\", \"EventTemplate\": \"" + parsedLog.getLogEventtemplate()
+                            + "\"}"
             );
         }
         if (result == 0) {
@@ -475,8 +602,8 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         for (VectorizedLog vectorizedLog : vectorizedLogList) {
             vectorizedLogResult.add(
                     "{\"VectorizedId\": \"" + vectorizedLog.getVectorId()
-                    + "\", \"Embedding\": \"" + vectorizedLog.getEmbedding()
-                    + "\"}"
+                            + "\", \"Embedding\": \"" + vectorizedLog.getEmbedding()
+                            + "\"}"
             );
 //            System.out.println("vectorizedLogResult: " + vectorizedLogResult);
         }
@@ -494,18 +621,18 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         QueryWrapper<AnodetectResult> wrapper = new QueryWrapper<>();
         wrapper.between("adr_id", startId, endId);
         List<AnodetectResult> anodetectResultList = anodetectResultMapper.selectList(wrapper);
-        System.out.println("anodetectResultList" + anodetectResultList);
+//        System.out.println("anodetectResultList" + anodetectResultList);
 
         // 封装List<String>
         List<String> anodetectStringList = new ArrayList<>();
         for (AnodetectResult anodetectResult : anodetectResultList) {
             anodetectStringList.add(
                     "{\"AnomalyDetectionId\": \"" + anodetectResult.getAdrId()
-                    + "\", \"Source Data Id Section\": \"" + anodetectResult.getSourceDataSection()
-                    + "\"}"
+                            + "\", \"Source Data Id Section\": \"" + anodetectResult.getSourceDataSection()
+                            + "\"}"
             );
         }
-        System.out.println("anodetectStringList: " + anodetectStringList);
+//        System.out.println("anodetectStringList: " + anodetectStringList);
 
         if (result == 0) {
             return anodetectResultList;
@@ -516,13 +643,39 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         return anodetectStringList;
     }
 
+    // 获取根因分析结果相关数据
+    public List getInOutData_RootCauseResult(Long startId, Long endId, Integer result) {
+        QueryWrapper<RootcauseResult> wrapper = new QueryWrapper<>();
+        wrapper.between("rcr_id", startId, endId);
+        List<RootcauseResult> rootcauseResultList = rootcauseResultMapper.selectList(wrapper);
+
+        // 封装List<String>
+        List<String> rootcauseStringList = new ArrayList<>();
+        for (RootcauseResult rootcauseResult : rootcauseResultList) {
+            rootcauseStringList.add(
+                    "{\"RootcauseId\": \"" + rootcauseResult.getRcrId()
+                            + "\", \"Source Data Id Section\": \"" + rootcauseResult.getSourceDataSection()
+                            + "\", \"Path\": \"" + rootcauseResult.getPath()
+                            + "\"}"
+            );
+        }
+
+        if (result == 0) {
+            return rootcauseResultList;
+        }
+        else if (result == 1) {
+            return rootcauseStringList;
+        }
+        return rootcauseStringList;
+    }
+
     // 从生成知识图谱的表中获取所有根因路径，然后组成一个大的List<String>
     @Override
     public List<String> getAllRCIds() {
         List<String> allRCIdsList = new ArrayList<>();
         List<KnowledgegraphResult> knowledgegraphResultList = knowledgegraphResultMapper.selectList(null);
         for (KnowledgegraphResult knowledgegraphResult : knowledgegraphResultList) {
-            String rootcauseIds = knowledgegraphResult.getRootcauseIds();
+            String rootcauseIds = knowledgegraphResult.getRootcauseNodeIds();
             if (rootcauseIds.length() < 2) {
                 System.out.println("rootcauseIds存在问题");
                 return null;

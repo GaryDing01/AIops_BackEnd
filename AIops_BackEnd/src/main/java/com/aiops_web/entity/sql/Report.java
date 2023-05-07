@@ -5,16 +5,17 @@ import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
- * @author 
+ * @author
  * @since 2023-04-12
  */
 @Data
@@ -26,7 +27,7 @@ public class Report implements Serializable {
     @TableId(value = "report_id", type = IdType.AUTO)
     private Integer reportId;
 
-    private Timestamp tstamp;
+    private Date tstamp;
 
     private String inputData;
 

@@ -8,6 +8,7 @@ import com.aiops_web.service.RoleEnumService;
 import com.aiops_web.service.UserService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.JWTUtils;
+import com.aiops_web.std.LoginState;
 import com.aiops_web.std.ResponseStd;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -63,8 +64,14 @@ public class UserController {
 
     @GetMapping("/login")
     public ResponseStd<Boolean> checkToken(@RequestHeader("Authorization") String authorization) {
-        Boolean res = JWTUtils.checkToken(authorization);
-        return new ResponseStd<>(res);
+        LoginState loginState = JWTUtils.checkToken(authorization);
+        if (loginState == LoginState.CHECKFAIL) {
+            return new ResponseStd<>(false, 40000, "CheckFail");
+        } else if (loginState == LoginState.EXPIRE) {
+            return new ResponseStd<>(false, 40000, "TimeExpire");
+        }
+
+        return new ResponseStd<>(true);
     }
 
 

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ import java.util.List;
  *  服务实现类
  * </p>
  *
- * @author 
+ * @author
  * @since 2023-04-12
  */
 @Service
@@ -88,9 +89,10 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
         System.out.println("outputSample: " + report.getOutputData());
 
         // 4. 生成执行信息和备注
-        report.setSituation("该步骤执行已成功, 详情请查看输入输出数据情况及执行报告.");
+//        report.setSituation("该步骤执行已成功, 详情请查看输入输出数据情况及执行报告.");
         StringBuilder remark = new StringBuilder("");
         if (workflowExec.getOutputTypeId() < 5) {
+            report.setSituation("该步骤执行已成功, 详情请查看输入输出数据情况及执行报告.");
             if (inSample == 0) {
                 remark.append("已展示所有输入数据. ");
             }
@@ -111,11 +113,17 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
             }
         }
         else if (workflowExec.getOutputTypeId() == 5) {
+            report.setSituation("该步骤执行已成功, 详情请查看故障管理子系统. ");
             remark.append("已展示故障检测结果. ");
+        }
+        else if (workflowExec.getOutputTypeId() == 6) {
+            report.setSituation("该步骤执行已成功, 生成知识图谱后可在故障管理子系统查看具体根因路径. ");
+            remark.append("已展示根因分析路径. ");
         }
 
         report.setRemark(remark.toString());
-        report.setTstamp(utils.getCurrentTstamp());
+        Date currentDate = new Date(System.currentTimeMillis());
+        report.setTstamp(currentDate);
 //        System.out.println(report);
         reportMapper.insert(report);
 

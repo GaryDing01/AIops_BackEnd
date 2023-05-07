@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import java.util.Map;
  */
 @Service
 public class AiopsAlgServiceImpl extends ServiceImpl<AiopsAlgMapper, AiopsAlg> implements AiopsAlgService {
+
     @Resource
     private AiopsAlgMapper algMapper;
 
@@ -50,22 +52,21 @@ public class AiopsAlgServiceImpl extends ServiceImpl<AiopsAlgMapper, AiopsAlg> i
     }
 
     @Override
-    public boolean updateAlg(String param) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> map = mapper.readValue(param, Map.class);
-        // robustness
-
-        AiopsAlg alg = new AiopsAlg(map);
+    public boolean updateAlg(AiopsAlg alg) throws JsonProcessingException {
+//        ObjectMapper mapper = new ObjectMapper();
+//        Map<String, Object> map = mapper.readValue(param, Map.class);
+//        // robustness
+//        AiopsAlg alg = new AiopsAlg(map);
+        alg.setUpdateTstamp(new Date(System.currentTimeMillis()));
         return algMapper.updateAlg(alg) > 0;
     }
 
     @Override
-    public boolean createAlg(String param) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> map = mapper.readValue(param, Map.class);
-        // robustness
-
-        AiopsAlg alg = new AiopsAlg(map);
+    public boolean createAlg(AiopsAlg alg) throws JsonProcessingException {
+//        ObjectMapper mapper = new ObjectMapper();
+//        Map<String, Object> map = mapper.readValue(param, Map.class);
+//        // robustness
+        alg.setUpdateTstamp(new Date(System.currentTimeMillis()));
         return algMapper.createAlg(alg) > 0;
     }
 }

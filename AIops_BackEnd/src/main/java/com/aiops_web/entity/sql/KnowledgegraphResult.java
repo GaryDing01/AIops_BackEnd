@@ -17,11 +17,15 @@ public class KnowledgegraphResult {
 
     private String sourceDataSection;
 
-    private String nodeIds;
+    private String allNodeIds;
 
-    private String relationIds;
+    private String allRelationIds;
 
-    private String rootcauseIds;
+    private String rootcauseNodeNames;
+
+    private String rootcauseNodeIds;
+
+    private String rootcauseRelationIds;
 
     @TableLogic
     private Integer deleted;
