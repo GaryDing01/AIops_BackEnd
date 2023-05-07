@@ -26,7 +26,7 @@ public interface UserService extends IService<User> {
 
     List<UserPermissionDTO> getUserByIds(List<Integer> ids);
 
-    boolean createUser(User user);
+    Integer createUser(User user);
 
     boolean deleteUserById(long userId);
 
@@ -38,5 +38,8 @@ public interface UserService extends IService<User> {
 
     //  登录
     UserPermissionDTO login(UserPermissionDTO userPermissionDTO);
-    
+
+    // 新修改接口
+    boolean updateInfo_new(UserPermissionDTO userPermissionDTO);
+
 }

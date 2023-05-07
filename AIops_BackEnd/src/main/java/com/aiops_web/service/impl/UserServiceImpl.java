@@ -72,18 +72,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
     @Override
-    public boolean createUser(User user) {
+    public Integer createUser(User user) {
 //        if (!permissionVerify(user.getPermitIds()))
 //            return false;
         //   创建的时候不需要permitIds  根据roleId 拉取初始化permits
         String permitIds = userMapper.getInitPermits(user.getRoleId());
         if (permitIds == null || permitIds.equals("")) {
-            return false;
+            return 0;
         }
 
         user.setPermitIds(permitIds);
+        int saveResult = userMapper.insert(user);
+        if (saveResult == 0) {
+            return 0;
+        }
 
-        return userMapper.createUser(user) > 0;
+        return user.getUserId();
     }
 
     @Override
@@ -91,6 +95,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userMapper.deleteUserById(userId) > 0;
     }
 
+    @Override
     public UserPermissionDTO login(UserPermissionDTO userPermissionDTO) {
         LoginState loginState = checkPwd(userPermissionDTO.getUserId(), userPermissionDTO.getPassword());
 
@@ -175,5 +180,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (realPwd==null)
             return LoginState.NOUSER;
         return realPwd.equals(pwd)? LoginState.SUCCESS: LoginState.WRONGPWD;
+    }
+
+    @Override
+    public boolean updateInfo_new(UserPermissionDTO userPermissionDTO) {
+        User user = new User();
+        user.setUserId(userPermissionDTO.getUserId());
+        user.setRoleId(userPermissionDTO.getRoleId());
+        user.setName(userPermissionDTO.getName());
+        user.setPassword(userPermissionDTO.getPassword());
+        user.setPermitIds(user.Listtopermission(userPermissionDTO.getPermissions(), 8)); // 8表示子系统模块的数量
+        int updateResult = userMapper.updateById(user);
+        return updateResult >= 1;
     }
 }

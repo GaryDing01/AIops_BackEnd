@@ -38,12 +38,12 @@ public class UserController {
     // 查询所有用户
     @GetMapping()
     public ResponseStd<List<UserPermissionDTO>> getAllUsers() {
-        List<UserPermissionDTO> alg = userService.getAllUsers();
+        List<UserPermissionDTO> userPermissionDTOList = userService.getAllUsers();
         // 没有user  (数据库问题)
-        if (alg.isEmpty()) {
+        if (userPermissionDTOList.isEmpty()) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
-        return new ResponseStd<>(alg);
+        return new ResponseStd<>(userPermissionDTOList);
     }
 
     /**
@@ -93,9 +93,9 @@ public class UserController {
     }
 
     @PostMapping()
-    public ResponseStd<Boolean> createUser(@RequestBody UserPermissionDTO user) {
-        boolean res = userService.createUser(user);
-        return new ResponseStd<>(res);
+    public ResponseStd<Long> createUser(@RequestBody UserPermissionDTO user) {
+//        boolean res = userService.createUser(user);
+        return new ResponseStd<Long>((long)userService.createUser(user));
     }
 
     @DeleteMapping("/{userId}")
@@ -110,8 +110,8 @@ public class UserController {
     }
 
     @PutMapping()
-    public ResponseStd<Boolean> updateInfo(@RequestBody String info) throws JsonProcessingException {
-        boolean res = userService.updateInfo(info);
+    public ResponseStd<Boolean> updateInfo(@RequestBody UserPermissionDTO userPermissionDTO) throws JsonProcessingException {
+        boolean res = userService.updateInfo_new(userPermissionDTO);
         return new ResponseStd<>(res);
     }
 
