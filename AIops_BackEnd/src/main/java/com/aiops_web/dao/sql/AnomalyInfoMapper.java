@@ -16,7 +16,7 @@ import java.util.List;
  * @since 2023-04-12
  */
 public interface AnomalyInfoMapper extends BaseMapper<AnomalyInfo> {
-    List<AnomalyInfoUserDTO> getAnomalyInfos(@Param("start") int start, @Param("size") int pageSize, @Param("info") AnomalyInfo info);
+    List<AnomalyInfoUserDTO> getAnomalyInfos(@Param("start") int start, @Param("size") int pageSize, @Param("info") AnomalyInfoUserDTO info);
 
     AnomalyInfo getById(int anoId);
 

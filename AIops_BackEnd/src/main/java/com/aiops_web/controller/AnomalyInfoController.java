@@ -14,9 +14,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -46,7 +43,7 @@ public class AnomalyInfoController {
 
     // 分页查找
     @GetMapping("/page")
-    public ResponseStd<List<AnomalyInfoUserDTO>> getAnomalyInfos(@RequestParam int pageNum, @RequestParam int count, @RequestParam(required = false) String username,
+    public ResponseStd<List<AnomalyInfoUserDTO>> getAnomalyInfos(@RequestParam int pageNum, @RequestParam int count, @RequestParam(required = false) String user_name,
                                                                  @RequestParam(required = false) Integer ano_id, @RequestParam(required = false) Integer obj_id,
                                                                  @RequestParam(required = false) Integer status_id, @RequestParam(required = false) Integer user_id,
                                                                  @RequestParam(required = false) Integer wf_id, @RequestParam(required = false) Integer deleted,
@@ -55,7 +52,7 @@ public class AnomalyInfoController {
                                                                  @RequestParam(required = false) String predict_tstamp, @RequestParam(required = false) String update_tstamp) {
         // 收集查询的条件
         AnomalyInfoUserDTO info = new AnomalyInfoUserDTO();
-        info.setUsername(username);
+        info.setUserName(user_name);
         info.setAnoId(ano_id);
         info.setObjId(obj_id);
         info.setStatusId(status_id);

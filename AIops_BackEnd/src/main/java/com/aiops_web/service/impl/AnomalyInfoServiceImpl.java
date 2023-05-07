@@ -57,7 +57,7 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
 
     // Yuran
     @Override
-    public List<AnomalyInfoUserDTO> getAnomalyInfos(AnomalyInfo info, int pageNum, int pageSize) {
+    public List<AnomalyInfoUserDTO> getAnomalyInfos(AnomalyInfoUserDTO info, int pageNum, int pageSize) {
         pageNum = pageNum > 1? pageNum : 1;
         pageSize = pageSize > 0? pageSize : 5;   // 默认5
         return anomalyInfoMapper.getAnomalyInfos((pageNum-1)*pageSize, pageSize, info);

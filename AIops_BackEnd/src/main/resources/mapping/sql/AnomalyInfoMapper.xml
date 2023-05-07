@@ -4,7 +4,7 @@
 
     <select id="getAnomalyInfos" resultType="com.aiops_web.dto.AnomalyInfoUserDTO" parameterType="java.util.Map">
         select ano_id, obj_id, status_id, unitnode_type_id, unitnode_name, detect_tstamp,
-        predict_tstamp, update_tstamp, source_data_id, anomaly_info.user_id, wf_id, deleted, name as username
+        predict_tstamp, update_tstamp, source_data_id, anomaly_info.user_id, wf_id, deleted, name as userName
         from anomaly_info, user
         <where>
             <if test="info.anoId != null and info.anoId!=''">
@@ -35,8 +35,8 @@
             <if test="info.sourceDataId != null and info.sourceDataId != ''">
                 source_data_id=#{info.sourceDataId} and
             </if>
-            <if test="info.username != null and info.username != ''">
-                user.name=#{info.username} and
+            <if test="info.userName != null and info.userName != ''">
+                user.name=#{info.userName} and
             </if>
             <if test="info.wfId != null and info.wfId != ''">
                 wf_id=#{info.wfId} and

@@ -7,5 +7,5 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class AnomalyInfoUserDTO extends AnomalyInfo {
-    private String username;
+    private String userName;
 }

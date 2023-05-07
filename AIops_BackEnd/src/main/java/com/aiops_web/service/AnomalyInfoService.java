@@ -18,7 +18,7 @@ import java.util.List;
 public interface AnomalyInfoService extends IService<AnomalyInfo> {
 
     // Yuran
-    List<AnomalyInfoUserDTO> getAnomalyInfos(AnomalyInfo info, int pageNum, int pageSize);
+    List<AnomalyInfoUserDTO> getAnomalyInfos(AnomalyInfoUserDTO info, int pageNum, int pageSize);
 
     boolean deleteByAnoId(int anoId);
 
