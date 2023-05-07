@@ -9,6 +9,7 @@ import com.aiops_web.service.UserService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.JWTUtils;
 import com.aiops_web.std.ResponseStd;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
 
@@ -108,8 +109,10 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/pwds")
-    public ResponseStd<Boolean> updatePwd(@PathVariable long userId, @RequestParam String password, @RequestParam String oldPassword) {
-        boolean res = userService.updatePwd(userId, password, oldPassword);
+    public ResponseStd<Boolean> updatePwd(@PathVariable long userId, @RequestBody JSONObject jsonObject) {
+        String newPassword = jsonObject.getString("newPassword");
+        String oldPassword = jsonObject.getString("oldPassword");
+        boolean res = userService.updatePwd(userId, newPassword, oldPassword);
         return new ResponseStd<>(res);
     }
 
