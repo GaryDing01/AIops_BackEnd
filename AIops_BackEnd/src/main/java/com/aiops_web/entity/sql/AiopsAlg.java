@@ -12,7 +12,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.neo4j.cypher.internal.expressions.In;
 
 /**
  * <p>
@@ -52,12 +51,6 @@ public class AiopsAlg implements Serializable {
     public AiopsAlg() {
     }
 
-<<<<<<< HEAD
-    public AiopsAlg() {
-    }
-
-=======
->>>>>>> temp
     /**
      * 把 json 解析成 map  之后用map初始化 alg
      * 因为 param 是 String  因此不能直接把json解析成AiopsAlg对象

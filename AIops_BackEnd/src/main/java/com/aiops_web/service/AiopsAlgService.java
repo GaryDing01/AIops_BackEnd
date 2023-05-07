@@ -17,11 +17,6 @@ import java.util.List;
 public interface AiopsAlgService extends IService<AiopsAlg> {
     List<AiopsAlg> getAllAlgs();
 
-<<<<<<< HEAD
-    List<AiopsAlg> getAllAlgs();
-
-=======
->>>>>>> temp
     boolean deleteAlgById(int algId);
 
     int deleteAlgByIds(List<Integer> ids);
@@ -29,10 +24,7 @@ public interface AiopsAlgService extends IService<AiopsAlg> {
     boolean updateAlg(AiopsAlg alg) throws JsonProcessingException;
 
     boolean createAlg(AiopsAlg alg) throws JsonProcessingException;
-<<<<<<< HEAD
-=======
 
     // 新修改
     int createAlg_new(AiopsAlg alg);
->>>>>>> temp
 }

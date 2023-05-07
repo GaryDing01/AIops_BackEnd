@@ -70,22 +70,13 @@
         where ano_id=#{anoId};
     </update>
 
-<<<<<<< HEAD
-=======
 
->>>>>>> temp
     <update id="updateAnoInfo" >
         update anomaly_info
         <set>
             <if test="objId != null and objId != ''">
                 obj_id=#{objId},
             </if>
-<<<<<<< HEAD
-<!--            <if test="statusId != null and statusId != ''">-->
-<!--                status_id=#{statusId},-->
-<!--            </if>-->
-=======
->>>>>>> temp
             <if test="unitnodeName != null and unitnodeName != ''">
                 unitnode_name=#{unitnodeName},
             </if>
@@ -101,13 +92,8 @@
             <if test="updateTstamp != null">
                 update_tstamp=#{updateTstamp},
             </if>
-<<<<<<< HEAD
-            <if test="sourceDataIds != null and sourceDataIds != ''">
-                source_data_ids=#{sourceDataIds},
-=======
             <if test="sourceDataId != null and sourceDataId != ''">
                 source_data_id=#{sourceDataId},
->>>>>>> temp
             </if>
             <if test="userId != null and userId != ''">
                 user_id=#{userId},

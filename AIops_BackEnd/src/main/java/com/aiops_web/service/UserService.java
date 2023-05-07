@@ -1,9 +1,6 @@
 package com.aiops_web.service;
 
-<<<<<<< HEAD
-=======
 import com.aiops_web.dto.RoleEnumDTO;
->>>>>>> temp
 import com.aiops_web.dto.UserPermissionDTO;
 import com.aiops_web.entity.sql.User;
 import com.aiops_web.std.LoginState;
@@ -29,11 +26,7 @@ public interface UserService extends IService<User> {
 
     List<UserPermissionDTO> getUserByIds(List<Integer> ids);
 
-<<<<<<< HEAD
-    boolean createUser(User user);
-=======
     Integer createUser(User user);
->>>>>>> temp
 
     boolean deleteUserById(long userId);
 
@@ -46,10 +39,7 @@ public interface UserService extends IService<User> {
     //  登录
     UserPermissionDTO login(UserPermissionDTO userPermissionDTO);
 
-<<<<<<< HEAD
-=======
     // 新修改接口
     boolean updateInfo_new(UserPermissionDTO userPermissionDTO);
->>>>>>> temp
 
 }

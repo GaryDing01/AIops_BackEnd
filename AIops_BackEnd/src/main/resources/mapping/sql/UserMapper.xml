@@ -15,11 +15,7 @@
         from user
         where user_id
         in (
-<<<<<<< HEAD
-            <foreach collection="ids" item="id" separator=","> #{id} </foreach>
-=======
         <foreach collection="ids" item="id" separator=","> #{id} </foreach>
->>>>>>> temp
         );
     </select>
 
@@ -27,11 +23,7 @@
         insert into user (role_id, name, password, permit_ids)
         values (#{roleId}, #{name}, #{password}, #{permitIds});
     </insert>
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> temp
     <select id="getInitPermits" resultType="String">
         select permit_ids from role_enum where role_id=#{roleId};
     </select>
@@ -53,11 +45,7 @@
         set permit_ids = #{permissions}
         where user_id = #{userId};
     </update>
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> temp
     <update id="updatePassword">
         update user
         <set>

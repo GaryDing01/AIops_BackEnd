@@ -2,12 +2,9 @@ package com.aiops_web.utils;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-<<<<<<< HEAD
-=======
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
->>>>>>> temp
 
 public class Utils {
 
@@ -20,8 +17,6 @@ public class Utils {
 //        System.out.println(time);//2017-05-06 15:54:21.0
         return time;
     }
-<<<<<<< HEAD
-=======
 
     public List<String> String2List(String s1) {
         if (s1.length() < 2) {
@@ -30,5 +25,4 @@ public class Utils {
         String s2 = s1.substring(1, s1.length() - 1);
         return Arrays.asList(s2.split(", "));
     }
->>>>>>> temp
 }

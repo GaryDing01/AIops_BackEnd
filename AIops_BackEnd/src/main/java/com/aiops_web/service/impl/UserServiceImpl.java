@@ -65,24 +65,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
     @Override
-<<<<<<< HEAD
-    public boolean createUser(User user) {
-=======
     public Integer createUser(User user) {
->>>>>>> temp
 //        if (!permissionVerify(user.getPermitIds()))
 //            return false;
         //   创建的时候不需要permitIds  根据roleId 拉取初始化permits
         String permitIds = userMapper.getInitPermits(user.getRoleId());
         if (permitIds == null || permitIds.equals("")) {
-<<<<<<< HEAD
-            return false;
-        }
-
-        user.setPermitIds(permitIds);
-
-        return userMapper.createUser(user) > 0;
-=======
             return 0;
         }
 
@@ -93,7 +81,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         return user.getUserId();
->>>>>>> temp
     }
 
     @Override
@@ -101,10 +88,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userMapper.deleteUserById(userId) > 0;
     }
 
-<<<<<<< HEAD
-=======
     @Override
->>>>>>> temp
     public UserPermissionDTO login(UserPermissionDTO userPermissionDTO) {
         LoginState loginState = checkPwd(userPermissionDTO.getUserId(), userPermissionDTO.getPassword());
 
@@ -190,8 +174,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return LoginState.NOUSER;
         return realPwd.equals(pwd)? LoginState.SUCCESS: LoginState.WRONGPWD;
     }
-<<<<<<< HEAD
-=======
 
     @Override
     public boolean updateInfo_new(UserPermissionDTO userPermissionDTO) {
@@ -204,5 +186,4 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         int updateResult = userMapper.updateById(user);
         return updateResult >= 1;
     }
->>>>>>> temp
 }

@@ -15,13 +15,8 @@
         from aiops_alg
         where aiops_alg.alg_id
         in (
-<<<<<<< HEAD
-            <foreach collection="ids" item="id" separator=","> #{id} </foreach>
-            );
-=======
         <foreach collection="ids" item="id" separator=","> #{id} </foreach>
         );
->>>>>>> temp
     </delete>
 
     <!-- 添加 并把自动生成的主码注入到 对象中 -->
@@ -48,17 +43,10 @@
             <if test="updateTstamp != null">
                 update_tstamp = #{updateTstamp},
             </if>
-<<<<<<< HEAD
-<!--            <if test="updateNum != null and updateNum != ''">-->
-<!--                update_num = #{updateNum},-->
-<!--            </if>-->
-                update_num = update_num+1,
-=======
             <!--            <if test="updateNum != null and updateNum != ''">-->
             <!--                update_num = #{updateNum},-->
             <!--            </if>-->
             update_num = update_num+1,
->>>>>>> temp
             <if test="userId != null and userId != ''">
                 user_id = #{userId},
             </if>

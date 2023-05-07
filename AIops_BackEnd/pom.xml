@@ -137,28 +137,6 @@
             <version>3.5.2</version>
         </dependency>
 
-<<<<<<< HEAD
-
-        <dependency>
-            <groupId>jakarta.json</groupId>
-            <artifactId>jakarta.json-api</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.9</version>
-        </dependency>
-
-        <!-- YuRan  -->
-        <!--  MyBatis PageHelper -->
-<!--        <dependency>-->
-<!--            <groupId>com.github.pagehelper</groupId>-->
-<!--            <artifactId>pagehelper</artifactId>-->
-<!--            <version>3.7.5</version>-->
-<!--        </dependency>-->
-
-=======
         <!-- 热重载 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -181,7 +159,6 @@
             <version>2.0.28</version>
         </dependency>
 
->>>>>>> temp
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>

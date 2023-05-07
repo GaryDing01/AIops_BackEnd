@@ -1,11 +1,5 @@
 package com.aiops_web.service;
 
-<<<<<<< HEAD
-import com.aiops_web.entity.sql.RoleEnum;
-import com.baomidou.mybatisplus.extension.service.IService;
-
-public interface RoleEnumService extends IService<RoleEnum> {
-=======
 import com.aiops_web.dto.RoleEnumDTO;
 import com.aiops_web.entity.sql.RoleEnum;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -27,5 +21,4 @@ public interface RoleEnumService extends IService<RoleEnum> {
 
     // 根据Id获取RoleEnumDTO
     RoleEnumDTO selectRoleTypeById(Integer roleId);
->>>>>>> temp
 }

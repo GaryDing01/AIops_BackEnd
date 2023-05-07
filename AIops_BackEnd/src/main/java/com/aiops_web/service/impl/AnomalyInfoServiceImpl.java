@@ -1,35 +1,22 @@
 package com.aiops_web.service.impl;
 
-<<<<<<< HEAD
-import com.aiops_web.dto.AnomalyInfoUserDTO;
-import com.aiops_web.entity.sql.AnomalyInfo;
-import com.aiops_web.dao.sql.AnomalyInfoMapper;
-=======
 import com.aiops_web.dao.sql.*;
 import com.aiops_web.dto.AnomalyInfoUserDTO;
 import com.aiops_web.entity.elasticsearch.OriginalData;
 import com.aiops_web.entity.sql.*;
->>>>>>> temp
 import com.aiops_web.service.AnomalyInfoService;
 import com.aiops_web.service.OriginalDataService;
 import com.aiops_web.service.UnitnodeTypeEnumService;
 import com.aiops_web.utils.Utils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-<<<<<<< HEAD
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-=======
 import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
->>>>>>> temp
 
 /**
  * <p>
@@ -42,11 +29,6 @@ import java.util.List;
 @Service
 public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, AnomalyInfo> implements AnomalyInfoService {
 
-<<<<<<< HEAD
-    @Autowired
-    private AnomalyInfoMapper anomalyInfoMapper;
-
-=======
     @Resource
     AnomalyInfoMapper anomalyInfoMapper;
 
@@ -74,19 +56,10 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
     Utils utils = new Utils();
 
     // Yuran
->>>>>>> temp
     @Override
     public List<AnomalyInfoUserDTO> getAnomalyInfos(AnomalyInfo info, int pageNum, int pageSize) {
         pageNum = pageNum > 1? pageNum : 1;
         pageSize = pageSize > 0? pageSize : 5;   // 默认5
-<<<<<<< HEAD
-        // 参数类型 不用map了
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("startIdx", (pageNum-1)*pageSize);
-//        map.put("pageSize", pageSize);
-//        map.put("info", info);
-=======
->>>>>>> temp
         return anomalyInfoMapper.getAnomalyInfos((pageNum-1)*pageSize, pageSize, info);
     }
 
@@ -111,9 +84,6 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
         return anomalyInfoMapper.updateAnoInfo(info) > 0;
     }
 
-<<<<<<< HEAD
-
-=======
     // 根据故障检测(本次只涉及故障检测)的执行结果(此时workflowExec信息应该完成)来保存故障信息
     @Override
     public boolean saveAnoInfoByExec(WorkflowExec workflowExec) {
@@ -220,5 +190,4 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
         System.out.println(originalLogStringList);
         return originalLogStringList.toString();
     }
->>>>>>> temp
 }

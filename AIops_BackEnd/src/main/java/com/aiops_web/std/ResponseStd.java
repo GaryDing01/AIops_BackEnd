@@ -42,6 +42,4 @@ public class ResponseStd<T> implements Serializable {
     public ResponseStd(ErrorCode errorCode, T data) {
         this(data, errorCode.getCode(), errorCode.getMessage(), errorCode.getDescription());
     }
-
-
 }

@@ -17,10 +17,7 @@ import java.util.List;
  */
 public interface AnomalyInfoService extends IService<AnomalyInfo> {
 
-<<<<<<< HEAD
-=======
     // Yuran
->>>>>>> temp
     List<AnomalyInfoUserDTO> getAnomalyInfos(AnomalyInfo info, int pageNum, int pageSize);
 
     boolean deleteByAnoId(int anoId);
@@ -28,13 +25,10 @@ public interface AnomalyInfoService extends IService<AnomalyInfo> {
     AnomalyInfo updateStatusById(int anoId, int statusId);
 
     boolean updateInfo(AnomalyInfo info);
-<<<<<<< HEAD
-=======
 
     // 根据故障检测的执行结果(此时workflowExec信息应该完成)来保存故障信息
     boolean saveAnoInfoByExec(WorkflowExec workflowExec);
 
     interface RoleEnumService {
     }
->>>>>>> temp
 }

@@ -1,22 +1,15 @@
 package com.aiops_web.controller;
 
 
-<<<<<<< HEAD
-import com.aiops_web.dto.UserPermissionDTO;
-=======
 import com.aiops_web.dto.RoleEnumDTO;
 import com.aiops_web.dto.UserPermissionDTO;
 import com.aiops_web.service.RoleEnumService;
->>>>>>> temp
 import com.aiops_web.service.UserService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.utils.JWTUtils;
 import com.aiops_web.std.LoginState;
 import com.aiops_web.std.ResponseStd;
-<<<<<<< HEAD
-=======
 import com.alibaba.fastjson.JSONObject;
->>>>>>> temp
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,17 +30,6 @@ public class UserController {
     @Resource
     UserService userService;
 
-<<<<<<< HEAD
-    // 查询所有用户
-    @GetMapping()
-    public ResponseStd<List<UserPermissionDTO>> getAllUsers() {
-        List<UserPermissionDTO> alg = userService.getAllUsers();
-        // 没有user  (数据库问题)
-        if (alg.isEmpty()) {
-            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
-        }
-        return new ResponseStd<>(alg);
-=======
     @Resource
     RoleEnumService roleEnumService;
 
@@ -60,7 +42,6 @@ public class UserController {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
         return new ResponseStd<>(userPermissionDTOList);
->>>>>>> temp
     }
 
     /**
@@ -110,15 +91,9 @@ public class UserController {
     }
 
     @PostMapping()
-<<<<<<< HEAD
-    public ResponseStd<Boolean> createUser(@RequestBody UserPermissionDTO user) {
-        boolean res = userService.createUser(user);
-        return new ResponseStd<>(res);
-=======
     public ResponseStd<Long> createUser(@RequestBody UserPermissionDTO user) {
 //        boolean res = userService.createUser(user);
         return new ResponseStd<Long>((long)userService.createUser(user));
->>>>>>> temp
     }
 
     @DeleteMapping("/{userId}")
@@ -133,22 +108,12 @@ public class UserController {
     }
 
     @PutMapping()
-<<<<<<< HEAD
-    public ResponseStd<Boolean> updateInfo(@RequestBody String info) throws JsonProcessingException {
-        boolean res = userService.updateInfo(info);
-=======
     public ResponseStd<Boolean> updateInfo(@RequestBody UserPermissionDTO userPermissionDTO) throws JsonProcessingException {
         boolean res = userService.updateInfo_new(userPermissionDTO);
->>>>>>> temp
         return new ResponseStd<>(res);
     }
 
     @PutMapping("/{userId}/pwds")
-<<<<<<< HEAD
-    public ResponseStd<Boolean> updatePwd(@PathVariable long userId, @RequestParam String password, @RequestParam String oldPassword) {
-        boolean res = userService.updatePwd(userId, password, oldPassword);
-        return new ResponseStd<>(res);
-=======
     public ResponseStd<Boolean> updatePwd(@PathVariable long userId, @RequestBody JSONObject jsonObject) {
         String newPassword = jsonObject.getString("newPassword");
         String oldPassword = jsonObject.getString("oldPassword");
@@ -195,7 +160,6 @@ public class UserController {
     @GetMapping("/roleTypes/{roleId}")
     public ResponseStd<RoleEnumDTO> selectRoleTypeById(@PathVariable Integer roleId) {
         return new ResponseStd<RoleEnumDTO>(roleEnumService.selectRoleTypeById(roleId));
->>>>>>> temp
     }
 }
 

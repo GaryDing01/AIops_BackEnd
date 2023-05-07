@@ -1,19 +1,13 @@
 package com.aiops_web.entity.sql;
 
-<<<<<<< HEAD
-=======
 import com.aiops_web.dto.RoleEnumDTO;
->>>>>>> temp
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-<<<<<<< HEAD
-=======
 import java.util.List;
 
->>>>>>> temp
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class RoleEnum {
@@ -21,13 +15,6 @@ public class RoleEnum {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "role_id", type = IdType.AUTO)
-<<<<<<< HEAD
-    private Integer roleId;
-
-    private String name;
-
-    private String permitIds;
-=======
     protected Integer roleId;
 
     protected String name;
@@ -54,5 +41,4 @@ public class RoleEnum {
         }
         return permitIds.toString();
     }
->>>>>>> temp
 }

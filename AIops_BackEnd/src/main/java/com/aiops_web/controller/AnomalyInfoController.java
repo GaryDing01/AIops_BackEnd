@@ -2,16 +2,6 @@ package com.aiops_web.controller;
 
 
 import com.aiops_web.dto.AnomalyInfoUserDTO;
-<<<<<<< HEAD
-import com.aiops_web.entity.sql.AnomalyInfo;
-import com.aiops_web.service.AnomalyInfoService;
-import com.aiops_web.std.ErrorCode;
-import com.aiops_web.std.ResponseStd;
-import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-=======
 import com.aiops_web.dto.ExecStepDTO;
 import com.aiops_web.entity.sql.*;
 import com.aiops_web.service.AnomalyInfoService;
@@ -27,7 +17,6 @@ import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
->>>>>>> temp
 import java.util.Date;
 import java.util.List;
 
@@ -43,12 +32,6 @@ import java.util.List;
 @RequestMapping("/anomaly")
 public class AnomalyInfoController {
 
-<<<<<<< HEAD
-    @Autowired
-    private AnomalyInfoService anomalyInfoService;
-
-    @GetMapping()
-=======
     @Resource
     AnomalyInfoService anomalyInfoService;
 
@@ -63,7 +46,6 @@ public class AnomalyInfoController {
 
     // 分页查找
     @GetMapping("/page")
->>>>>>> temp
     public ResponseStd<List<AnomalyInfoUserDTO>> getAnomalyInfos(@RequestParam int pageNum, @RequestParam int count, @RequestParam(required = false) String username,
                                                                  @RequestParam(required = false) Integer ano_id, @RequestParam(required = false) Integer obj_id,
                                                                  @RequestParam(required = false) Integer status_id, @RequestParam(required = false) Integer user_id,
@@ -100,8 +82,6 @@ public class AnomalyInfoController {
         return new ResponseStd<>(infos);
     }
 
-<<<<<<< HEAD
-=======
     // 补, 获取所有故障信息
     @GetMapping("")
     public ResponseStd<List<AnomalyInfo>> selectAllAnoInfo() {
@@ -113,7 +93,6 @@ public class AnomalyInfoController {
     }
 
     // 更新故障状态
->>>>>>> temp
     @PutMapping("/updateStatus/{anoId}")
     public ResponseStd<Boolean> updateStatus(@PathVariable int anoId, @RequestBody JSONObject jsonObject) {
         int statusId = (Integer) jsonObject.get("statusId");
@@ -125,10 +104,7 @@ public class AnomalyInfoController {
         return new ResponseStd<>(true);
     }
 
-<<<<<<< HEAD
-=======
     // 更新故障信息
->>>>>>> temp
     @PutMapping()
     public ResponseStd<Boolean>  updateAnoInfo(@RequestBody AnomalyInfoUserDTO info) {
         System.out.println();
@@ -140,8 +116,6 @@ public class AnomalyInfoController {
         return new ResponseStd<>(res);
     }
 
-<<<<<<< HEAD
-=======
 //    // 更新故障信息(后端自查)
 //    @PutMapping("/check/{anoId}")
 //    public ResponseStd<Boolean>  updateAnoInfoCheck(@PathVariable Integer anoId) throws ParseException {
@@ -173,15 +147,12 @@ public class AnomalyInfoController {
     }
 
     // 删除故障
->>>>>>> temp
     @DeleteMapping("/{anoId}")
     public ResponseStd<Boolean> deleteAnoInfoById(@PathVariable int anoId) {
         boolean res = anomalyInfoService.deleteByAnoId(anoId);
         return new ResponseStd<>(res);
     }
 
-<<<<<<< HEAD
-=======
     // 获取每一步骤报告
     @GetMapping("/{anoId}/stepReport")
     public ResponseStd<Report> selectOneReport(@PathVariable int anoId, @RequestParam int stepNum) {
@@ -204,6 +175,5 @@ public class AnomalyInfoController {
         return new ResponseStd<Report>(report);
     }
 
->>>>>>> temp
 }
 

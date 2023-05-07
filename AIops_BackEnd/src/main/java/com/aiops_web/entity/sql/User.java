@@ -23,11 +23,7 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-<<<<<<< HEAD
-      @TableId(value = "user_id", type = IdType.AUTO)
-=======
     @TableId(value = "user_id", type = IdType.AUTO)
->>>>>>> temp
     protected Integer userId;
 
     protected Integer roleId;

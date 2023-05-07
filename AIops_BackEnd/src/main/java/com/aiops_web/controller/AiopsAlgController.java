@@ -1,14 +1,6 @@
 package com.aiops_web.controller;
 
 
-<<<<<<< HEAD
-import com.aiops_web.entity.sql.AiopsAlg;
-import com.aiops_web.std.ErrorCode;
-import com.aiops_web.std.ResponseStd;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.web.bind.annotation.*;
-import com.aiops_web.service.AiopsAlgService;
-=======
 import com.aiops_web.entity.sql.*;
 import com.aiops_web.service.AlgTypeEnumService;
 import com.aiops_web.std.ErrorCode;
@@ -18,7 +10,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
 import com.aiops_web.service.AiopsAlgService;
 import scala.Int;
->>>>>>> temp
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -39,12 +30,9 @@ public class AiopsAlgController {
     @Resource
     AiopsAlgService aiopsAlgService;
 
-<<<<<<< HEAD
-=======
     @Resource
     AlgTypeEnumService algTypeEnumService;
 
->>>>>>> temp
     @GetMapping()
     public ResponseStd<List<AiopsAlg>> getAlg() {
         List<AiopsAlg> alg = aiopsAlgService.getAllAlgs();
@@ -63,12 +51,6 @@ public class AiopsAlgController {
     }
 
     @PostMapping
-<<<<<<< HEAD
-    public ResponseStd<Boolean> createAlg(@RequestBody AiopsAlg alg) throws JsonProcessingException {
-        // 在 Service 中解析参数
-        boolean res = aiopsAlgService.createAlg(alg);
-        return  new ResponseStd<>(res);
-=======
     public ResponseStd<Integer> createAlg(@RequestBody AiopsAlg alg) throws JsonProcessingException {
         // 在 Service 中解析参数
 //        boolean res = aiopsAlgService.createAlg(alg);
@@ -77,7 +59,6 @@ public class AiopsAlgController {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
         return new ResponseStd<Integer>(saveResult);
->>>>>>> temp
     }
 
     @DeleteMapping("/{algId}")
@@ -87,11 +68,7 @@ public class AiopsAlgController {
     }
 
     @DeleteMapping()
-<<<<<<< HEAD
-    public ResponseStd<Integer> deleteAlgByIds(@RequestParam List<Integer> ids) {
-=======
     public ResponseStd<Boolean> deleteAlgByIds(@RequestParam List<Integer> ids) {
->>>>>>> temp
         // test ids
         System.out.println();
         if (ids.isEmpty()) {
@@ -100,9 +77,6 @@ public class AiopsAlgController {
 
         // return number of deleted tuples
         int tupleNum = aiopsAlgService.deleteAlgByIds(ids);
-<<<<<<< HEAD
-        return new ResponseStd<>(tupleNum);
-=======
         if (tupleNum < 1) {
             return new ResponseStd<Boolean>(false);
         }
@@ -160,7 +134,6 @@ public class AiopsAlgController {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
         return new ResponseStd<AlgTypeEnum>(algTypeEnum);
->>>>>>> temp
     }
 
 }
