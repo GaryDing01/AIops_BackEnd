@@ -1,5 +1,6 @@
 package com.aiops_web.controller;
 
+import com.aiops_web.entity.elasticsearch.OriginalData;
 import com.aiops_web.service.OriginalDataService;
 import com.aiops_web.std.ResponseStd;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
+import java.util.List;
 
 /**
  * 对 es 的 origin_data 进行操作
@@ -25,17 +26,23 @@ public class OriginalDataController {
     }
 
     @GetMapping("/range")
-    public ResponseStd getRange(int beginId, int endId) throws IOException {
-        return new ResponseStd(originalDataService.getRange(beginId, endId));
+    public ResponseStd<List<OriginalData>> getRange(long beginId, long endId) {
+        return new ResponseStd<>(originalDataService.getRange(beginId, endId));
     }
 
     @GetMapping("/relativeRange")
-    public ResponseStd getRelativeRange(int batchId, int beginId, int endId) {
-        return new ResponseStd(originalDataService.getRelativeRange(batchId, beginId, endId));
+    public ResponseStd<List<OriginalData>> getRelativeRange(int batchId, long beginId, long endId) {
+        return new ResponseStd<>(originalDataService.getRelativeRange(batchId, beginId, endId));
     }
 
     @DeleteMapping("/range")
-    public ResponseStd deleteRange(int beginId, int endId) throws IOException {
-        return new ResponseStd(originalDataService.deleteRange(beginId, endId));
+    public ResponseStd<Boolean> deleteRange(long beginId, long endId) {
+        return new ResponseStd<>(originalDataService.deleteRange(beginId, endId));
     }
+
+    // 后端测试用
+//    @GetMapping("/test")
+//    public ResponseStd<Long> getAddTest() {
+//        return new ResponseStd<Long>(originalDataService.addBatchDoc(1, 1, "1"));
+//    }
 }

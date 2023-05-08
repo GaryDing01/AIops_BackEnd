@@ -9,13 +9,13 @@ import java.util.List;
  * @time 2023/4/17
  */
 public interface OriginalDataService {
-    List<OriginalData> getRange(int beginId, int endId);
+    List<OriginalData> getRange(long beginId, long endId);
 
-    List<OriginalData> getRelativeRange(int batchId, int beginId, int endId);
+    List<OriginalData> getRelativeRange(int batchId, long beginId, long endId);
 
-    boolean deleteRange(int beginId, int endId);
+    boolean deleteRange(long beginId, long endId);
 
-    void addBatchDoc(int batchId, int objId, String filepath);
+    long addBatchDoc(int batchId, int objId, String filepath);
 
     void TransferDataToLake(int batchId);
 }

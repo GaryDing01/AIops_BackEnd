@@ -48,7 +48,7 @@ public class OriginalDataServiceImpl implements OriginalDataService {
     }
 
     @Override
-    public List<OriginalData> getRange(int beginId, int endId) {
+    public List<OriginalData> getRange(long beginId, long endId) {
         RestClient restClient = RestClient.builder(new HttpHost("82.157.145.14", 9200)).build();
         ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
         ElasticsearchClient client = new ElasticsearchClient(transport);
@@ -80,7 +80,7 @@ public class OriginalDataServiceImpl implements OriginalDataService {
     }
 
     @Override
-    public List<OriginalData> getRelativeRange(int batchId, int beginId, int endId) {
+    public List<OriginalData> getRelativeRange(int batchId, long beginId, long endId) {
         RestClient restClient = RestClient.builder(new HttpHost("82.157.145.14", 9200)).build();
         ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
         ElasticsearchClient client = new ElasticsearchClient(transport);
@@ -113,7 +113,7 @@ public class OriginalDataServiceImpl implements OriginalDataService {
     }
 
     @Override
-    public boolean deleteRange(int beginId, int endId) {
+    public boolean deleteRange(long beginId, long endId) {
         List<OriginalData> updateList = getRange(beginId, endId);
         for (OriginalData data : updateList) {
             data.setDeleted(1);
@@ -131,9 +131,10 @@ public class OriginalDataServiceImpl implements OriginalDataService {
      * @param filepath: 存储源数据的文件
      */
     @Override
-    public void addBatchDoc(int batchId, int objId, String filepath) {
+    public long addBatchDoc(int batchId, int objId, String filepath) {
         long curNum = originalDataRepository.count();
         System.out.println("当前已有" + curNum + "条源数据");
+//        return 1L;
         List<OriginalData> addList = new ArrayList<>();
         long addNum = 1L;
         try {
@@ -163,6 +164,7 @@ public class OriginalDataServiceImpl implements OriginalDataService {
         }
         originalDataRepository.saveAll(addList);
         System.out.println("insert " + (addNum - 1L) + " in total");
+        return (addNum - 1L);
     }
 
     /**

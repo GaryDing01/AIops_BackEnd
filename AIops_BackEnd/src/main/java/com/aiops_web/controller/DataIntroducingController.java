@@ -1,6 +1,8 @@
 package com.aiops_web.controller;
 
 
+import com.aiops_web.dto.AlgUserDTO;
+import com.aiops_web.dto.DataIntroUserDTO;
 import com.aiops_web.entity.elasticsearch.OriginalData;
 import com.aiops_web.entity.sql.DataIntroducing;
 import com.aiops_web.service.DataIntroducingService;
@@ -33,54 +35,74 @@ public class DataIntroducingController {
         this.originalDataService = originalDataService;
     }
 
+    // DTO新增
     @PostMapping("")
-    public ResponseStd<Boolean> saveOne(@RequestBody DataIntroducing dataIntroducing) {
-        String filePath = dataIntroducing.getSource();
+    public ResponseStd<Integer> saveOne_new(@RequestBody DataIntroUserDTO dataIntroUserDTO) {
+
+        DataIntroducing dataIntroducing = dataIntroducingService.saveOne(dataIntroUserDTO);
+        if (dataIntroducing == null) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+
+        String filePath = dataIntroducing.getFilePath();
         int batchId = dataIntroducing.getBatchId();
         int objId = dataIntroducing.getObjId();
-        // 没有传入源日志的文件路径
-        if (filePath == null || batchId < 0 || objId < 0) {
-            return new ResponseStd<>(ErrorCode.NULL_ERROR);
-        }
+
         File file = new File(filePath);
-        // 传入的文件路径不存在
+        // 传入的文件路径不存在, 则直接返回dataIntroducing, 不返回
         if (!file.exists()) {
-            return new ResponseStd<>(ErrorCode.PARAMS_ERROR);
+            System.out.println("The file path is not correct.");
+            return new ResponseStd<Integer>(dataIntroducing.getBatchId());
         }
-        originalDataService.addBatchDoc(batchId, objId, filePath);
+
+        long addNum = originalDataService.addBatchDoc(batchId, objId, filePath); // 完成导入
+        dataIntroducing.setDataNum(addNum);
         List<OriginalData> sampleList = originalDataService.getRelativeRange(batchId, 1, 5);
         dataIntroducing.setDataSample(sampleList.toString());
         // 获得当前时间
         Date date = new Date();
-
-//        Timestamp t = new Timestamp(date.getTime()); //将时间转换成 Timestamp 类型，这样便可以存入到 Mysql 数据库中
-//        dataIntroducing.setTstamp(t);
         dataIntroducing.setTstamp(date);
-
         // 刚导入的源数据放在 OriginalData 中
         dataIntroducing.setPlace("OriginalData");
-        return new ResponseStd<>(dataIntroducingService.save(dataIntroducing));
+        // 因之前已经新建, 所以直接保存
+        boolean updateResult = dataIntroducingService.updateById(dataIntroducing);
+        if (updateResult == false) {
+            return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, null);
+        }
+
+        return new ResponseStd<Integer>(dataIntroducing.getBatchId());
     }
 
     @DeleteMapping("/{batchId}")
     public ResponseStd<Boolean> deleteOne(@PathVariable(value = "batchId") int batchId) {
-        return new ResponseStd<>(dataIntroducingService.removeById(batchId));
+        return new ResponseStd<Boolean>(dataIntroducingService.removeById(batchId));
     }
 
     @PutMapping("")
-    public ResponseStd<Boolean> updateOne(@RequestBody DataIntroducing dataIntroducing) {
-        Date date = new Date();
-
-//        Timestamp t = new Timestamp(date.getTime());
-//        dataIntroducing.setTstamp(t);
-        dataIntroducing.setTstamp(date);
-
-        return new ResponseStd<>(dataIntroducingService.saveOrUpdate(dataIntroducing));
+    public ResponseStd<Boolean> updateOne(@RequestBody DataIntroUserDTO dataIntroUserDTO) {
+//        Date date = new Date(System.currentTimeMillis());
+//        dataIntroducing.setTstamp(date);
+//        return new ResponseStd<>(dataIntroducingService.saveOrUpdate(dataIntroducing));
+        boolean res = dataIntroducingService.updateOne(dataIntroUserDTO);
+        return  new ResponseStd<>(res);
     }
 
     @GetMapping("")
-    public ResponseStd<List<DataIntroducing>> getAll() {
-        return new ResponseStd<>(dataIntroducingService.list());
+    public ResponseStd<List<DataIntroUserDTO>> getAll() {
+        List<DataIntroUserDTO> dataIntroUserDTOList = dataIntroducingService.getAllDataIntroUserDTO();
+        // 没有算法
+        if (dataIntroUserDTOList.isEmpty()) {
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
+        }
+        return new ResponseStd<List<DataIntroUserDTO>>(dataIntroUserDTOList);
     }
+
+    // 补
+    // 根据batchId获取某一个DataIntroDTO
+    @GetMapping("/{batchId}")
+    public ResponseStd<DataIntroUserDTO> selectAlgUserDTOById(@PathVariable Integer batchId) {
+        return new ResponseStd<DataIntroUserDTO>(dataIntroducingService.getDataIntroUserDTOById(batchId));
+    }
+
 }
 
