@@ -1,6 +1,7 @@
 package com.aiops_web.service.impl;
 
 import com.aiops_web.dao.sql.*;
+import com.aiops_web.dto.AnomalyInfoUserDTO;
 import com.aiops_web.entity.elasticsearch.OriginalData;
 import com.aiops_web.entity.sql.*;
 import com.aiops_web.service.AnomalyInfoService;
@@ -22,7 +23,7 @@ import java.util.List;
  *  服务实现类
  * </p>
  *
- * @author 
+ * @author
  * @since 2023-04-12
  */
 @Service
@@ -56,14 +57,9 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
 
     // Yuran
     @Override
-    public List<AnomalyInfo> getAnomalyInfos(AnomalyInfo info, int pageNum, int pageSize) {
+    public List<AnomalyInfoUserDTO> getAnomalyInfos(AnomalyInfoUserDTO info, int pageNum, int pageSize) {
         pageNum = pageNum > 1? pageNum : 1;
         pageSize = pageSize > 0? pageSize : 5;   // 默认5
-        // 参数类型 不用map了
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("startIdx", (pageNum-1)*pageSize);
-//        map.put("pageSize", pageSize);
-//        map.put("info", info);
         return anomalyInfoMapper.getAnomalyInfos((pageNum-1)*pageSize, pageSize, info);
     }
 
@@ -193,5 +189,15 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
         System.out.println("originalLogStringList.size()" + originalLogStringList.size());
         System.out.println(originalLogStringList);
         return originalLogStringList.toString();
+    }
+
+    @Override
+    public AnomalyInfoUserDTO getAnomalyInfoUserDTOById(Integer anoId) {
+        return anomalyInfoMapper.getAnomalyInfoUserDTOById(anoId);
+    }
+
+    @Override
+    public List<AnomalyInfoUserDTO> getAllAnomalyInfoUserDTO() {
+        return anomalyInfoMapper.getAllAnomalyInfoUserDTO();
     }
 }

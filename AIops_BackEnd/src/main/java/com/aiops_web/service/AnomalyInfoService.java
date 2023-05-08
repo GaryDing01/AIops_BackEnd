@@ -1,5 +1,6 @@
 package com.aiops_web.service;
 
+import com.aiops_web.dto.AnomalyInfoUserDTO;
 import com.aiops_web.entity.sql.AnomalyInfo;
 import com.aiops_web.entity.sql.WorkflowExec;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -11,13 +12,13 @@ import java.util.List;
  *  服务类
  * </p>
  *
- * @author 
+ * @author
  * @since 2023-04-12
  */
 public interface AnomalyInfoService extends IService<AnomalyInfo> {
 
     // Yuran
-    List<AnomalyInfo> getAnomalyInfos(AnomalyInfo info, int pageNum, int pageSize);
+    List<AnomalyInfoUserDTO> getAnomalyInfos(AnomalyInfoUserDTO info, int pageNum, int pageSize);
 
     boolean deleteByAnoId(int anoId);
 
@@ -30,4 +31,10 @@ public interface AnomalyInfoService extends IService<AnomalyInfo> {
 
     interface RoleEnumService {
     }
+
+    // DTO相关
+    // 根据algId获取AlgUserDTO
+    AnomalyInfoUserDTO getAnomalyInfoUserDTOById(Integer anoId);
+    // 获取所有的AlgUserDTO
+    List<AnomalyInfoUserDTO> getAllAnomalyInfoUserDTO();
 }
