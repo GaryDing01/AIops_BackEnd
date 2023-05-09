@@ -88,6 +88,8 @@ public class OriginalDataServiceImpl implements OriginalDataService {
                     s -> s.index(indexName).query(
                             q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))
                     ), className);
+            transport.close();
+            restClient.close();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
             System.out.println("连接出错，获取数据失败！");

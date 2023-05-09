@@ -85,5 +85,10 @@ public class DataIntroducingController {
         dataIntroducing.setDataSample(dataList.toString());
         return new ResponseStd<>(dataIntroducingService.saveOrUpdate(dataIntroducing));
     }
+
+    @PostMapping("/try")
+    public ResponseStd<Boolean> trySomthing(int batchId) {
+        return new ResponseStd<>(true);
+    }
 }
 
