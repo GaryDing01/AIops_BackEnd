@@ -76,5 +76,14 @@ public class DataIntroducingController {
     public ResponseStd<List<DataIntroducing>> getAll() {
         return new ResponseStd<>(dataIntroducingService.list());
     }
+
+    @PutMapping("/updateSample/{batchId}")
+    public ResponseStd<Boolean> updateSample(@PathVariable(value = "batchId") int batchId) {
+        List<OriginalData> dataList = originalDataService.getRelativeRange(batchId, 1, 5);
+        DataIntroducing dataIntroducing = new DataIntroducing();
+        dataIntroducing.setBatchId(batchId);
+        dataIntroducing.setDataSample(dataList.toString());
+        return new ResponseStd<>(dataIntroducingService.saveOrUpdate(dataIntroducing));
+    }
 }
 

@@ -7,8 +7,10 @@ import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.aiops_web.dao.elasticsearch.OriginalDataLakeRepository;
 import com.aiops_web.dao.elasticsearch.OriginalDataRepository;
 import com.aiops_web.entity.elasticsearch.OriginalData;
+import com.aiops_web.entity.elasticsearch.OriginalDataLake;
 import com.aiops_web.service.DataIntroducingService;
 import com.aiops_web.service.OriginalDataService;
 import com.alibaba.fastjson.JSONObject;
@@ -35,48 +37,62 @@ import java.util.Scanner;
 public class OriginalDataServiceImpl implements OriginalDataService {
     private final DataIntroducingService dataIntroducingService;
     private final OriginalDataRepository originalDataRepository;
+    private final OriginalDataLakeRepository originalDataLakeRepository;
     private final RestTemplateBuilder restTemplateBuilder;
     private final String index = "origin_data";
     private final String indexLake = "origin_data_lake";
 
     public OriginalDataServiceImpl(OriginalDataRepository originalDataRepository,
                                    RestTemplateBuilder restTemplateBuilder,
-                                   DataIntroducingService dataIntroducingService) {
+                                   DataIntroducingService dataIntroducingService,
+                                   OriginalDataLakeRepository originalDataLakeRepository) {
         this.originalDataRepository = originalDataRepository;
         this.restTemplateBuilder = restTemplateBuilder;
         this.dataIntroducingService = dataIntroducingService;
+        this.originalDataLakeRepository = originalDataLakeRepository;
     }
 
     @Override
     public List<OriginalData> getRange(long beginId, long endId) {
+        List<OriginalData> dataList = new ArrayList<>();
+        //两个索引都查一下
+        SearchResponse<OriginalData> searchResponse = getRangeSearchResponse(beginId, endId, index, OriginalData.class);
+        if (searchResponse != null) {
+            searchResponse.hits().hits().forEach(h -> dataList.add(h.source()));
+        }
+        searchResponse = getRangeSearchResponse(beginId, endId, indexLake, OriginalData.class);
+        if (searchResponse != null) {
+            searchResponse.hits().hits().forEach(h -> dataList.add(h.source()));
+        }
+        Collections.sort(dataList); // 按 calcId 排序
+        return dataList;
+    }
+
+    /**
+     * 在 indexName 索引中查询 beginId<=id<=endId 的数据，并指定其返回类型
+     *
+     * @param beginId:   范围查询，id最小值
+     * @param endId:     范围查询，id最大值
+     * @param indexName: 想要查询的索引名称
+     * @param className: 查询后返回的类型
+     * @return co.elastic.clients.elasticsearch.core.SearchResponse<T>
+     */
+    private <T> SearchResponse<T> getRangeSearchResponse(long beginId, long endId, String indexName, Class<T> className) {
         RestClient restClient = RestClient.builder(new HttpHost("82.157.145.14", 9200)).build();
         ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
         ElasticsearchClient client = new ElasticsearchClient(transport);
 
-        List<OriginalData> dataList = new ArrayList<>();
+        SearchResponse<T> searchResponse = null;
         try {
-            //查询 es 中符合条件的数据 id
-            SearchResponse<OriginalData> searchResponse = client.search(
-                    s -> s.index(index).query(
+            searchResponse = client.search(
+                    s -> s.index(indexName).query(
                             q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))
-                    ), OriginalData.class);
-            searchResponse.hits().hits().forEach(h -> dataList.add(h.source()));
-            if (searchResponse.hits().total() != null && searchResponse.hits().total().value() < (endId - beginId + 1)) {
-                // 数据不全在 OriginalData 中
-                searchResponse = client.search(
-                        s -> s.index(indexLake).query(
-                                q -> q.range(r -> r.field("calcId").gte(JsonData.of(beginId)).lte(JsonData.of(endId)))
-                        ), OriginalData.class);
-                searchResponse.hits().hits().forEach(h -> dataList.add(h.source()));
-            }
-            transport.close();
-            restClient.close();
+                    ), className);
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
             System.out.println("连接出错，获取数据失败！");
         }
-        Collections.sort(dataList); // 按 calcId 排序
-        return dataList;
+        return searchResponse;
     }
 
     @Override
@@ -89,6 +105,7 @@ public class OriginalDataServiceImpl implements OriginalDataService {
         try {
             // 根据 batchId 找到数据所在的索引
             String indexName;
+            System.out.println(dataIntroducingService.getById(batchId).getPlace());
             if (dataIntroducingService.getById(batchId).getPlace().equals("OriginalData")) {
                 indexName = index;
             } else {
@@ -114,11 +131,25 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 
     @Override
     public boolean deleteRange(long beginId, long endId) {
-        List<OriginalData> updateList = getRange(beginId, endId);
-        for (OriginalData data : updateList) {
-            data.setDeleted(1);
+        List<OriginalData> dataList1 = new ArrayList<>();
+        //查询 es 中符合条件的数据 id
+        SearchResponse<OriginalData> searchResponse = getRangeSearchResponse(beginId, endId, index, OriginalData.class);
+        if (searchResponse != null) {
+            searchResponse.hits().hits().forEach(h -> dataList1.add(h.source()));
+            for (OriginalData data : dataList1) {
+                data.setDeleted(1);
+            }
+            originalDataRepository.saveAll(dataList1);
         }
-        originalDataRepository.saveAll(updateList);
+        List<OriginalDataLake> dataList2 = new ArrayList<>();
+        SearchResponse<OriginalDataLake> searchResponse2 = getRangeSearchResponse(beginId, endId, indexLake, OriginalDataLake.class);
+        if (searchResponse2 != null) {
+            searchResponse2.hits().hits().forEach(h -> dataList2.add(h.source()));
+            for (OriginalDataLake data : dataList2) {
+                data.setDeleted(1);
+            }
+            originalDataLakeRepository.saveAll(dataList2);
+        }
         return true;
     }
 
@@ -132,7 +163,7 @@ public class OriginalDataServiceImpl implements OriginalDataService {
      */
     @Override
     public long addBatchDoc(int batchId, int objId, String filepath) {
-        long curNum = originalDataRepository.count();
+        long curNum = originalDataRepository.count() + originalDataLakeRepository.count();
         System.out.println("当前已有" + curNum + "条源数据");
         List<OriginalData> addList = new ArrayList<>();
         long addNum = 1L;

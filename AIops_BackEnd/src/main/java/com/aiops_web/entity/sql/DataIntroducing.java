@@ -46,5 +46,6 @@ public class DataIntroducing implements Serializable {
 
     private String place;
 
+    @Column(name = "data_num")
     private Long dataNum;
 }
