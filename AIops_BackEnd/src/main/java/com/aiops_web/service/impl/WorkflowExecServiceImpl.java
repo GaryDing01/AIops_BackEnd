@@ -588,7 +588,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         long startId = Long.parseLong(temp[1]);
         long endId = Long.parseLong(temp[2]);
 
-        List<OriginalData> originalLogList = originalDataService.getRelativeRange(batchId, startId, endId);
+        List<OriginalData> originalLogList = originalDataService.getRelativeRange(batchId, (int)startId, (int)endId);
         // 封装List<String>
         List<String> originalLogStringList = new ArrayList<>();
         for (OriginalData originalData : originalLogList) {
@@ -818,6 +818,133 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
     public List<WorkflowExec> getExecsByWf(Integer wfId) {
         return workflowExecMapper.selectExecByWf(wfId);
     }
+
+    // 步骤回退
+    @Override
+    public boolean withdrawExec(Integer execId) {
+        // 1. 取出要回退的对应执行信息
+        WorkflowExec workflowExec = workflowExecMapper.selectById(execId);
+        if (workflowExec == null) {
+            return false;
+        }
+        // 2. 报告是一定有的, 所以先删除报告
+        boolean delReportResult = reportService.removeById(workflowExec.getReportId());
+        if (!delReportResult) {
+            return false;
+        }
+        // 3. 准备各个表要删除的id的区间
+        long startId = 0L;
+        long endId = 0L;
+        if (workflowExec.getOutputTypeId() != 1) {
+            String[] temp = workflowExec.getOutputId().split("\\|");
+            if (temp.length != 2) {
+                System.out.println("outputId有误");
+                return false;
+            }
+            startId = Long.parseLong(temp[0]);
+            endId = Long.parseLong(temp[1]);
+        }
+        // 4. 判断output_type_id进入对应执行方法, 联动删除相关数据
+        boolean result;
+        switch (workflowExec.getOutputTypeId()) {
+            case 1: // 源日志
+                System.out.println("Withdraw a Data Source Execution.");
+                // 不用做任何操作
+                break;
+            case 2:
+                System.out.println("Withdraw a Log Cleaning Execution.");
+                // 不用做任何操作
+                break;
+            case 3:
+                System.out.println("Withdraw a Log Parsing Execution.");
+                // 不用做任何操作
+                break;
+            case 4:
+                System.out.println("Withdraw a Log Vectorizing Execution.");
+                // 不用做任何操作
+                break;
+            case 5:
+                System.out.println("Withdraw a Log Anomaly Detecting Execution.");
+                // 联动删除anomaly_info表和anodetect_result表
+                result = withdrawExec_LogAnoDetect(startId, endId, workflowExec);
+                if (!result) {
+                    return false;
+                }
+                break;
+            case 6:
+                System.out.println("Withdraw a Root Cause Analyzing Execution.");
+                // 联动删除rootcause_result表
+                result = withdrawExec_RootCause(startId, endId);
+                if (!result) {
+                    return false;
+                }
+                break;
+            case 7:
+                System.out.println("Withdraw a Knowledge Graph Generating Execution.");
+                // 联动删除knowledgegraph_result表
+                result = withdrawExec_KG(startId, endId);
+                if (!result) {
+                    return false;
+                }
+                break;
+            default:
+                System.out.println("Withdraw an Unknown Execution.");
+                return false;
+        }
+        // 最后把这个步骤删除
+        int delExecResult = workflowExecMapper.deleteById(execId);
+        if (delExecResult < 1) {
+            return false;
+        }
+        return true;
+    }
+
+    // 回退故障检测
+    public boolean withdrawExec_LogAnoDetect(Long startId, Long endId, WorkflowExec workflowExec) {
+        // 先删除anomaly_info中的数据 (直接删除wf_id对应的记录即可)
+        StepConfig stepConfig = stepConfigMapper.selectById(workflowExec.getStepId());
+        QueryWrapper<AnomalyInfo> wrapper_1 = new QueryWrapper<>();
+        wrapper_1.eq("wf_id",stepConfig.getWfId());
+        boolean delAnoInfoResult = anomalyInfoService.remove(wrapper_1);
+        if (!delAnoInfoResult) {
+            return false;
+        }
+
+        // 再删除anodetect_result表里的数据
+        QueryWrapper<AnodetectResult> wrapper_2 = new QueryWrapper<>();
+        wrapper_2.between("adr_id",startId, endId);
+        int delAnoDetectResult = anodetectResultMapper.delete(wrapper_2);
+        if (delAnoDetectResult < 1) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // 回退根因分析
+    public boolean withdrawExec_RootCause(Long startId, Long endId) {
+        // 删除rootcause_result表里的数据
+        QueryWrapper<RootcauseResult> wrapper = new QueryWrapper<>();
+        wrapper.between("adr_id",startId, endId);
+        int delResult = rootcauseResultMapper.delete(wrapper);
+        if (delResult < 1) {
+            return false;
+        }
+        return true;
+    }
+
+    // 回退生成知识图谱
+    public boolean withdrawExec_KG(Long startId, Long endId) {
+        // 删除rootcause_result表里的数据
+        QueryWrapper<KnowledgegraphResult> wrapper = new QueryWrapper<>();
+        wrapper.between("kgr_id",startId, endId);
+        int delResult = knowledgegraphResultMapper.delete(wrapper);
+        if (delResult < 1) {
+            return false;
+        }
+        return true;
+    }
+
 }
 
 //        workflowExec.setTstamp(utils.getCurrentTstamp());

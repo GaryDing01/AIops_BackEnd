@@ -5,9 +5,11 @@ import com.aiops_web.entity.sql.*;
 import com.aiops_web.service.*;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -225,10 +227,28 @@ public class WorkflowController {
         return new ResponseStd<Integer>(workflowExecService.saveOneExecByStep(stepId, inputTypeId, inputId));
     }
 
+    // 传入流程编号，一次性执行流程中的所有步骤
+    @PostMapping("/{wfId}/exec")
+    public ResponseStd<List<Integer>> createAllExecByWf(@PathVariable Integer wfId) {
+        // 匹配step和wfId
+        QueryWrapper<StepConfig> wrapper = new QueryWrapper<>();
+        wrapper.eq("wf_id",wfId);
+        List<StepConfig> stepConfigList = stepConfigService.list(wrapper);
+        List<Integer> wfExecIdList = new ArrayList<>();
+        for (StepConfig stepConfig : stepConfigList) {
+            int execResult = workflowExecService.saveOneExecByStep(stepConfig.getStepId(), null, null);
+            if (execResult < 1) {
+                return new ResponseStd<>(ErrorCode.PARAMS_ERROR, null);
+            }
+            wfExecIdList.add(execResult);
+        }
+        return new ResponseStd<List<Integer>>(wfExecIdList);
+    }
+
     // 步骤回退
     @DeleteMapping("/exec/{execId}")
     public ResponseStd<Boolean> deleteOneExec(@PathVariable Integer execId) {
-        return new ResponseStd<Boolean>(workflowExecService.removeById(execId));
+        return new ResponseStd<Boolean>(workflowExecService.withdrawExec(execId));
     }
 
     // 简单的修改步骤

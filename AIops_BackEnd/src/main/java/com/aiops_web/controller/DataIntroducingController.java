@@ -97,6 +97,15 @@ public class DataIntroducingController {
         return new ResponseStd<List<DataIntroUserDTO>>(dataIntroUserDTOList);
     }
 
+    @PutMapping("/updateSample/{batchId}")
+    public ResponseStd<Boolean> updateSample(@PathVariable(value = "batchId") int batchId) {
+        List<OriginalData> dataList = originalDataService.getRelativeRange(batchId, 1, 5);
+        DataIntroducing dataIntroducing = new DataIntroducing();
+        dataIntroducing.setBatchId(batchId);
+        dataIntroducing.setDataSample(dataList.toString());
+        return new ResponseStd<>(dataIntroducingService.saveOrUpdate(dataIntroducing));
+    }
+
     // 补
     // 根据batchId获取某一个DataIntroDTO
     @GetMapping("/{batchId}")

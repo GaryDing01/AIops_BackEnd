@@ -41,6 +41,7 @@ public class DataIntroducing implements Serializable {
     @Column(name = "obj_id")
     private Integer objId;
 
+    @Column(name = "data_num")
     private Long dataNum;
 
     @Column(name = "data_sample")

@@ -32,7 +32,7 @@ public class OriginalDataController {
 
     @GetMapping("/relativeRange")
     public ResponseStd<List<OriginalData>> getRelativeRange(int batchId, long beginId, long endId) {
-        return new ResponseStd<>(originalDataService.getRelativeRange(batchId, beginId, endId));
+        return new ResponseStd<>(originalDataService.getRelativeRange(batchId, (int)beginId, (int)endId));
     }
 
     @DeleteMapping("/range")

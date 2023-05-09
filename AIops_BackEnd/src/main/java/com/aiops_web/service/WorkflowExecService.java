@@ -37,4 +37,7 @@ public interface WorkflowExecService extends IService<WorkflowExec> {
 
     // 更新知识图谱
     public boolean updateAllKGR();
+
+    // 回退步骤
+    public boolean withdrawExec(Integer execId);
 }
