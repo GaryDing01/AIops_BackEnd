@@ -5,6 +5,7 @@ import com.aiops_web.entity.sql.*;
 import com.aiops_web.service.*;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.web.bind.annotation.*;
 
@@ -222,8 +223,24 @@ public class WorkflowController {
     }
 
     // 单步执行步骤
+//    @PostMapping("/exec/step/{stepId}")
+//    public ResponseStd<Integer> createOneExecByStep(@PathVariable Integer stepId, @RequestParam(required = false) Integer inputTypeId, @RequestParam(required = false) String inputId) {
+//        return new ResponseStd<Integer>(workflowExecService.saveOneExecByStep(stepId, inputTypeId, inputId));
+//    }
+
     @PostMapping("/exec/step/{stepId}")
-    public ResponseStd<Integer> createOneExecByStep(@PathVariable Integer stepId, @RequestParam(required = false) Integer inputTypeId, @RequestParam(required = false) String inputId) {
+    public ResponseStd<Integer> createOneExecByStep(@PathVariable Integer stepId, @RequestBody(required = false) JSONObject jsonObject) {
+        Integer inputTypeId;
+        String inputId;
+        if (jsonObject == null) {
+            inputTypeId = null;
+            inputId = "";
+        }
+        else {
+            inputTypeId = (Integer) jsonObject.get("inputTypeId");
+            inputId = jsonObject.getString("inputId");
+        }
+        System.out.println("测试: " + inputTypeId + inputId);
         return new ResponseStd<Integer>(workflowExecService.saveOneExecByStep(stepId, inputTypeId, inputId));
     }
 

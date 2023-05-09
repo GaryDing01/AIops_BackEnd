@@ -100,7 +100,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         }
         System.out.println(stepConfig);
 
-        if (inputTypeId == null || inputId == null) {
+        if (inputTypeId == null || inputId == null || inputId.equals("")) {
             if (stepConfig.getStepNum() == 1) { // 第一步
                 // 先找到源日志的枚举id
                 QueryWrapper<ExecDataTypeEnum> wrapper = new QueryWrapper<>();
