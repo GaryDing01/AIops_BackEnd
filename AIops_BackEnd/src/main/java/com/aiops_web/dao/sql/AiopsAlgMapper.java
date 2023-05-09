@@ -13,7 +13,7 @@ import java.util.List;
  *  Mapper 接口
  * </p>
  *
- * @author
+ * @author 
  * @since 2023-04-12
  */
 public interface AiopsAlgMapper extends BaseMapper<AiopsAlg> {

@@ -2,7 +2,9 @@ package com.aiops_web.controller;
 
 
 import com.aiops_web.dto.AnomalyInfoUserDTO;
+import com.aiops_web.dto.AnomalyInfoUserKGDTO;
 import com.aiops_web.dto.ExecStepDTO;
+import com.aiops_web.dto.RootCauseKGDTO;
 import com.aiops_web.entity.sql.*;
 import com.aiops_web.service.AnomalyInfoService;
 import com.aiops_web.service.ReportService;
@@ -14,6 +16,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,13 +46,13 @@ public class AnomalyInfoController {
 
     // 分页查找
     @GetMapping("/page")
-    public ResponseStd<List<AnomalyInfoUserDTO>> getAnomalyInfos(@RequestParam int pageNum, @RequestParam int count, @RequestParam(required = false) String user_name,
-                                                                 @RequestParam(required = false) Integer ano_id, @RequestParam(required = false) Integer obj_id,
-                                                                 @RequestParam(required = false) Integer status_id, @RequestParam(required = false) Integer user_id,
-                                                                 @RequestParam(required = false) Integer wf_id, @RequestParam(required = false) Integer deleted,
-                                                                 @RequestParam(required = false) Integer unitnode_type_id, @RequestParam(required = false) String unitnode_name,
-                                                                 @RequestParam(required = false) String source_data_id, @RequestParam(required = false) String detect_tstamp,
-                                                                 @RequestParam(required = false) String predict_tstamp, @RequestParam(required = false) String update_tstamp) {
+    public ResponseStd<List<AnomalyInfoUserKGDTO>> getAnomalyInfos(@RequestParam int pageNum, @RequestParam int count, @RequestParam(required = false) String user_name,
+                                                                   @RequestParam(required = false) Integer ano_id, @RequestParam(required = false) Integer obj_id,
+                                                                   @RequestParam(required = false) Integer status_id, @RequestParam(required = false) Integer user_id,
+                                                                   @RequestParam(required = false) Integer wf_id, @RequestParam(required = false) Integer deleted,
+                                                                   @RequestParam(required = false) Integer unitnode_type_id, @RequestParam(required = false) String unitnode_name,
+                                                                   @RequestParam(required = false) String source_data_id, @RequestParam(required = false) String detect_tstamp,
+                                                                   @RequestParam(required = false) String predict_tstamp, @RequestParam(required = false) String update_tstamp) {
         // 收集查询的条件
         AnomalyInfoUserDTO info = new AnomalyInfoUserDTO();
         info.setUserName(user_name);
@@ -73,26 +76,34 @@ public class AnomalyInfoController {
         }
 
         List<AnomalyInfoUserDTO> infos = anomalyInfoService.getAnomalyInfos(info, pageNum, count);
-        if (infos == null) {
+        if (infos.isEmpty()) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR);
         }
-        return new ResponseStd<>(infos);
+
+        // 再次封装成AnomalyInfoUserKGDTO
+        List<AnomalyInfoUserKGDTO> anomalyInfoUserKGDTOList = new ArrayList<>();
+        for (AnomalyInfoUserDTO anomalyInfoUserDTO : infos) {
+            AnomalyInfoUserKGDTO anomalyInfoUserKGDTO = new AnomalyInfoUserKGDTO(anomalyInfoUserDTO, anomalyInfoService.checkAnoKG(anomalyInfoUserDTO.getAnoId()));
+            anomalyInfoUserKGDTOList.add(anomalyInfoUserKGDTO);
+        }
+
+        return new ResponseStd<>(anomalyInfoUserKGDTOList);
     }
 
     // 补, 获取所有故障信息
     @GetMapping("")
-    public ResponseStd<List<AnomalyInfoUserDTO>> selectAllAnoUserDTO() {
-        List<AnomalyInfoUserDTO> anomalyInfoUserDTO = anomalyInfoService.getAllAnomalyInfoUserDTO();
-        if (anomalyInfoUserDTO.isEmpty()) {
+    public ResponseStd<List<AnomalyInfoUserKGDTO>> selectAllAnoUserKGDTO() {
+        List<AnomalyInfoUserKGDTO> anomalyInfoUserKGDTOList = anomalyInfoService.getAllAnomalyInfoUserDTO();
+        if (anomalyInfoUserKGDTOList.isEmpty()) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
-        return new ResponseStd<List<AnomalyInfoUserDTO>>(anomalyInfoUserDTO);
+        return new ResponseStd<List<AnomalyInfoUserKGDTO>>(anomalyInfoUserKGDTOList);
     }
 
     // 根据id查找某一个故障
     @GetMapping("/{anoId}")
-    public ResponseStd<AnomalyInfoUserDTO> selectAnoUserDTOById(@PathVariable Integer anoId) {
-        return new ResponseStd<AnomalyInfoUserDTO>(anomalyInfoService.getAnomalyInfoUserDTOById(anoId));
+    public ResponseStd<AnomalyInfoUserKGDTO> selectAnoUserKGDTOById(@PathVariable Integer anoId) {
+        return new ResponseStd<AnomalyInfoUserKGDTO>(anomalyInfoService.getAnomalyInfoUserDTOById(anoId));
     }
 
     // 更新故障状态
@@ -109,8 +120,9 @@ public class AnomalyInfoController {
 
     // 更新故障信息
     @PutMapping()
-    public ResponseStd<Boolean>  updateAnoInfo(@RequestBody AnomalyInfoUserDTO info) {
-        System.out.println();
+    public ResponseStd<Boolean> updateAnoInfo(@RequestBody AnomalyInfo info) {
+//        System.out.println(info);
+//        System.out.println();
         boolean res = anomalyInfoService.updateInfo(info);
         if (res == false) {
             return new ResponseStd<>(ErrorCode.PARAMS_ERROR);
@@ -120,17 +132,10 @@ public class AnomalyInfoController {
     }
 
 //    // 更新故障信息(后端自查)
-//    @PutMapping("/check/{anoId}")
-//    public ResponseStd<Boolean>  updateAnoInfoCheck(@PathVariable Integer anoId) throws ParseException {
-//        AnomalyInfo anomalyInfo = anomalyInfoService.getById(anoId);
-//        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        String time = "2023-05-02 17:05:58";
-//        Date date_1 = ft.parse(time);
-////        System.out.println(date_1.getTime());
-//        anomalyInfo.setDetectTstamp(date_1);
-//        anomalyInfo.setUpdateTstamp(date_1);
+//    @PostMapping("/autocheck")
+//    public ResponseStd<Boolean>  updateAnoInfoAutoCheck(@RequestBody WorkflowExec workflowExec) {
 //
-//        boolean res = anomalyInfoService.updateInfo(anomalyInfo);
+//        boolean res = anomalyInfoService.saveAnoInfoByExec(workflowExec);
 //        if (res == false) {
 //            return new ResponseStd<>(ErrorCode.PARAMS_ERROR);
 //        }
@@ -138,15 +143,11 @@ public class AnomalyInfoController {
 //        return new ResponseStd<>(res);
 //    }
 
-    @PostMapping("/autocheck")
-    public ResponseStd<Boolean>  updateAnoInfoAutoCheck(@RequestBody WorkflowExec workflowExec) {
-
-        boolean res = anomalyInfoService.saveAnoInfoByExec(workflowExec);
-        if (res == false) {
-            return new ResponseStd<>(ErrorCode.PARAMS_ERROR);
-        }
-
-        return new ResponseStd<>(res);
+    // 后端自查
+    // 该故障是否有对应的知识图谱
+    @GetMapping("/{anoId}/checkKG")
+    public ResponseStd<Integer> checkAnoKG(@PathVariable Integer anoId) {
+        return new ResponseStd<Integer>(anomalyInfoService.checkAnoKG(anoId));
     }
 
     // 删除故障
@@ -165,9 +166,15 @@ public class AnomalyInfoController {
             return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, null);
         }
         // 根据接口可以直接找对应步骤执行
+        // 故障中有Mock的非日志故障数据, 应先排除
+        int wfId = anomalyInfo.getWfId();
+        if (wfId <= 0 || stepNum <= 0) {
+            return new ResponseStd<Report>(null, ErrorCode.PARAMS_ERROR.getCode(), "", "该故障不是日志故障, 无法查看报告. ");
+        }
+        // 以下应该是真实日志故障数据
         ExecStepDTO execStepDTO = workflowExecService.getOneExecStep(anomalyInfo.getWfId(), stepNum);
         if (execStepDTO == null) {
-            return new ResponseStd<>(ErrorCode.SYSTEM_ERROR, null);
+            return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
         // 最后找到报告
         Report report = reportService.getById(execStepDTO.getReportId());
@@ -176,6 +183,12 @@ public class AnomalyInfoController {
         }
 
         return new ResponseStd<Report>(report);
+    }
+
+    // 获取故障对应的知识图谱
+    @GetMapping("/{anoId}/kg")
+    public ResponseStd<RootCauseKGDTO> selectKGByAno(@PathVariable Integer anoId) {
+        return new ResponseStd<RootCauseKGDTO>(anomalyInfoService.getKGByAno(anoId));
     }
 
 }

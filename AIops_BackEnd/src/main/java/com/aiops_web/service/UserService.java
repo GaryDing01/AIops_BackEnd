@@ -41,5 +41,5 @@ public interface UserService extends IService<User> {
 
     // 新修改接口
     boolean updateInfo_new(UserPermissionDTO userPermissionDTO);
-
+    
 }

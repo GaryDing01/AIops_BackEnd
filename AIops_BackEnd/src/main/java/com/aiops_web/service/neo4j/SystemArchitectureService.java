@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import com.aiops_web.service.WorkflowExecService;
 import org.springframework.stereotype.Service;
 
 import com.aiops_web.dto.Neo4jRelationshipDto;
@@ -22,6 +23,9 @@ public class SystemArchitectureService {
 
     @Resource
     private KnowledgeGraphService knowledgeGraphService;
+
+    @Resource
+    WorkflowExecService workflowExecService;
 
     private String systemNamespace = "train-ticket";
 
@@ -47,6 +51,13 @@ public class SystemArchitectureService {
         List<Node> serviceList = getSystemServicesBaseInfo(systemId);
         saveAllRelationship(nodeList, podList, containerList, serviceList); // 保存所有关系
         sshJschService.releaseSession();
+
+        // 更新Knowledgegraph_Result表
+        boolean updateResult = workflowExecService.updateAllKGR();
+        if (!updateResult) {
+            return false;
+        }
+
         return true;
     }
 

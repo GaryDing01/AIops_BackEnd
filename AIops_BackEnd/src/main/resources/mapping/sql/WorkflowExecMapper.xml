@@ -9,6 +9,13 @@
         WHERE we.step_id = sc.step_id AND sc.wf_id = #{wfId} AND sc.step_num = #{stepNum}
     </select>
 
+<!-- 根据输出数据类型查一个执行步骤-->
+    <select id="selectOneExecStepByOutType" resultType="com.aiops_web.dto.ExecStepDTO">
+        SELECT we.*, sc.type_id, sc.step_num, sc.param, sc.alg_id, sc.wf_id
+        FROM workflow_exec we, step_config sc
+        WHERE we.step_id = sc.step_id AND sc.wf_id = #{wfId} AND we.output_type_id = #{execTypeId}
+    </select>
+
     <select id="selectExecStepByWf" resultType="com.aiops_web.dto.ExecStepDTO">
         SELECT we.*, sc.type_id, sc.step_num, sc.param, sc.alg_id, sc.wf_id
         FROM workflow_exec we, step_config sc

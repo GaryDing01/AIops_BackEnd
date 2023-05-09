@@ -2,6 +2,7 @@ package com.aiops_web.service.impl;
 
 import com.aiops_web.dao.sql.*;
 import com.aiops_web.dto.ExecStepDTO;
+import com.aiops_web.dto.Neo4jRelationshipDto;
 import com.aiops_web.entity.elasticsearch.OriginalData;
 import com.aiops_web.entity.sql.*;
 import com.aiops_web.service.AnomalyInfoService;
@@ -74,6 +75,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
     @Resource
     KnowledgegraphResultMapper knowledgegraphResultMapper;
 
+    @Lazy
     @Resource
     KnowledgeGraphService knowledgeGraphService;
 
@@ -105,7 +107,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
                 wrapper.eq("name","源日志");
                 // 赋值
                 inputTypeId = execDataTypeEnumMapper.selectOne(wrapper).getTypeId();
-                inputId = "1|1|100";
+                inputId = "8|1|100";
             }
             else {
                 // 先找到上一个流程步骤
@@ -196,7 +198,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
                 return execAIops_Rootcause(aiopsAlg, stepConfig.getParam(), workflowExec);
             case 7:
                 System.out.println("Execute a Knowledge Graph Generating Algorithm.");
-                break;
+                return execAIops_genKGByLog(aiopsAlg, stepConfig.getParam(), workflowExec);
             default:
                 System.out.println("Execute an Unknown Algorithm.");
                 return false;
@@ -427,13 +429,15 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
             KnowledgegraphResult knowledgegraphResult = new KnowledgegraphResult();
             List<String> rcNodeNameList = utils.String2List(rootcauseResult.getPath());
             knowledgegraphResult.setSourceDataSection(rootcauseResult.getSourceDataSection()); // 1. 这部分表示故障数据的序号，不需要更新
+            knowledgegraphResult.setRootcauseNodeNames(rcNodeNameList.toString()); // 2. kgR表中的rootcause_node_names字段和rcR表中的path字段应相同
             // 调用genKG, 更新KnowledgegraphResult表中的一条数据(还未插入)
-//            rootcauseResult.setSourceDataSection(anodetectResult.getSourceDataSection());
-//            String path = genRootCausePath(anodetectResult.getSourceDataSection());
-//            rootcauseResult.setPath(path);
-//            rootcauseResult.setDeleted(0);
+            genKG(knowledgegraphResult);
 //            System.out.println(rootcauseResult);
             // 将knowledgegraphResult插入KnowledgegraphResult表
+            knowledgegraphResult.setDeleted(0);
+            System.out.println("knowledgegraphResult: ");
+            System.out.println(knowledgegraphResult);
+            System.out.println();
             knowledgegraphResultMapper.insert(knowledgegraphResult);
             if (i == 0) {
                 startId = knowledgegraphResult.getKgrId();
@@ -450,12 +454,17 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
     }
 
     // 根据KnowledgegraphResult表中的一条记录中的List<Name>(rootcause_node_names)更新该记录中的其他数据
-    public boolean genKG(KnowledgegraphResult knowledgegraphResult, List<String> rcNodeNameList) {
-        if (rcNodeNameList.isEmpty()) {
+    public boolean genKG(KnowledgegraphResult knowledgegraphResult) {
+        if (knowledgegraphResult == null) {
             return false;
         }
-        // 2. kgR表中的rootcause_node_names字段和rcR表中的path字段应相同 (1. 为source_data_section, 不需要更新)
-        knowledgegraphResult.setRootcauseNodeNames(rcNodeNameList.toString());
+        // 1., 2., 见上
+        // 1. 为source_data_section, 不需要更新
+        // 2. kgR表中的rootcause_node_names字段和rcR表中的path字段应相同, 也不需要更新
+        String rootcause_node_names = knowledgegraphResult.getRootcauseNodeNames();
+        List<String> rcNodeNameList = utils.String2List(rootcause_node_names);
+
+//        knowledgegraphResult.setRootcauseNodeNames(rcNodeNameList.toString()); 不用这一步了
 
         // 3 根据上述name, 生成rootcause_node_ids字段
         List<String> rcNodeIdList = new ArrayList<>();
@@ -487,8 +496,49 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         // 所有去重的nodeIds都已在rcNodeIDList_rd中
 
         // 6. 根据rcNodeIDList_rd获取all_node_ids, 并生成表中all_node_ids字段
+        List<Long> allNodeIdList = knowledgeGraphService.getRelevantNodesIdsByNodeIds(rcNodeIDList_rd);
+        StringBuilder allNodeIdSb = new StringBuilder("");
+        for (Long allNodeId : allNodeIdList) {
+            allNodeIdSb.append(allNodeId);
+            allNodeIdSb.append("|");
+        }
+        allNodeIdSb.deleteCharAt(allNodeIdSb.length() - 1); // 删除最后一个|
+        knowledgegraphResult.setAllNodeIds(allNodeIdSb.toString());
+
+        // 7. 调用方法, 根据all_node_ids先获取到Neo4jRelationshipDto, 再生成表中all_relation_ids字段
+        List<Neo4jRelationshipDto> allRelaDTOList = knowledgeGraphService.getRelevantRelationshipsByNodeIds(allNodeIdList);
+        StringBuilder allRelationIdSb = new StringBuilder("");
+        for (Neo4jRelationshipDto neo4jRelationshipDto : allRelaDTOList) {
+            allRelationIdSb.append(neo4jRelationshipDto.getRId());
+            allRelationIdSb.append("|");
+        }
+        allRelationIdSb.deleteCharAt(allRelationIdSb.length() - 1); // 删除最后一个|
+        knowledgegraphResult.setAllRelationIds(allRelationIdSb.toString());
+
+        // 8. 完成genKG所有内容, 更新了一条knowledgegraph_result表的数据
+
         return true;
 
+    }
+
+    // 更新知识图谱
+    @Override
+    public boolean updateAllKGR() {
+        // 因为生成了新的知识图谱, 所以相关Node和Relation的Id都会发生变化(但假定Name不会变), 所以要更新所有的knowledgegraph_result表
+        List<KnowledgegraphResult> knowledgegraphResultList = knowledgegraphResultMapper.selectList(null);
+        for (int i = 0; i < knowledgegraphResultList.size(); i++) {
+            KnowledgegraphResult knowledgegraphResult = knowledgegraphResultList.get(i);
+            boolean genResult = genKG(knowledgegraphResult);
+            if (!genResult) {
+                return false;
+            }
+            // 将更新后的结果重新插入表中
+            int updateResult = knowledgegraphResultMapper.updateById(knowledgegraphResult);
+            if (updateResult < 1) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // 获取相关数据调度
@@ -519,7 +569,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
             case 6: // 根因分析结果
                 return getInOutData_RootCauseResult(startId, endId, result);
             case 7: // 知识图谱结果
-                break;
+                return getInOutData_KGResult(startId, endId, result);
             default:
                 return null;
         }
@@ -538,7 +588,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         long startId = Long.parseLong(temp[1]);
         long endId = Long.parseLong(temp[2]);
 
-        List<OriginalData> originalLogList = originalDataService.getRelativeRange(batchId, (int)startId, (int)endId);
+        List<OriginalData> originalLogList = originalDataService.getRelativeRange(batchId, startId, endId);
         // 封装List<String>
         List<String> originalLogStringList = new ArrayList<>();
         for (OriginalData originalData : originalLogList) {
@@ -667,6 +717,33 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
             return rootcauseStringList;
         }
         return rootcauseStringList;
+    }
+
+    // 获取生成知识图谱结果结果相关数据
+    public List getInOutData_KGResult(Long startId, Long endId, Integer result) {
+        QueryWrapper<KnowledgegraphResult> wrapper = new QueryWrapper<>();
+        wrapper.between("kgr_id", startId, endId);
+        List<KnowledgegraphResult> kgResultList = knowledgegraphResultMapper.selectList(wrapper);
+
+        // 封装List<String>
+        List<String> kgStringList = new ArrayList<>();
+        for (KnowledgegraphResult knowledgegraphResult : kgResultList) {
+            kgStringList.add(
+                    "{\"KnowledgeGraphId\": \"" + knowledgegraphResult.getKgrId()
+                    + "\", \"Source Data Id Section\": \"" + knowledgegraphResult.getSourceDataSection()
+                    + "\", \"Rootcause Related Node Ids:\": \"" + knowledgegraphResult.getRootcauseNodeIds()
+                    + "\", \"Rootcause Related Relation Ids:\": \"" + knowledgegraphResult.getRootcauseRelationIds()
+                    + "\"}"
+            );
+        }
+
+        if (result == 0) {
+            return kgResultList;
+        }
+        else if (result == 1) {
+            return kgStringList;
+        }
+        return kgStringList;
     }
 
     // 从生成知识图谱的表中获取所有根因路径，然后组成一个大的List<String>

@@ -40,9 +40,8 @@ public class OriginalDataController {
         return new ResponseStd<>(originalDataService.deleteRange(beginId, endId));
     }
 
-    // 后端测试用
-//    @GetMapping("/test")
-//    public ResponseStd<Long> getAddTest() {
-//        return new ResponseStd<Long>(originalDataService.addBatchDoc(1, 1, "1"));
-//    }
+    @GetMapping("/test")
+    public ResponseStd<Long> getAddTest() {
+        return new ResponseStd<Long>(originalDataService.addBatchDoc(1, 1, "1"));
+    }
 }

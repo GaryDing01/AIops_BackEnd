@@ -88,6 +88,7 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
         return workflowConfigMapper.selectList(wrapper_2);
     }
 
+    // 将流程保存为模板(新增模板)
     @Override
     public Integer saveTemplates(Integer wfId) {
         // 流程复制

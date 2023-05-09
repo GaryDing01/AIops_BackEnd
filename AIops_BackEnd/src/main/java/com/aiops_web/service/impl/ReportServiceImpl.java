@@ -44,13 +44,13 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
 
         // 1. 生成报告编号
         int currentReportNum = workflowExecMapper.selectCount(null);
-        System.out.println("currentReportNum: " + currentReportNum);
+//        System.out.println("currentReportNum: " + currentReportNum);
 //        workflowExec.setReportId(currentReportNum + 1);
 //        reports.setReportId(currentReportNum + 1);
 
         // 2. 生成输入数据样例
         // 2.1 获取输入数据
-        System.out.println("workflowExec.getInputId(): " + workflowExec.getInputId());
+//        System.out.println("workflowExec.getInputId(): " + workflowExec.getInputId());
         List<String> inputDataAll = workflowExecService.getInOutData(workflowExec.getInputTypeId(), workflowExec.getInputId(), 1);
 //        System.out.println("inputDataAll: " + inputDataAll);
         // 2.2 生成样例
@@ -76,7 +76,7 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
 
         // 3. 生成输出数据样例
         // 3.1 获取输入数据
-        System.out.println("workflowExec.getOutputId(): " + workflowExec.getOutputId());
+//        System.out.println("workflowExec.getOutputId(): " + workflowExec.getOutputId());
         List<String> outputDataAll = workflowExecService.getInOutData(workflowExec.getOutputTypeId(), workflowExec.getOutputId(), 1);
         // 2.2 生成样例
         if (outputDataAll.size() < 5) {
@@ -86,7 +86,7 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
             outSample = 1;
             report.setOutputData(outputDataAll.subList(0, 5).toString());
         }
-        System.out.println("outputSample: " + report.getOutputData());
+//        System.out.println("outputSample: " + report.getOutputData());
 
         // 4. 生成执行信息和备注
 //        report.setSituation("该步骤执行已成功, 详情请查看输入输出数据情况及执行报告.");
@@ -119,6 +119,10 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
         else if (workflowExec.getOutputTypeId() == 6) {
             report.setSituation("该步骤执行已成功, 生成知识图谱后可在故障管理子系统查看具体根因路径. ");
             remark.append("已展示根因分析路径. ");
+        }
+        else if (workflowExec.getOutputTypeId() == 7) {
+            report.setSituation("该步骤执行已成功, 可在故障管理子系统查看具体知识图谱及根因路径. ");
+            remark.append("已展示知识图谱相关信息. ");
         }
 
         report.setRemark(remark.toString());

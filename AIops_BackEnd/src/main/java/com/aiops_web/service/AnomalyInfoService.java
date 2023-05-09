@@ -1,6 +1,8 @@
 package com.aiops_web.service;
 
 import com.aiops_web.dto.AnomalyInfoUserDTO;
+import com.aiops_web.dto.AnomalyInfoUserKGDTO;
+import com.aiops_web.dto.RootCauseKGDTO;
 import com.aiops_web.entity.sql.AnomalyInfo;
 import com.aiops_web.entity.sql.WorkflowExec;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -32,9 +34,15 @@ public interface AnomalyInfoService extends IService<AnomalyInfo> {
     interface RoleEnumService {
     }
 
+    // 根据故障id获取对应的KG
+    RootCauseKGDTO getKGByAno(Integer anoId);
+
+    // 检查该故障是否有知识图谱可以查看
+    int checkAnoKG(Integer anoId);
+
     // DTO相关
     // 根据algId获取AlgUserDTO
-    AnomalyInfoUserDTO getAnomalyInfoUserDTOById(Integer anoId);
+    AnomalyInfoUserKGDTO getAnomalyInfoUserDTOById(Integer anoId);
     // 获取所有的AlgUserDTO
-    List<AnomalyInfoUserDTO> getAllAnomalyInfoUserDTO();
+    List<AnomalyInfoUserKGDTO> getAllAnomalyInfoUserDTO();
 }

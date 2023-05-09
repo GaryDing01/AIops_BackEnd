@@ -35,4 +35,6 @@ public interface WorkflowExecService extends IService<WorkflowExec> {
     // 从生成知识图谱的表中获取所有根因路径，然后组成一个大的List<String>
     public List<String> getAllRCIds();
 
+    // 更新知识图谱
+    public boolean updateAllKGR();
 }

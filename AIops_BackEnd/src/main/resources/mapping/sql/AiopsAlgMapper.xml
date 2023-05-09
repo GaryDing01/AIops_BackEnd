@@ -60,7 +60,7 @@
         where alg_id = #{algId};
     </update>
 
-    <!-- 新增DTO相关 -->
+<!-- 新增DTO相关 -->
     <resultMap id="AlgUserDTO" type="com.aiops_web.dto.AlgUserDTO">
         <id property="algId" column="alg_id" />
         <result property="typeId" column="type_id" />

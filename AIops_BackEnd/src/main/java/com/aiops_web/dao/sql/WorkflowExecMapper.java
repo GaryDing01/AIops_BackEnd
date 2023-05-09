@@ -18,6 +18,9 @@ public interface WorkflowExecMapper extends BaseMapper<WorkflowExec> {
     // 查一个执行步骤
     ExecStepDTO selectOneExecStep(Integer wfId, Integer stepNum);
 
+    // 根据输出数据类型查一个执行步骤
+    ExecStepDTO selectOneExecStepByOutType(Integer wfId, Integer execTypeId);
+
     // 根据wfId查找所有对应的执行步骤
     List<ExecStepDTO> selectExecStepByWf(Integer wfId);
 
