@@ -83,6 +83,9 @@
             <if test="objId != null and objId != ''">
                 obj_id=#{objId},
             </if>
+            <if test="statusId != null and statusId != ''">
+                status_id=#{statusId},
+            </if>
             <if test="unitnodeName != null and unitnodeName != ''">
                 unitnode_name=#{unitnodeName},
             </if>
