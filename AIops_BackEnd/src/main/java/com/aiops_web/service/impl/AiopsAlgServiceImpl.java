@@ -63,6 +63,7 @@ public class AiopsAlgServiceImpl extends ServiceImpl<AiopsAlgMapper, AiopsAlg> i
         alg.setName(algUserDTO.getName());
         alg.setIntro(algUserDTO.getIntro());
         alg.setSource(algUserDTO.getSource());
+        alg.setFilePath(algUserDTO.getFilePath());
         alg.setUpdateNum(algUserDTO.getUpdateNum());
         alg.setUserId(algUserDTO.getUserId());
         alg.setParam(algUserDTO.getParam());
@@ -87,6 +88,7 @@ public class AiopsAlgServiceImpl extends ServiceImpl<AiopsAlgMapper, AiopsAlg> i
         alg.setName(algUserDTO.getName());
         alg.setIntro(algUserDTO.getIntro());
         alg.setSource(algUserDTO.getSource());
+        alg.setFilePath(algUserDTO.getFilePath());
         alg.setUserId(algUserDTO.getUserId());
         alg.setParam(algUserDTO.getParam());
         alg.setContent(algUserDTO.getContent());

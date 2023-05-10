@@ -1,9 +1,8 @@
 package com.aiops_web.entity.sql;
 
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.util.Date;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,9 @@ public class AiopsAlg implements Serializable {
     private String intro;
 
     private String source;
+
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    private String filePath;
 
     private Date updateTstamp;
 
