@@ -168,7 +168,7 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
             // sourceDataId要变一下, 加上批次信息
             anomalyInfo.setSourceDataId(batchId + "|" + startId_dataSample + "|" + endId_dataSample);
 
-            String dataSample = genDataSample(startId_dataSample, endId_dataSample);
+            String dataSample = genDataSample(batchId, startId_dataSample, endId_dataSample);
             anomalyInfo.setDataSample(dataSample);
 
             anomalyInfo.setDescription("批次为" + batchId + ", 相对位次序号为" + sourceDataId + "的数据出现故障");
@@ -192,9 +192,9 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
         return true;
     }
 
-    public String genDataSample(long startId, long endId) {
-        System.out.println("genDataSample(" + startId + ", " + endId + ")");
-        List<OriginalData> originalDataList = originalDataService.getRange((int)startId, (int)endId);
+    public String genDataSample(int batchId, long startId, long endId) {
+//        System.out.println("genDataSample(" + startId + ", " + endId + ")");
+        List<OriginalData> originalDataList = originalDataService.getRelativeRange(batchId, startId, endId);
         System.out.println(originalDataList.size());
         // 只取Sample
         if (originalDataList.size() > 5) {

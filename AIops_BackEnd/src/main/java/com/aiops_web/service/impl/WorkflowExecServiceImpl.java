@@ -222,11 +222,31 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         return true;
     }
 
+    // 日志清洗
+    public boolean execAIops_LogCleaning(AiopsAlg aiopsAlg, String params, WorkflowExec workflowExec) {
+        // 先获取输入值
+        if (workflowExec.getInputTypeId() == 1) { // 源日志
+            List<OriginalData> inputDataList = getInOutData(workflowExec.getInputTypeId(),workflowExec.getInputId(),0);
+        }
+        else { // 其他都不可能了
+            return false;
+        }
+
+        // 2. 调用算法
+        // 此处应该用到aiopsAlg, params等, 目前仅供模拟
+
+        // 3. 生成输出结果
+        // 只剩下outputId需要更新，看下和inputId的对应关系
+        workflowExec.setOutputId("201|300");
+
+        return true;
+    }
+
     // 日志解析
     public boolean execAIops_LogParsing(AiopsAlg aiopsAlg, String params, WorkflowExec workflowExec) {
         // 先获取输入值
         if (workflowExec.getInputTypeId() == 1) { // 源日志
-            ; // 暂存
+            List<OriginalData> inputDataList = getInOutData(workflowExec.getInputTypeId(),workflowExec.getInputId(),0);
         }
         else if (workflowExec.getInputTypeId() == 2) { // 清洗后的日志
             ;
@@ -249,7 +269,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
     public boolean execAIops_LogVectorizing(AiopsAlg aiopsAlg, String params, WorkflowExec workflowExec) {
         // 先获取输入值
         if (workflowExec.getInputTypeId() == 1) { // 源日志
-            ; // 暂存
+            List<OriginalData> inputDataList = getInOutData(workflowExec.getInputTypeId(),workflowExec.getInputId(),0);
         }
         else if (workflowExec.getInputTypeId() == 2) { // 清洗后的日志
             ;
@@ -275,7 +295,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
     public boolean execAIops_LogAnoDetecting(AiopsAlg aiopsAlg, String params, WorkflowExec workflowExec) {
         // 先获取输入值
         if (workflowExec.getInputTypeId() == 1) { // 源日志
-            ; // 暂存
+            List<OriginalData> inputDataList = getInOutData(workflowExec.getInputTypeId(),workflowExec.getInputId(),0);
         }
         else if (workflowExec.getInputTypeId() == 2) { // 清洗后的日志
             ;
@@ -559,7 +579,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
             case 1: // 目前只考虑源日志
                 return getInOutData_OriginalLog(dataIds, result);
             case 2: // 清洗后日志
-                break;
+                return getInOutData_CleanedLog(startId, endId, result);
             case 3: // 结构化日志
                 return getInOutData_ParsedLog(startId, endId, result);
             case 4: // 向量化日志
@@ -573,7 +593,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
             default:
                 return null;
         }
-        return null;
+//        return null;
     }
 
     // 获取源日志数据 (还需要和DQL整合)
@@ -611,6 +631,43 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         }
 
         return originalLogStringList;
+    }
+
+    // 获取清洗后日志数据
+    // 由于实验室算法中将清洗算法和解析算法合并, 所以模拟返回结果和日志解析相同, 只是返回显示的名字有所不同
+    public List getInOutData_CleanedLog(Long startId, Long endId, Integer result) {
+        QueryWrapper<ParsedLog> wrapper = new QueryWrapper<>();
+        wrapper.between("parse_id", startId, endId);
+        List<ParsedLog> parsedLogList = parsedLogMapper.selectList(wrapper);
+        if (parsedLogList == null) {
+            return null;
+        }
+
+        // 封装List<String>
+        List<String> parsedLogResult = new ArrayList<>();
+        for (ParsedLog parsedLog : parsedLogList) {
+            parsedLogResult.add(
+                    "{\"CleanedId\": \"" + parsedLog.getParseId()
+                            + "\", \"LineId\": \"" + parsedLog.getLogLineid()
+                            + "\", \"Datetime\": \"" + parsedLog.getLogDate()
+                            + "\", \"Timestamp\": \"" + parsedLog.getLogTimestamp()
+                            + "\", \"TraceId\": \"" + parsedLog.getLogTraceid()
+                            + "\", \"SpanId\": \"" + parsedLog.getLogSpanid()
+                            + "\", \"Unknown\": \"" + parsedLog.getLogUnknown()
+                            + "\", \"Level\": \"" + parsedLog.getLogLevel()
+                            + "\", \"Content\": \"" + parsedLog.getLogContent()
+                            + "\", \"EventId\": \"" + parsedLog.getLogEventid()
+                            + "\", \"EventTemplate\": \"" + parsedLog.getLogEventtemplate()
+                            + "\"}"
+            );
+        }
+        if (result == 0) {
+            return parsedLogList;
+        }
+        else if (result == 1) {
+            return parsedLogResult;
+        }
+        return parsedLogResult;
     }
 
     // 获取结构化日志数据

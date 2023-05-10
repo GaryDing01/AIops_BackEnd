@@ -175,8 +175,12 @@ public class WorkflowController {
 
     // 根据模板创建流程
     @PostMapping("/template/{wfId}")
-    public ResponseStd<Integer> addWFByT(@PathVariable Integer wfId) {
-        return new ResponseStd<Integer>(workflowConfigService.saveWfByT(wfId));
+    public ResponseStd<Integer> addWFByT(@PathVariable Integer wfId, @RequestBody JSONObject jsonObject) {
+        Integer userId = (Integer) jsonObject.get("userId");
+        if (userId == null) {
+            return new ResponseStd<>(ErrorCode.PARAMS_ERROR, null);
+        }
+        return new ResponseStd<Integer>(workflowConfigService.saveWfByT(wfId, userId));
     }
 
     // 更新模板

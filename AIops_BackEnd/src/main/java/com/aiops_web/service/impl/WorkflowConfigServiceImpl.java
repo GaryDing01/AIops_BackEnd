@@ -129,7 +129,7 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
     }
 
     @Override
-    public Integer saveWfByT(Integer wfId) {
+    public Integer saveWfByT(Integer wfId, Integer userId) {
         // 先取出模板
         TemplateDTO templateDTO = workflowConfigMapper.selectOneTemplate(wfId);
 
@@ -140,7 +140,7 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
         workflowConfig.setCurrentStep(-1);
         workflowConfig.setTemplate(0); // new一个新流程
         workflowConfig.setReportIds("");
-        workflowConfig.setUserId(templateDTO.getUserId());
+        workflowConfig.setUserId(userId);
 
         workflowConfigMapper.insert(workflowConfig);
         int wfId_new = workflowConfig.getWfId();

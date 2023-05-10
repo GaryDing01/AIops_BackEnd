@@ -32,7 +32,7 @@ public interface WorkflowConfigService extends IService<WorkflowConfig> {
     TemplateDTO getOneTemplate(Integer wfId);
 
     // 根据模板创建流程
-    Integer saveWfByT(Integer wfId);
+    Integer saveWfByT(Integer wfId, Integer userId);
 
     // 根据已知模板修改流程
     Boolean updateWfByT(Integer wfId_origin, TemplateDTO templateDTO);

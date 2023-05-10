@@ -1,8 +1,6 @@
 package com.aiops_web.entity.sql;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,6 +30,7 @@ public class DataIntroducing implements Serializable {
 
     private String source;
 
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String filePath;
 
     private String intro;
