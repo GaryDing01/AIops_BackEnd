@@ -235,12 +235,14 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
             return null;
         }
         String sourceDataSection = sdi_ano[1] + "-" + sdi_ano[2];
+        System.out.println("sourceDataSection: " + sourceDataSection);
 
         // 查找knowledgegraph_result中的数据
         ExecStepDTO execStepDTO = workflowExecMapper.selectOneExecStepByOutType(wfId, execTypeId); // 先找到生成知识图谱的执行步骤
         if (execStepDTO == null) {
             return null;
         }
+        System.out.println("execStepDTO: " + execStepDTO);
         String[] outputIdList = execStepDTO.getOutputId().split("\\|");
         if (outputIdList.length != 2) {
             return null;
@@ -258,6 +260,8 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
         if (knowledgegraphResult == null) {
             return null;
         }
+        System.out.println("knowledgegraphResult: ");
+        System.out.println(knowledgegraphResult);
 
         // 获取相关数据, 先封装到RootCauseInfo中
         RootCauseInfo rootCauseInfo = new RootCauseInfo();
@@ -287,6 +291,9 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
         }
         List<Neo4jRelationshipDto> allRelationList = knowledgeGraphService.getAllRelationshipByIds(allRelationIdList);
         rootCauseKGDTO.setRelationList(allRelationList);
+
+        System.out.println("rootCauseKGDTO: ");
+        System.out.println(rootCauseKGDTO);
 
         return rootCauseKGDTO;
 
