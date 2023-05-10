@@ -38,7 +38,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,1,'张诚','ZhangCheng','1|1|1|1|1|1|1|1'),(2,2,'王刚','WangGang','1|0|1|1|0|0|0|0'),(3,3,'汪淼','WangMiao','1|0|0|0|1|0|0|0'),(4,4,'程心','ChengXin','1|0|0|0|0|1|0|0');
+INSERT INTO `user` VALUES (1,1,'张诚','e10adc3949ba59abbe56e057f20f883e','1|1|1|1|1|1|1|1'),(2,2,'王刚','e10adc3949ba59abbe56e057f20f883e','1|0|1|1|0|0|0|0'),(3,3,'汪淼','e10adc3949ba59abbe56e057f20f883e','1|0|0|0|1|0|0|0'),(4,4,'程心','e10adc3949ba59abbe56e057f20f883e','1|0|0|0|0|1|0|0');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -51,4 +51,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-10 18:12:31
+-- Dump completed on 2023-05-10 18:36:32
