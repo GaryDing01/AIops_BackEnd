@@ -67,8 +67,6 @@ public class WorkflowController {
     // 新增流程-强调用户
     @PostMapping("/user/{userId}")
     public ResponseStd<Integer> createWorkflowsByUser(@PathVariable Integer userId, @RequestParam(required = false, defaultValue = "") String name) {
-//        System.out.println("userId: " + userId);
-//        System.out.println("name: " + name);
         return new ResponseStd<Integer>(workflowConfigService.saveWorkflowsByUser(userId, name));
     }
 
@@ -81,7 +79,7 @@ public class WorkflowController {
     // 修改某一个流程
     @PutMapping("")
     public ResponseStd<Boolean> updateWorkflows(@RequestBody WorkflowConfig workflowConfig) {
-        return new ResponseStd<Boolean>(workflowConfigService.removeById(workflowConfig));
+        return new ResponseStd<Boolean>(workflowConfigService.updateById(workflowConfig));
     }
 
     // 结束流程
