@@ -113,5 +113,11 @@ public class DataIntroducingController {
         return new ResponseStd<DataIntroUserDTO>(dataIntroducingService.getDataIntroUserDTOById(batchId));
     }
 
+    // 后端测试
+    @PostMapping("/try")
+    public ResponseStd<Boolean> trySomthing(int batchId) {
+        return new ResponseStd<>(true);
+    }
+
 }
 

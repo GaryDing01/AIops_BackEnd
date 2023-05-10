@@ -24,7 +24,7 @@ public class DayInterval implements ServletContextListener {
     private DataIntroducingService dataIntroducingService;
 
     // 每天晚上 23:30 触发
-    @Scheduled(cron = "0 30 23 ? * *")
+    @Scheduled(cron = "0 45 21 ? * *")
     public void scheduled() {
         // 获取保存在 OriginalData 中的 batchId
         QueryWrapper<DataIntroducing> queryWrapper = new QueryWrapper<>();
@@ -38,9 +38,10 @@ public class DayInterval implements ServletContextListener {
             Date last_7 = new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 7));
             System.out.println(last_7);
             for (DataIntroducing data : dataList) {
+                // date1.compareTo(date2) > 0 : date1 时间在 date2 之后
                 int result = data.getTstamp().compareTo(last_7);
                 System.out.println(result);
-                if (result > 0) {
+                if (result < 0) {
                     int batchId = data.getBatchId();
                     String secondPlace = "OriginalDataLake";
                     originalDataService.TransferDataToLake(batchId);

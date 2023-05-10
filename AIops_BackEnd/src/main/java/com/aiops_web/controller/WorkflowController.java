@@ -228,6 +228,7 @@ public class WorkflowController {
 //        return new ResponseStd<Integer>(workflowExecService.saveOneExecByStep(stepId, inputTypeId, inputId));
 //    }
 
+    // 单步执行封装JSONObject
     @PostMapping("/exec/step/{stepId}")
     public ResponseStd<Integer> createOneExecByStep(@PathVariable Integer stepId, @RequestBody(required = false) JSONObject jsonObject) {
         Integer inputTypeId;
@@ -240,8 +241,12 @@ public class WorkflowController {
             inputTypeId = (Integer) jsonObject.get("inputTypeId");
             inputId = jsonObject.getString("inputId");
         }
-        System.out.println("测试: " + inputTypeId + inputId);
-        return new ResponseStd<Integer>(workflowExecService.saveOneExecByStep(stepId, inputTypeId, inputId));
+        System.out.println("测试: " + "inputTypeID: " +  inputTypeId + ", inputId: " + inputId);
+        int oneExecId = workflowExecService.saveOneExecByStep(stepId, inputTypeId, inputId);
+        if (oneExecId < 1) {
+            return new ResponseStd<>(ErrorCode.PARAMS_ERROR, null);
+        }
+        return new ResponseStd<Integer>(oneExecId);
     }
 
     // 传入流程编号，一次性执行流程中的所有步骤

@@ -589,6 +589,9 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         long endId = Long.parseLong(temp[2]);
 
         List<OriginalData> originalLogList = originalDataService.getRelativeRange(batchId, (int)startId, (int)endId);
+        if (originalLogList == null) {
+            return null;
+        }
         // 封装List<String>
         List<String> originalLogStringList = new ArrayList<>();
         for (OriginalData originalData : originalLogList) {
@@ -615,6 +618,10 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         QueryWrapper<ParsedLog> wrapper = new QueryWrapper<>();
         wrapper.between("parse_id", startId, endId);
         List<ParsedLog> parsedLogList = parsedLogMapper.selectList(wrapper);
+        if (parsedLogList == null) {
+            return null;
+        }
+
         // 封装List<String>
         List<String> parsedLogResult = new ArrayList<>();
         for (ParsedLog parsedLog : parsedLogList) {
@@ -647,6 +654,10 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         QueryWrapper<VectorizedLog> wrapper = new QueryWrapper<>();
         wrapper.between("vector_id", startId, endId);
         List<VectorizedLog> vectorizedLogList = vectorizedLogMapper.selectList(wrapper);
+        if (vectorizedLogList == null) {
+            return null;
+        }
+
         List<String> vectorizedLogResult = new ArrayList<>();
         // 封装List<String>
         for (VectorizedLog vectorizedLog : vectorizedLogList) {
@@ -671,7 +682,9 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         QueryWrapper<AnodetectResult> wrapper = new QueryWrapper<>();
         wrapper.between("adr_id", startId, endId);
         List<AnodetectResult> anodetectResultList = anodetectResultMapper.selectList(wrapper);
-//        System.out.println("anodetectResultList" + anodetectResultList);
+        if (anodetectResultList == null) {
+            return null;
+        }
 
         // 封装List<String>
         List<String> anodetectStringList = new ArrayList<>();
@@ -698,6 +711,9 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         QueryWrapper<RootcauseResult> wrapper = new QueryWrapper<>();
         wrapper.between("rcr_id", startId, endId);
         List<RootcauseResult> rootcauseResultList = rootcauseResultMapper.selectList(wrapper);
+        if (rootcauseResultList == null) {
+            return null;
+        }
 
         // 封装List<String>
         List<String> rootcauseStringList = new ArrayList<>();
@@ -724,6 +740,9 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         QueryWrapper<KnowledgegraphResult> wrapper = new QueryWrapper<>();
         wrapper.between("kgr_id", startId, endId);
         List<KnowledgegraphResult> kgResultList = knowledgegraphResultMapper.selectList(wrapper);
+        if (kgResultList == null) {
+            return null;
+        }
 
         // 封装List<String>
         List<String> kgStringList = new ArrayList<>();
