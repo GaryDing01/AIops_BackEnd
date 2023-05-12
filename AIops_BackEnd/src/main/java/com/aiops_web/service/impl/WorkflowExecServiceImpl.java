@@ -91,11 +91,20 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
     // 单步执行
     @Override
     public Integer saveOneExecByStep(Integer stepId, Integer inputTypeId, String inputId) {
-        // 1. 先拿到步骤信息并完善信息
+        // 1. 基本信息准备
+        // 1.1 如果执行表中已经有该步骤, 则不能进行该执行(否则后面结果会非常混乱)
+        QueryWrapper<WorkflowExec> wrapper_precheck = new QueryWrapper<>();
+        wrapper_precheck.eq("step_id",stepId);
+        WorkflowExec workflowExec_precheck = workflowExecMapper.selectOne(null);
+        if (workflowExec_precheck != null) {
+            System.out.println("同一个步骤不能执行两次!");
+            return 0;
+        }
+        // 1.2 该单步执行是被允许的, 先拿到步骤信息并完善信息
         System.out.println("1. 先拿到步骤信息并完善信息");
         StepConfig stepConfig = stepConfigMapper.selectById(stepId);
         if (stepConfig == null) {
-            System.out.println("该步骤不存在");
+            System.out.println("该步骤不存在!");
             return 0;
         }
         System.out.println(stepConfig);
@@ -866,6 +875,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
     public Boolean closeWorkflow(Integer wfId) {
         // 1. 先找执行表，找到对应的报告Id
         List<ExecStepDTO> execStepDTOList = workflowExecMapper.selectExecStepByWf(wfId);
+        
 
         // 2. 然后再改流程表
         // 2.1 先找到要改的流程
