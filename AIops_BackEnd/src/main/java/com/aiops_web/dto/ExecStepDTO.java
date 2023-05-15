@@ -1,6 +1,6 @@
 package com.aiops_web.dto;
 
-import com.aiops_web.entity.sql.WorkflowExec;
+import com.aiops_web.entity.mysql.WorkflowExec;
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;

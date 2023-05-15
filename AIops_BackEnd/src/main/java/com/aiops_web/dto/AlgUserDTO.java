@@ -1,6 +1,6 @@
 package com.aiops_web.dto;
 
-import com.aiops_web.entity.sql.AiopsAlg;
+import com.aiops_web.entity.mysql.AiopsAlg;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

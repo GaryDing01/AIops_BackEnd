@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiops_web.dao.mysql.AnomalyInfoMapper">
+
+    <select id="getAnomalyInfos" resultType="com.aiops_web.dto.AnomalyInfoUserDTO" parameterType="java.util.Map">
+        select ano_id, obj_id, status_id, unitnode_type_id, unitnode_name, detect_tstamp,
+        predict_tstamp, update_tstamp, source_data_id, anomaly_info.user_id, wf_id, deleted, name as userName
+        from anomaly_info, user
+        <where>
+            <if test="info.anoId != null and info.anoId!=''">
+                ano_id=#{info.anoId} and
+            </if>
+            <if test="info.objId != null and info.objId!=''">
+                obj_id=#{info.objId} and
+            </if>
+            <if test="info.statusId != null and info.statusId != ''">
+                status_id=#{info.statusId} and
+            </if>
+            <if test="info.unitnodeName != null and info.unitnodeName != ''">
+                unitnode_name=#{info.unitnodeName} and
+            </if>
+            <if test="info.unitnodeTypeId != null and info.unitnodeTypeId != ''">
+                unitnode_type_id=#{info.unitnodeTypeId} and
+            </if>
+            <!--  时间部分需要根据粒度来更改一下查询条件 -->
+            <if test="info.detectTstamp != null">
+                DATE_FORMAT(detect_tstamp, '%Y-%m-%d') = DATE_FORMAT(#{info.detectTstamp}, '%Y-%m-%d') and
+            </if>
+            <if test="info.predictTstamp != null">
+                DATE_FORMAT(predict_tstamp, '%Y-%m-%d') = DATE_FORMAT(#{info.predictTstamp}, '%Y-%m-%d') and
+            </if>
+            <if test="info.updateTstamp != null">
+                DATE_FORMAT(update_tstamp, '%Y-%m-%d') = DATE_FORMAT(#{info.updateTstamp}, '%Y-%m-%d') and
+            </if>
+            <if test="description!= null and description != ''">
+                description=#{description},
+            </if>
+            <if test="info.sourceDataId != null and info.sourceDataId != ''">
+                source_data_id=#{info.sourceDataId} and
+            </if>
+            <if test="dataSample != null and dataSample != ''">
+                data_sample=#{dataSample},
+            </if>
+            <if test="info.userName != null and info.userName != ''">
+                user.name=#{info.userName} and
+            </if>
+            <if test="info.wfId != null and info.wfId != ''">
+                wf_id=#{info.wfId} and
+            </if>
+            <if test="info.deleted != null and info.deleted != ''">
+                deleted=#{info.deleted} and
+            </if>
+            <if test="info.userId != null and info.userId != ''">
+                user.user_id=#{info.userId} and
+            </if>
+            user.user_id = anomaly_info.user_id
+        </where>
+        limit #{start}, #{size};
+    </select>
+
+    <select id="getById" resultType="AnomalyInfo" >
+        select *
+        from anomaly_info
+        where ano_id=#{anoId};
+    </select>
+
+    <delete id="deleteByAnoId" >
+        delete
+        from anomaly_info
+        where ano_id=#{anoId};
+    </delete>
+
+    <update id="updateStatusById" >
+        update anomaly_info
+        set status_id=#{statusId}
+        where ano_id=#{anoId};
+    </update>
+
+
+    <update id="updateAnoInfo" >
+        update anomaly_info
+        <set>
+            <if test="objId != null and objId != ''">
+                obj_id=#{objId},
+            </if>
+            <if test="statusId != null and statusId != ''">
+                status_id=#{statusId},
+            </if>
+            <if test="unitnodeName != null and unitnodeName != ''">
+                unitnode_name=#{unitnodeName},
+            </if>
+            <if test="unitnodeTypeId != null and unitnodeTypeId != ''">
+                unitnode_type_id=#{unitnodeTypeId},
+            </if>
+            <if test="detectTstamp != null">
+                detect_tstamp=#{detectTstamp},
+            </if>
+            <if test="predictTstamp != null">
+                predict_tstamp=#{predictTstamp},
+            </if>
+            <if test="updateTstamp != null">
+                update_tstamp=#{updateTstamp},
+            </if>
+            <if test="description!= null and description != ''">
+                description=#{description},
+            </if>
+            <if test="sourceDataId != null and sourceDataId != ''">
+                source_data_id=#{sourceDataId},
+            </if>
+            <if test="dataSample != null and dataSample != ''">
+                data_sample=#{dataSample},
+            </if>
+            <if test="userId != null and userId != ''">
+                user_id=#{userId},
+            </if>
+            <if test="wfId != null and wfId != ''">
+                wf_id=#{wfId},
+            </if>
+            <if test="deleted != null and deleted != ''">
+                deleted=#{deleted},
+            </if>
+        </set>
+        where ano_id=#{anoId};
+    </update>
+
+<!--DCH新增DTO相关-->
+    <!-- 新增DTO相关 -->
+    <resultMap id="AnomalyInfoUserDTO" type="com.aiops_web.dto.AnomalyInfoUserDTO">
+        <id property="anoId" column="ano_id" />
+        <result property="objId" column="obj_id" />
+        <result property="statusId" column="status_id" />
+        <result property="unitnodeTypeId" column="unitnode_type_id" />
+        <result property="unitnodeName" column="unitnode_name" />
+        <result property="detectTstamp" column="detect_tstamp" />
+        <result property="predictTstamp" column="predict_tstamp" />
+        <result property="updateTstamp" column="update_tstamp" />
+        <result property="description" column="description" />
+        <result property="sourceDataId" column="source_data_id" />
+        <result property="updateNum" column="update_num" />
+        <result property="dataSample" column="data_sample" />
+        <result property="userId" column="user_id" />
+        <result property="wfId" column="wf_id" />
+        <result property="deleted" column="deleted" />
+        <association property="userName" column="user_id" select="getUserName" />
+    </resultMap>
+
+    <!--DTO连接语句-->
+    <select id="getUserName" resultType="string">
+        select name userName from user where user_id = #{user_id};
+    </select>
+    <!--查询一个DTO-->
+    <select id="getAnomalyInfoUserDTOById" resultMap="AnomalyInfoUserDTO">
+        select *
+        from anomaly_info
+        where ano_id = #{anoId}
+    </select>
+
+    <!--查询所有DTO-->
+    <select id="getAllAnomalyInfoUserDTO" resultMap="AnomalyInfoUserDTO">
+        select *
+        from anomaly_info
+    </select>
+
+</mapper>
+

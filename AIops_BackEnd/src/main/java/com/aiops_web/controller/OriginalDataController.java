@@ -1,7 +1,7 @@
 package com.aiops_web.controller;
 
 import com.aiops_web.entity.elasticsearch.OriginalData;
-import com.aiops_web.service.OriginalDataService;
+import com.aiops_web.service.mysql.OriginalDataService;
 import com.aiops_web.std.ResponseStd;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

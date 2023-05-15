@@ -1,18 +1,16 @@
 package com.aiops_web.controller;
 
 
-import com.aiops_web.dto.AlgUserDTO;
 import com.aiops_web.dto.DataIntroUserDTO;
 import com.aiops_web.entity.elasticsearch.OriginalData;
-import com.aiops_web.entity.sql.DataIntroducing;
-import com.aiops_web.service.DataIntroducingService;
-import com.aiops_web.service.OriginalDataService;
+import com.aiops_web.entity.mysql.DataIntroducing;
+import com.aiops_web.service.mysql.DataIntroducingService;
+import com.aiops_web.service.mysql.OriginalDataService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 

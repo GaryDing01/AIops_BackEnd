@@ -1,6 +1,6 @@
 package com.aiops_web.dto;
 
-import com.aiops_web.entity.sql.RoleEnum;
+import com.aiops_web.entity.mysql.RoleEnum;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

@@ -1,11 +1,10 @@
 package com.aiops_web.controller;
 
 
-import com.aiops_web.entity.sql.RoleEnum;
-import com.aiops_web.entity.sql.UnitnodeInfo;
-import com.aiops_web.entity.sql.UnitnodeTypeEnum;
-import com.aiops_web.service.UnitnodeInfoService;
-import com.aiops_web.service.UnitnodeTypeEnumService;
+import com.aiops_web.entity.mysql.UnitnodeInfo;
+import com.aiops_web.entity.mysql.UnitnodeTypeEnum;
+import com.aiops_web.service.mysql.UnitnodeInfoService;
+import com.aiops_web.service.mysql.UnitnodeTypeEnumService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
 import org.springframework.web.bind.annotation.*;

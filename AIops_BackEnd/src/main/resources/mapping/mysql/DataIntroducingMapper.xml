@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiops_web.dao.mysql.DataIntroducingMapper">
+    <!-- 新增DTO相关 -->
+    <resultMap id="DataIntroUserDTO" type="com.aiops_web.dto.DataIntroUserDTO">
+        <id property="batchId" column="batch_id" />
+        <result property="tstamp" column="tstamp" />
+        <result property="source" column="source" />
+        <result property="filePath" column="file_path" />
+        <result property="intro" column="intro" />
+        <result property="name" column="name" />
+        <result property="objId" column="obj_id" />
+        <result property="dataNum" column="data_num" />
+        <result property="dataSample" column="data_sample" />
+        <result property="userId" column="user_id" />
+        <result property="place" column="place" />
+        <association property="userName" column="user_id" select="getUserName" />
+    </resultMap>
+
+    <!--DTO连接语句-->
+    <select id="getUserName" resultType="string">
+        select name userName from user where user_id = #{user_id};
+    </select>
+    <!--查询一个DTO-->
+    <select id="getDataIntroUserDTOById" resultMap="DataIntroUserDTO">
+        select *
+        from data_introducing
+        where batch_id = #{batchId}
+    </select>
+
+    <!--查询所有DTO-->
+    <select id="getAllDataIntroUserDTO" resultMap="DataIntroUserDTO">
+        select *
+        from data_introducing
+    </select>
+</mapper>

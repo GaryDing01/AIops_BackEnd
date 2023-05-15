@@ -1,7 +1,7 @@
 package com.aiops_web.dto;
 
-import com.aiops_web.entity.sql.StepConfig;
-import com.aiops_web.entity.sql.WorkflowConfig;
+import com.aiops_web.entity.mysql.StepConfig;
+import com.aiops_web.entity.mysql.WorkflowConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

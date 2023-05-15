@@ -1,8 +1,8 @@
 package com.aiops_web.controller;
 
 import com.aiops_web.dto.TemplateDTO;
-import com.aiops_web.entity.sql.*;
-import com.aiops_web.service.*;
+import com.aiops_web.entity.mysql.*;
+import com.aiops_web.service.mysql.*;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
 import com.alibaba.fastjson.JSONObject;

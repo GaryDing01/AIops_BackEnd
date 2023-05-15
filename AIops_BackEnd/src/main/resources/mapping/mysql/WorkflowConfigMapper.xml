@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiops_web.dao.mysql.WorkflowConfigMapper">
+
+    <resultMap id="allTemplatesMap" type="com.aiops_web.dto.TemplateDTO">
+        <id property="wfId" column="wf_id" />
+        <result property="name" column="name" />
+        <result property="statusId" column="status_id" />
+        <result property="currentStep" column="current_step" />
+        <result property="template" column="template" />
+        <result property="reportIds" column="report_ids" />
+        <result property="userId" column="user_id" />
+        <!-- 配置一对多的关联关系 -->
+        <collection property="stepConfigList" ofType="com.aiops_web.entity.mysql.StepConfig" >
+            <id property="stepId" column="step_id" />
+            <result property="typeId" column="type_id" />
+            <result property="stepNum" column="step_num" />
+            <result property="param" column="param" />
+            <result property="algId" column="alg_id" />
+            <result property="wfId" column="wf_id" />
+        </collection>
+    </resultMap>
+
+<!-- 查看所有模板 -->
+    <select id="selectAllTemplates" resultMap="allTemplatesMap">
+        SELECT *
+        FROM workflow_config wf,step_config s
+        WHERE wf.wf_id = s.wf_id AND wf.template = 1
+    </select>
+
+<!-- 查看一个模板 -->
+    <select id="selectOneTemplate" resultMap="allTemplatesMap">
+        SELECT *
+        FROM workflow_config wf,step_config s
+        WHERE wf.wf_id = s.wf_id AND wf.template = 1 AND wf.wf_id = #{wfId}
+    </select>
+
+</mapper>

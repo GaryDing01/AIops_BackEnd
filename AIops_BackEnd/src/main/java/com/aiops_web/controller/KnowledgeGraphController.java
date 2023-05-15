@@ -2,10 +2,8 @@ package com.aiops_web.controller;
 
 import com.aiops_web.dto.Neo4jRelationshipDto;
 import com.aiops_web.entity.neo4j.Node;
-import com.aiops_web.entity.neo4j.Relationship;
-import com.aiops_web.entity.sql.AnodetectResult;
-import com.aiops_web.entity.sql.RelationshipEnum;
-import com.aiops_web.service.RelationshipEnumService;
+import com.aiops_web.entity.mysql.RelationshipEnum;
+import com.aiops_web.service.mysql.RelationshipEnumService;
 import com.aiops_web.service.neo4j.KnowledgeGraphService;
 import com.aiops_web.service.neo4j.SystemArchitectureService;
 import com.aiops_web.std.ErrorCode;

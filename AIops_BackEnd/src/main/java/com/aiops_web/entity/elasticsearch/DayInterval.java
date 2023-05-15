@@ -1,8 +1,8 @@
 package com.aiops_web.entity.elasticsearch;
 
-import com.aiops_web.entity.sql.DataIntroducing;
-import com.aiops_web.service.DataIntroducingService;
-import com.aiops_web.service.OriginalDataService;
+import com.aiops_web.entity.mysql.DataIntroducing;
+import com.aiops_web.service.mysql.DataIntroducingService;
+import com.aiops_web.service.mysql.OriginalDataService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;

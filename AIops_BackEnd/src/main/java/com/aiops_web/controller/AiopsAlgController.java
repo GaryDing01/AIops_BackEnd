@@ -2,15 +2,13 @@ package com.aiops_web.controller;
 
 
 import com.aiops_web.dto.AlgUserDTO;
-import com.aiops_web.entity.sql.*;
-import com.aiops_web.service.AlgTypeEnumService;
+import com.aiops_web.entity.mysql.*;
+import com.aiops_web.service.mysql.AlgTypeEnumService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
-import com.aiops_web.service.AiopsAlgService;
-import scala.Int;
+import com.aiops_web.service.mysql.AiopsAlgService;
 
 import javax.annotation.Resource;
 import java.util.List;

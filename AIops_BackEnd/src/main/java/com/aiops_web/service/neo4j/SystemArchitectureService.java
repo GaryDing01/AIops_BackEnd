@@ -7,7 +7,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import com.aiops_web.service.WorkflowExecService;
+import com.aiops_web.service.mysql.WorkflowExecService;
 import org.springframework.stereotype.Service;
 
 import com.aiops_web.dto.Neo4jRelationshipDto;

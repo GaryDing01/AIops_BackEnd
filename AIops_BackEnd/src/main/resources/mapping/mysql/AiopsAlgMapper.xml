@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiops_web.dao.mysql.AiopsAlgMapper">
+
+    <select id="getAllAlgs" resultType="AiopsAlg">
+        select * from aiops_alg;
+    </select>
+
+    <delete id="deleteAlgById">
+        delete from aiops_alg where alg_id = #{algId};
+    </delete>
+
+    <delete id="deleteAlgByIds">
+        delete
+        from aiops_alg
+        where aiops_alg.alg_id
+        in (
+        <foreach collection="ids" item="id" separator=","> #{id} </foreach>
+        );
+    </delete>
+
+    <!-- 添加 并把自动生成的主码注入到 对象中 -->
+    <insert id="createAlg" useGeneratedKeys="true" keyProperty="algId">
+        insert into aiops_alg(type_id, name, intro, source, file_path, update_tstamp, update_num, user_id, param, content)
+        values (#{typeId}, #{name}, #{intro}, #{filePath} #{source}, #{updateTstamp}, 0, #{userId}, #{param}, #{content});
+    </insert>
+
+    <update id="updateAlg" >
+        update aiops_alg
+        <set>
+            <if test="typeId != 0">
+                type_id = #{typeId},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="intro != null and intro != ''">
+                intro = #{intro},
+            </if>
+            <if test="source != null and source != ''">
+                source = #{source},
+            </if>
+            <if test="filePath != null and filePath != ''">
+                file_path = #{filePath},
+            </if>
+            <if test="updateTstamp != null">
+                update_tstamp = #{updateTstamp},
+            </if>
+            <!--            <if test="updateNum != null and updateNum != ''">-->
+            <!--                update_num = #{updateNum},-->
+            <!--            </if>-->
+            update_num = update_num+1,
+            <if test="userId != null and userId != ''">
+                user_id = #{userId},
+            </if>
+            <if test="param != null and param != ''">
+                param = #{param},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+        </set>
+        where alg_id = #{algId};
+    </update>
+
+<!-- 新增DTO相关 -->
+    <resultMap id="AlgUserDTO" type="com.aiops_web.dto.AlgUserDTO">
+        <id property="algId" column="alg_id" />
+        <result property="typeId" column="type_id" />
+        <result property="name" column="name" />
+        <result property="intro" column="intro" />
+        <result property="source" column="source" />
+        <result property="filePath" column="file_path" />
+        <result property="updateTstamp" column="update_tstamp" />
+        <result property="updateNum" column="update_num" />
+        <result property="param" column="param" />
+        <result property="content" column="content" />
+        <result property="userId" column="user_id" />
+        <association property="userName" column="user_id" select="getUserName" />
+    </resultMap>
+
+    <!--DTO连接语句-->
+    <select id="getUserName" resultType="string">
+        select name userName from user where user_id = #{user_id};
+    </select>
+    <!--查询一个DTO-->
+    <select id="getAlgUserDTOById" resultMap="AlgUserDTO">
+        select *
+        from aiops_alg
+        where alg_id = #{algId}
+    </select>
+
+    <!--查询所有DTO-->
+    <select id="getAllAlgUserDTO" resultMap="AlgUserDTO">
+        select *
+        from aiops_alg
+    </select>
+
+
+</mapper>

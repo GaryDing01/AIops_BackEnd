@@ -1,22 +1,17 @@
 package com.aiops_web.controller;
 
-import com.aiops_web.dao.sql.AnomalyInfoMapper;
-import com.aiops_web.entity.sql.AnomalyInfo;
-import com.aiops_web.entity.sql.WorkflowExec;
-import com.aiops_web.service.AnomalyInfoService;
+import com.aiops_web.entity.mysql.AnomalyInfo;
+import com.aiops_web.service.mysql.AnomalyInfoService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
