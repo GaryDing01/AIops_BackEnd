@@ -95,7 +95,8 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         // 1.1 如果执行表中已经有该步骤, 则不能进行该执行(否则后面结果会非常混乱)
         QueryWrapper<WorkflowExec> wrapper_precheck = new QueryWrapper<>();
         wrapper_precheck.eq("step_id",stepId);
-        WorkflowExec workflowExec_precheck = workflowExecMapper.selectOne(null);
+        WorkflowExec workflowExec_precheck = workflowExecMapper.selectOne(wrapper_precheck);
+//        System.out.println(workflowExec_precheck);
         if (workflowExec_precheck != null) {
             System.out.println("同一个步骤不能执行两次!");
             return 0;
@@ -815,10 +816,10 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         for (KnowledgegraphResult knowledgegraphResult : kgResultList) {
             kgStringList.add(
                     "{\"KnowledgeGraphId\": \"" + knowledgegraphResult.getKgrId()
-                    + "\", \"Source Data Id Section\": \"" + knowledgegraphResult.getSourceDataSection()
-                    + "\", \"Rootcause Related Node Ids:\": \"" + knowledgegraphResult.getRootcauseNodeIds()
-                    + "\", \"Rootcause Related Relation Ids:\": \"" + knowledgegraphResult.getRootcauseRelationIds()
-                    + "\"}"
+                            + "\", \"Source Data Id Section\": \"" + knowledgegraphResult.getSourceDataSection()
+                            + "\", \"Rootcause Related Node Ids:\": \"" + knowledgegraphResult.getRootcauseNodeIds()
+                            + "\", \"Rootcause Related Relation Ids:\": \"" + knowledgegraphResult.getRootcauseRelationIds()
+                            + "\"}"
             );
         }
 
@@ -875,7 +876,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
     public Boolean closeWorkflow(Integer wfId) {
         // 1. 先找执行表，找到对应的报告Id
         List<ExecStepDTO> execStepDTOList = workflowExecMapper.selectExecStepByWf(wfId);
-        
+
 
         // 2. 然后再改流程表
         // 2.1 先找到要改的流程
