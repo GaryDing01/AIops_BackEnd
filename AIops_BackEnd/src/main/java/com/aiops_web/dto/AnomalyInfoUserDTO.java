@@ -8,4 +8,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class AnomalyInfoUserDTO extends AnomalyInfo {
     private String userName;
+    private Long unitnodeId;  // unitnodeId对应的id
 }

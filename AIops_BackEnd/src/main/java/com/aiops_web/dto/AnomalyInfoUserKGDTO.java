@@ -24,6 +24,7 @@ public class AnomalyInfoUserKGDTO extends AnomalyInfoUserDTO{
         this.setWfId(anomalyInfoUserDTO.getWfId());
         this.setDeleted(anomalyInfoUserDTO.getDeleted());
         this.setUserName(anomalyInfoUserDTO.getUserName());
+        this.setUnitnodeId(anomalyInfoUserDTO.getUnitnodeId());
         this.setWithKG(withKG);
     }
 }

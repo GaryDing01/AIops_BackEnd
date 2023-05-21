@@ -51,7 +51,7 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
         // 2. 生成输入数据样例
         // 2.1 获取输入数据
 //        System.out.println("workflowExec.getInputId(): " + workflowExec.getInputId());
-        List<String> inputDataAll = workflowExecService.getInOutData(workflowExec.getInputTypeId(), workflowExec.getInputId(), 1);
+        List<String> inputDataAll = workflowExecService.getInOutData(workflowExec.getStepId(), workflowExec.getInputTypeId(), workflowExec.getInputId(), 1);
 //        System.out.println("inputDataAll: " + inputDataAll);
         // 2.2 生成样例
         if (inputDataAll.size() < 5) {
@@ -77,7 +77,7 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
         // 3. 生成输出数据样例
         // 3.1 获取输入数据
 //        System.out.println("workflowExec.getOutputId(): " + workflowExec.getOutputId());
-        List<String> outputDataAll = workflowExecService.getInOutData(workflowExec.getOutputTypeId(), workflowExec.getOutputId(), 1);
+        List<String> outputDataAll = workflowExecService.getInOutData(workflowExec.getStepId(), workflowExec.getOutputTypeId(), workflowExec.getOutputId(), 1);
         // 2.2 生成样例
         if (outputDataAll.size() < 5) {
             report.setOutputData(outputDataAll.toString());

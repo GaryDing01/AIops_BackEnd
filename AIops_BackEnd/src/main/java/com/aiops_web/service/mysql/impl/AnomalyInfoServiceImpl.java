@@ -72,7 +72,24 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
     public List<AnomalyInfoUserDTO> getAnomalyInfos(AnomalyInfoUserDTO info, int pageNum, int pageSize) {
         pageNum = pageNum > 1? pageNum : 1;
         pageSize = pageSize > 0? pageSize : 5;   // 默认5
-        return anomalyInfoMapper.getAnomalyInfos((pageNum-1)*pageSize, pageSize, info);
+
+        // 先获得AnomalyInfoUserDTO的List
+        List<AnomalyInfoUserDTO> anomalyInfoUserDTOList = anomalyInfoMapper.getAnomalyInfos((pageNum-1)*pageSize, pageSize, info);
+        if (anomalyInfoUserDTOList.isEmpty()) {
+            return null;
+        }
+        // 再根据unitnodeName获取对应的unitnodeId
+        for (AnomalyInfoUserDTO anomalyInfoUserDTO : anomalyInfoUserDTOList) {
+            Node unitnode = knowledgeGraphService.getNodeByNameInService(anomalyInfoUserDTO.getUnitnodeName());
+            if (unitnode == null) {
+                anomalyInfoUserDTO.setUnitnodeId(null);
+            }
+            else {
+                anomalyInfoUserDTO.setUnitnodeId(unitnode.getId());
+            }
+        }
+
+        return anomalyInfoUserDTOList;
     }
 
     @Override
@@ -96,7 +113,7 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
         return anomalyInfoMapper.updateAnoInfo(info) > 0;
     }
 
-    // 根据故障检测(本次只涉及故障检测)的执行结果(此时workflowExec信息应该完成)来保存故障信息
+    // 根据异常检测(本次只涉及故障检测)的执行结果(此时workflowExec信息应该完成)来保存故障信息
     @Override
     public boolean saveAnoInfoByExec(WorkflowExec workflowExec) {
         if (workflowExec.getOutputTypeId() != 5) { // 本项目只涉及故障检测
@@ -128,6 +145,8 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
         ExecStepDTO execStepDTO = workflowExecMapper.selectOneExecStep(workflowConfig.getWfId(), 1); // 找到数据源执行信息
         String[] inputInfo_temp = execStepDTO.getInputId().split("\\|");
         int batchId = Integer.parseInt(inputInfo_temp[0]); // 找到批次信息
+        long startId_sourceBatchRela = Long.parseLong(inputInfo_temp[1]);
+        long endId_sourceBatchRela = Long.parseLong(inputInfo_temp[2]);
 
         String[] anodetectOutputArray = workflowExec.getOutputId().split("\\|");
         if (anodetectOutputArray.length != 2) {
@@ -146,29 +165,53 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
             AnomalyInfo anomalyInfo = new AnomalyInfo();
 
             // 先解析故障对应的源日志id
-            String sourceDataId = anodetectResultList.get(i).getSourceDataSection();
+            String sourceDataSection = anodetectResultList.get(i).getSourceDataSection();
 
             // 填写故障信息记录的基本信息
             anomalyInfo.setObjId(objId);
             anomalyInfo.setStatusId(statusId);
             anomalyInfo.setUnitnodeTypeId(unitnodeTypeId);
-            anomalyInfo.setUnitnodeName("cart" + i);
 
-            // 解析出故障指向的数据相对位次序号
-            String[] dataSampleArray = sourceDataId.split("-");
+            // unitnodeName实际上是要用其他算法, 根据异常检测获得的实体名称
+            // 此处和根因分析对应
+            String unitnodeName;
+            switch (sourceDataSection) {
+                case "10-20":
+                    unitnodeName = "ts-travel-plan-service";
+                    break;
+                case "20-30":
+                    unitnodeName = "ts-payment-service";
+                    break;
+                case "30-40":
+                    unitnodeName = "nacos";
+                    break;
+                case "40-50":
+                    unitnodeName = "ts-cancel-service";
+                    break;
+                default:
+                    unitnodeName = "ts-preserve-other-service";
+                    break;
+            }
+            // 设置异常检测及后续算法得到的异常节点名称
+            anomalyInfo.setUnitnodeName(unitnodeName);
+
+            // 解析出故障指向的数据相对批次的位次序号
+            String[] dataSampleArray = sourceDataSection.split("-");
             if (dataSampleArray.length != 2) {
                 return false;
             }
-            long startId_dataSample = Long.parseLong(dataSampleArray[0]);
-            long endId_dataSample = Long.parseLong(dataSampleArray[1]);
+            long startId_dataRela = Long.parseLong(dataSampleArray[0]);
+            long endId_dataRela = Long.parseLong(dataSampleArray[1]);
+            long startId_batchRela = startId_sourceBatchRela + startId_dataRela;
+            long endId_batchRela = startId_sourceBatchRela + endId_dataRela;
 
             // sourceDataId要变一下, 加上批次信息
-            anomalyInfo.setSourceDataId(batchId + "|" + startId_dataSample + "|" + endId_dataSample);
+            anomalyInfo.setSourceDataId(batchId + "|" + startId_batchRela + "|" + endId_batchRela);
 
-            String dataSample = genDataSample(batchId, startId_dataSample, endId_dataSample);
+            String dataSample = genDataSample(batchId, startId_batchRela, endId_batchRela);
             anomalyInfo.setDataSample(dataSample);
 
-            anomalyInfo.setDescription("批次为" + batchId + ", 相对位次序号为" + sourceDataId + "的数据出现故障");
+            anomalyInfo.setDescription("批次为" + batchId + ", 相对位次序号为" + startId_batchRela + "-" + endId_batchRela + "的数据出现故障");
             anomalyInfo.setUserId(workflowConfig.getUserId());
             anomalyInfo.setWfId(workflowConfig.getWfId());
             anomalyInfo.setDeleted(0); // 没被删除
@@ -299,7 +342,9 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
     // 检查该故障是否有知识图谱可以查看
     @Override
     public int checkAnoKG(Integer anoId) {
+//        System.out.println("anoId: " + anoId);
         AnomalyInfo anomalyInfo = anomalyInfoMapper.selectById(anoId);
+//        System.out.println("anomalyInfo: " + anomalyInfo);
 
         // 获取输出数据是KG的对应枚举
         QueryWrapper<ExecDataTypeEnum> wrapper_1 = new QueryWrapper<>();
@@ -319,15 +364,37 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
         if (anomalyInfoUserDTO == null) {
             return null;
         }
+        // 根据unitnodeName获取unitnodeId
+//        System.out.println("unitnodeName: " + anomalyInfoUserDTO.getUnitnodeName());
+        Node unitnode = knowledgeGraphService.getNodeByNameInService(anomalyInfoUserDTO.getUnitnodeName());
+        if (unitnode == null) {
+            anomalyInfoUserDTO.setUnitnodeId(null);
+        }
+        else {
+            anomalyInfoUserDTO.setUnitnodeId(unitnode.getId());
+        }
+//        System.out.println("Node: " + knowledgeGraphService.getNodeByNameInService(anomalyInfoUserDTO.getUnitnodeName()));
+
         return new AnomalyInfoUserKGDTO(anomalyInfoUserDTO, checkAnoKG(anomalyInfoUserDTO.getAnoId()));
     }
 
     @Override
     public List<AnomalyInfoUserKGDTO> getAllAnomalyInfoUserDTO() {
         List<AnomalyInfoUserDTO> anomalyInfoUserDTOList = anomalyInfoMapper.getAllAnomalyInfoUserDTO();
-        if (anomalyInfoUserDTOList.isEmpty()) {
+        if (anomalyInfoUserDTOList == null || anomalyInfoUserDTOList.isEmpty()) {
             return null;
         }
+        // 再根据unitnodeName获取对应的unitnodeId
+        for (AnomalyInfoUserDTO anomalyInfoUserDTO : anomalyInfoUserDTOList) {
+            Node unitnode = knowledgeGraphService.getNodeByNameInService(anomalyInfoUserDTO.getUnitnodeName());
+            if (unitnode == null) {
+                anomalyInfoUserDTO.setUnitnodeId(null);
+            }
+            else {
+                anomalyInfoUserDTO.setUnitnodeId(unitnode.getId());
+            }
+        }
+
         // 再次封装成AnomalyInfoUserKGDTO
         List<AnomalyInfoUserKGDTO> anomalyInfoUserKGDTOList = new ArrayList<>();
         for (AnomalyInfoUserDTO anomalyInfoUserDTO : anomalyInfoUserDTOList) {

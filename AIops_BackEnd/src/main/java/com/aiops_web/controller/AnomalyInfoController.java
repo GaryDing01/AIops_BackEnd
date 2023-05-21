@@ -10,6 +10,7 @@ import com.aiops_web.service.mysql.AnomalyInfoService;
 import com.aiops_web.service.mysql.ReportService;
 import com.aiops_web.service.mysql.WorkflowConfigService;
 import com.aiops_web.service.mysql.WorkflowExecService;
+import com.aiops_web.service.neo4j.KnowledgeGraphService;
 import com.aiops_web.std.ErrorCode;
 import com.aiops_web.std.ResponseStd;
 import com.alibaba.fastjson.JSONObject;
@@ -44,6 +45,9 @@ public class AnomalyInfoController {
     @Resource
     ReportService reportService;
 
+    @Resource
+    KnowledgeGraphService knowledgeGraphService;
+
     // 分页查找
     @GetMapping("/page")
     public ResponseStd<List<AnomalyInfoUserKGDTO>> getAnomalyInfos(@RequestParam int pageNum, @RequestParam int count, @RequestParam(required = false) String user_name,
@@ -51,7 +55,8 @@ public class AnomalyInfoController {
                                                                    @RequestParam(required = false) Integer status_id, @RequestParam(required = false) Integer user_id,
                                                                    @RequestParam(required = false) Integer wf_id, @RequestParam(required = false) Integer deleted,
                                                                    @RequestParam(required = false) Integer unitnode_type_id, @RequestParam(required = false) String unitnode_name,
-                                                                   @RequestParam(required = false) String source_data_id, @RequestParam(required = false) String detect_tstamp,
+                                                                   @RequestParam(required = false) String source_data_id, @RequestParam(required = false) String data_sample,
+                                                                   @RequestParam(required = false) String detect_tstamp, @RequestParam(required = false) String description,
                                                                    @RequestParam(required = false) String predict_tstamp, @RequestParam(required = false) String update_tstamp) {
         // 收集查询的条件
         AnomalyInfoUserDTO info = new AnomalyInfoUserDTO();
@@ -65,6 +70,8 @@ public class AnomalyInfoController {
         info.setWfId(wf_id);
         info.setDeleted(deleted);
         info.setSourceDataId(source_data_id);
+        info.setDataSample(data_sample);
+        info.setDescription(description);
         if (detect_tstamp != null) {
             info.setDetectTstamp(new Date(Long.parseLong(detect_tstamp)));
         }
@@ -76,7 +83,7 @@ public class AnomalyInfoController {
         }
 
         List<AnomalyInfoUserDTO> infos = anomalyInfoService.getAnomalyInfos(info, pageNum, count);
-        if (infos.isEmpty()) {
+        if (infos == null || infos.isEmpty()) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR);
         }
 
@@ -94,7 +101,7 @@ public class AnomalyInfoController {
     @GetMapping("")
     public ResponseStd<List<AnomalyInfoUserKGDTO>> selectAllAnoUserKGDTO() {
         List<AnomalyInfoUserKGDTO> anomalyInfoUserKGDTOList = anomalyInfoService.getAllAnomalyInfoUserDTO();
-        if (anomalyInfoUserKGDTOList.isEmpty()) {
+        if (anomalyInfoUserKGDTOList == null || anomalyInfoUserKGDTOList.isEmpty()) {
             return new ResponseStd<>(ErrorCode.NULL_ERROR, null);
         }
         return new ResponseStd<List<AnomalyInfoUserKGDTO>>(anomalyInfoUserKGDTOList);
@@ -153,7 +160,7 @@ public class AnomalyInfoController {
     // 删除故障
     @DeleteMapping("/{anoId}")
     public ResponseStd<Boolean> deleteAnoInfoById(@PathVariable int anoId) {
-        boolean res = anomalyInfoService.deleteByAnoId(anoId);
+        boolean res = anomalyInfoService.removeById(anoId);
         return new ResponseStd<>(res);
     }
 
