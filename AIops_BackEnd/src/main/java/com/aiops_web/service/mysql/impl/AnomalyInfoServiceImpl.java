@@ -205,12 +205,14 @@ public class AnomalyInfoServiceImpl extends ServiceImpl<AnomalyInfoMapper, Anoma
             long startId_batchRela = startId_sourceBatchRela + startId_dataRela;
             long endId_batchRela = startId_sourceBatchRela + endId_dataRela;
 
-            // sourceDataId要变一下, 加上批次信息
-            anomalyInfo.setSourceDataId(batchId + "|" + startId_batchRela + "|" + endId_batchRela);
+            // sourceDataId不要变, 不加上批次信息
+            anomalyInfo.setSourceDataId(batchId + "|" + startId_dataRela + "|" + endId_dataRela);
 
+            // 获取数据要加上批次信息
             String dataSample = genDataSample(batchId, startId_batchRela, endId_batchRela);
             anomalyInfo.setDataSample(dataSample);
 
+            // Description要变, 加上批次信息
             anomalyInfo.setDescription("批次为" + batchId + ", 相对位次序号为" + startId_batchRela + "-" + endId_batchRela + "的数据出现故障");
             anomalyInfo.setUserId(workflowConfig.getUserId());
             anomalyInfo.setWfId(workflowConfig.getWfId());
