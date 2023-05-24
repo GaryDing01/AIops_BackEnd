@@ -46,6 +46,11 @@ public class DataIntroducingController {
         int batchId = dataIntroducing.getBatchId();
         int objId = dataIntroducing.getObjId();
 
+        if (filePath == null) {
+            System.out.println("The file path is null.");
+            return new ResponseStd<Integer>(dataIntroducing.getBatchId());
+        }
+
         File file = new File(filePath);
         // 传入的文件路径不存在, 则直接返回dataIntroducing, 不返回
         if (!file.exists()) {
