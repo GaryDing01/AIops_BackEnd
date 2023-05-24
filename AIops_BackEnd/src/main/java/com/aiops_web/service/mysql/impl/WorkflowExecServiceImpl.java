@@ -193,7 +193,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
                 return execAIops_OriginalLog(stepConfig.getParam(), workflowExec);
             case 2:
                 System.out.println("Execute a Log Cleaning Algorithm.");
-                break;
+                return execAIops_LogCleaning(aiopsAlg, stepConfig.getParam(), workflowExec);
             case 3:
                 System.out.println("Execute a Log Parsing Algorithm.");
                 return execAIops_LogParsing(aiopsAlg, stepConfig.getParam(), workflowExec);
@@ -213,7 +213,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
                 System.out.println("Execute an Unknown Algorithm.");
                 return false;
         }
-        return false;
+//        return false;
     }
 
     // 源日志选择
