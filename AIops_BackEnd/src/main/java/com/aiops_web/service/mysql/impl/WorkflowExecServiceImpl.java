@@ -175,6 +175,7 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
         workflowConfigMapper.updateById(workflowConfig);
 
         System.out.println("5. 单步执行完成");
+        System.out.println("workflowConfig: " + workflowConfig);
         return workflowExec.getExecId();
     }
 
@@ -1073,6 +1074,35 @@ public class WorkflowExecServiceImpl extends ServiceImpl<WorkflowExecMapper, Wor
                 System.out.println("Withdraw an Unknown Execution.");
                 return false;
         }
+
+        // 更新流程表中的信息
+        StepConfig stepConfig = stepConfigMapper.selectById(workflowExec.getStepId());
+        if (stepConfig == null) {
+            return false;
+        }
+//        System.out.println("stepConfig:" + stepConfig);
+        WorkflowConfig workflowConfig = workflowConfigMapper.selectById(stepConfig.getWfId());
+        if (workflowConfig == null) {
+            return false;
+        }
+//        System.out.println("wf:" + workflowConfig);
+        int currentStep = workflowConfig.getCurrentStep();
+        workflowConfig.setCurrentStep(currentStep - 1);
+        // 判断回退到第一步执行之前的情况
+        if (workflowConfig.getCurrentStep() == 0) {
+            QueryWrapper<WorkflowStatusEnum> wrapper = new QueryWrapper<>();
+            wrapper.eq("name","未执行");
+            int statusId = workflowStatusEnumMapper.selectOne(wrapper).getStatusId();
+            workflowConfig.setStatusId(statusId);
+            workflowConfig.setCurrentStep(-1); // 未执行时，当前步骤为-1
+        }
+//        System.out.println("updateWf:");
+//        System.out.println(workflowConfig);
+        int updateWfResult = workflowConfigMapper.updateById(workflowConfig);
+        if (updateWfResult < 1) {
+            return false;
+        }
+
         // 最后把这个步骤删除
         int delExecResult = workflowExecMapper.deleteById(execId);
         if (delExecResult < 1) {
