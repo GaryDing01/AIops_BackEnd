@@ -253,14 +253,31 @@ public class WorkflowController {
 
     // 传入流程编号，一次性执行流程中的所有步骤
     @PostMapping("/{wfId}/exec")
-    public ResponseStd<List<Integer>> createAllExecByWf(@PathVariable Integer wfId) {
+    public ResponseStd<List<Integer>> createAllExecByWf(@PathVariable Integer wfId, @RequestBody(required = false) JSONObject jsonObject) {
+        Integer inputTypeId;
+        String inputId;
+        if (jsonObject == null) {
+            inputTypeId = null;
+            inputId = "";
+        }
+        else {
+            inputTypeId = (Integer) jsonObject.get("inputTypeId");
+            inputId = jsonObject.getString("inputId");
+        }
         // 匹配step和wfId
         QueryWrapper<StepConfig> wrapper = new QueryWrapper<>();
         wrapper.eq("wf_id",wfId);
         List<StepConfig> stepConfigList = stepConfigService.list(wrapper);
         List<Integer> wfExecIdList = new ArrayList<>();
         for (StepConfig stepConfig : stepConfigList) {
-            int execResult = workflowExecService.saveOneExecByStep(stepConfig.getStepId(), null, null);
+            int execResult = 0;
+            // 数据源要单独执行
+            if (stepConfig.getTypeId() == 1) {
+                execResult = workflowExecService.saveOneExecByStep(stepConfig.getStepId(), inputTypeId, inputId);
+            }
+            else {
+                execResult = workflowExecService.saveOneExecByStep(stepConfig.getStepId(), null, null);
+            }
             if (execResult < 1) {
                 return new ResponseStd<>(ErrorCode.PARAMS_ERROR, null);
             }
