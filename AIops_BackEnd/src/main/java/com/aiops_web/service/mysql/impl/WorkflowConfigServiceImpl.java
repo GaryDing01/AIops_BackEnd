@@ -93,7 +93,10 @@ public class WorkflowConfigServiceImpl extends ServiceImpl<WorkflowConfigMapper,
     public Integer saveTemplates(Integer wfId) {
         // 流程复制
         WorkflowConfig workflowConfig = workflowConfigMapper.selectById(wfId);
-        // name保留
+        // name做调整，使能够判别出是模板
+        String wfName = workflowConfig.getName();
+        workflowConfig.setName(wfName + " (模板)");
+
         workflowConfig.setStatusId(3); // 状态已完成
         workflowConfig.setCurrentStep(-1);
         workflowConfig.setTemplate(1); // 设置为模板
